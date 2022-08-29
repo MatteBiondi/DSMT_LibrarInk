@@ -1,0 +1,15 @@
+{application, librarink_mnesiaDB,
+ [{description, "An OTP library"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {applications,
+   [kernel,
+    stdlib,
+    mnesia
+   ]},
+  {env,[]},
+  {modules, [librarink_mnesiaDB]},
+
+  {licenses, ["Apache-2.0"]},
+  {links, []}
+ ]}.

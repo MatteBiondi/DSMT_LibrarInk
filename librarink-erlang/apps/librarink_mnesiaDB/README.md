@@ -1,7 +1,7 @@
-websocket
+librarink_mnesiaDB
 =====
 
-An OTP application
+An OTP library
 
 Build
 -----
