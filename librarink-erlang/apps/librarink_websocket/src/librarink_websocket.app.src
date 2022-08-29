@@ -1,11 +1,11 @@
-{application, websocket,
+{application, librarink_websocket,
  [{description, "Real-time update user interface through websockets"},
   {vsn, "0.1.0"},
   {registered, []},
-  {mod, {websocket_app, []}},
+  {mod, {librarink_websocket_app, []}},
   {applications,[kernel,stdlib,cowboy]},
   {env,[]},
-  {modules, [websocket_app, websocket_sup, websocket_handler]},
+  {modules, [librarink_websocket_app, websocket_handler]},
   {licenses, ["Apache-2.0"]},
   {links, []}
  ]}.

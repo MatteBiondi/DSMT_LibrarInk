@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 27. ago 2022 18:28
 %%%-------------------------------------------------------------------
--module(websocket_app).
+-module(librarink_websocket_app).
 
 -author("Federico").
 
@@ -44,18 +44,11 @@ start(_StartType, _StartArgs) ->
         {'_', [{"/update", websocket_handler, []}]} %% {HostMatch, list({PathMatch, Handler, InitialState})}
     ]),
 
-    {ok, _} = cowboy:start_clear(update_listener,
+    cowboy:start_clear(update_listener,
         [{port, WSPort}],
         #{env => #{dispatch => UpdateDispatch}}
     ).
 
-    %% Start application
-    %%case websocket_sup:start_link() of
-    %%    {ok, Pid} ->
-    %%        {ok, Pid};
-    %%    Error ->
-    %%        Error
-    %%end.
 
 %%--------------------------------------------------------------------
 %% @private
