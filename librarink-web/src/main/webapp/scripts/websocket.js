@@ -1,8 +1,12 @@
 const socket = new WebSocket('ws://' + location.hostname + ':5000/update');
+const intervalID = setInterval(function(){
+    if (socket.readyState === 1) socket.send("keep-alive")
+}, 90 * 1000);
+
 
 socket.onopen = function (){
     console.log("Websocket opened");
-    socket.send("Objs"); // TODO: send objects to track
+    //socket.send("Objs"); // TODO: send objects to track
 }
 
 socket.onmessage = function (event){
@@ -10,9 +14,13 @@ socket.onmessage = function (event){
     // TODO: update interface
 }
 socket.onerror = function (event){
-    console.log(event)
+   //alert("We are experiencing some troubles, the information may not be updated.\nWe apologize for the
+    // inconvenience");
 }
-socket.onclose = function (){console.log("Websocket closed")}
+socket.onclose = function (){
+    alert("We are experiencing some troubles, the information may not be updated.\nWe apologize for the inconvenience");
+    console.log("Websocket closed")
+}
 
 
 // TODO: remove, test only
