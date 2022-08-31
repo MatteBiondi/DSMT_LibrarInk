@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Shell" type="RebarRunConfigurationType" factoryName="Erlang Rebar">
+    <module name="librarink-erlang" />
+    <option name="command" value="shell" />
+    <option name="skipDependencies" value="false" />
+    <envs />
+    <method v="2" />
+  </configuration>
+</component>
