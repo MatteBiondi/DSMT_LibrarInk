@@ -5,7 +5,7 @@
   {mod, {librarink_websocket_app, []}},
   {applications,[kernel, stdlib, cowboy, librarink_mqs]},
   {env,[]},
-  {modules, [librarink_websocket_app, websocket_handler]},
+  {modules, [librarink_websocket_app, librarink_websocket_handler]},
   {licenses, ["Apache-2.0"]},
   {links, []}
  ]}.

@@ -27,7 +27,6 @@
 %% application. If the application is structured according to the OTP
 %% design principles as a supervision tree, this means starting the
 %% top supervisor of the tree.
-%%
 %% @end
 %%--------------------------------------------------------------------
 -spec(start(StartType :: normal | {takeover, node()} | {failover, node()},
@@ -41,7 +40,7 @@ start(_StartType, _StartArgs) ->
 
     %% Start cowboy server
     UpdateDispatch = cowboy_router:compile([
-        {'_', [{"/update", websocket_handler, []}]} %% {HostMatch, list({PathMatch, Handler, InitialState})}
+        {'_', [{"/update", librarink_websocket_handler, []}]} %% {HostMatch, list({PathMatch, Handler, InitialState})}
     ]),
 
     cowboy:start_clear(update_listener,

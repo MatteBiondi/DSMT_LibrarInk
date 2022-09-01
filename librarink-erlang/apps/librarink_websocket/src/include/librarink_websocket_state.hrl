@@ -7,5 +7,4 @@
 %%% Created : 30. ago 2022 15:54
 %%%-------------------------------------------------------------------
 -author("Federico").
--record(websocket_state, {mqs_pid = none, objects=[]}).
--define(WEBSOCKET_STATE(Objects), #websocket_state{objects = Objects}).
+-record(librarink_websocket_state, {mqs_pid = none, items=[]}).
