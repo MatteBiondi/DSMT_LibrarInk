@@ -835,11 +835,7 @@ get_pending_loans(User, Isbn, Copy_Id) ->
 
 
 %_________________________________________________________________________________
-%todo prima di rimuovere loan o reserv devo controllare che siano cancellate o finite?
 %todo metti i tipi agli spec
 %todo metti a tutti gli spec e la desc
-%todo in loan e reservation vedi cosa fare pending e cosa accettare che sia finito
 %todo modifico con seletc, read, index_read?
-
-% todo valuta se servono macro
-% todo rivedi le spec e le descrizioni sopra. Chi davvero da una eccezione? vedi da manuale
+%todo rivedi le spec e le descrizioni sopra. Chi davvero da una eccezione? vedi da manuale
