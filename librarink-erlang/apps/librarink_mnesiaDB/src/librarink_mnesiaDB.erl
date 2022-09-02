@@ -1,49 +1,56 @@
 -module(librarink_mnesiaDB).
 
--export([install/2]).
+-export([install/2, start_librarink_mnesia/1, stop_librarink_mnesia/1, add_book_copy/2, from_reservation_to_loan/2,
+  add_book_reservation/2, delete_book_copy/2, delete_all_book_copies/1, delete_lent_book/3, delete_lent_by_book/1,
+  delete_lent_book_by_user/1, delete_book_reservation/2, delete_books_reservation_by_user/1,
+  delete_book_reservations_by_book/1, copies_by_book/1, count_available_copies_by_book/1,
+  list_available_copies_by_book/1, lent_copies_by_book/1, loans_by_user/1, loan_by_book_copy/2, reservations_by_user/1,
+  reservations_by_user_and_book/2, reservations_by_book/1, terminate_loan_by_book/2,
+  cancel_reservation_by_book_and_user/2, get_and_delete_ended_reservations/0, get_and_delete_ended_loans/0,
+  all_copies_all_book/0, all_pending_reservations/0, all_ended_reservations/0, all_pending_loans/0, all_ended_loans/0]).
 
 -include_lib("stdlib/include/ms_transform.hrl").
 -import(calendar, [now_to_universal_time/1]).
 
-%% Definition of db record
+%% Definition of DB record
 -record(librarink_lent_book, {user, isbn, physical_copy_id, start_date, stop_date}).
 -record(librarink_reserved_book, {user, isbn, start_date, stop_date, canceled}).
 -record(librarink_physical_book_copy, {isbn, physical_copy_id}).
 
-%_________________________________________________________________________________
-%todo controlla di avere operazioni per eliminare recor da passare a history
-%todo metti le catch all clause
-%todo Check codice ridondante
-%todo prima di rimuovere loan o reserv devo controllare che siano cancellate o finite?
-%todo metti i tipi agli spec
-%todo metti a tutti gli spec e la desc
-%todo metti metodi in export
-%todo in loan e reservation vedi cosa fare pending e cosa accettare che sia finito
-%% select   -> It works using match specifications or ets:fun2ms as a way to do queries
-%% vs match -> It uses patterns such as those described in Meeting Your Match to return entire records from the database table
-%% vs read  -> function will return a list of records with their primary key matching Key.
-%% vs index_read
-
-%% todo valuta se servono macro
-% todo: rivedi le spec e le descrizioni sopra. Chi davvero da una eccezione? vedi da manuale
 
 %_________________________________________________________________________________
 
 %%%%%%%%%%%%%%%%%%%%%%
 %%% INITIALIZATION
 %%%%%%%%%%%%%%%%%%%%%%
-%TODO desc + spec
+
+%%--------------------------------------------------------------------
+%% @doc
+%%  This function is called to start Mnesia, create schema and create
+%%  all the tables
+%%  In:   - ActiveNodes: List of active nodes
+%%        - BackupNodes: List of backup nodes
+%%  Out:  - install_succeeded -> No error
+%%        - Exception -> In case of error
+%% @end
+%%--------------------------------------------------------------------
+-spec(install(ActiveNodes::list() , BackupNodes::list()) ->
+  install_succeeded | Exception).
 install(ActiveNodes, BackupNodes) ->
+  %Create schema for all nodes received as parameter
   Nodes = ActiveNodes ++ BackupNodes,
   mnesia:create_schema(Nodes),
+  %Activate Mnesia in all nodes
   rpc:multicall(Nodes, application, start, [mnesia]),
+  %Define Mnesia DB directory
   DB_Directory = application:get_env(db_dir),
   application:set_env(mnesia, dir, DB_Directory),
+  %Create tables if not exist
   case mnesia:wait_for_tables([ librarink_lent_book,
                                 librarink_reserved_book,
                                 librarink_physical_book_copy], 5000) =:= ok of
     true ->
-      ok;
+      install_succeeded;
     false ->
       mnesia:create_table(librarink_lent_book,
         [{attributes, record_info(fields, librarink_lent_book)},
@@ -62,18 +69,38 @@ install(ActiveNodes, BackupNodes) ->
           {index, [#librarink_physical_book_copy.physical_copy_id]},
           {disc_copies, ActiveNodes},
           {disc_only_copies, BackupNodes},
-          {type, bag}])
+          {type, bag}]),
+      install_succeeded
   end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 %%% START AND STOP MNESIA
 %%%%%%%%%%%%%%%%%%%%%%%%%
-%TODO desc + spec
+
+%%--------------------------------------------------------------------
+%% @doc
+%%  This function is called to start Mnesia
+%%  In:   - Nodes: List of nodes
+%%  Out:  - ok -> No error
+%%        - Exception -> In case of error
+%% @end
+%%--------------------------------------------------------------------
+-spec(start_librarink_mnesia(Nodes::list()) ->   ok | Exception).
 start_librarink_mnesia(Nodes) ->
   rpc:multicall(Nodes, application, start, [mnesia]),
   ok.
 
-end_librarink_mnesia(Nodes) ->
+
+%%--------------------------------------------------------------------
+%% @doc
+%%  This function is called to stop Mnesia
+%%  In:   - Nodes: List of nodes
+%%  Out:  - ok -> No error
+%%        - Exception -> In case of error
+%% @end
+%%--------------------------------------------------------------------
+-spec(stop_librarink_mnesia(Nodes::list()) ->   ok | Exception).
+stop_librarink_mnesia(Nodes) ->
   rpc:multicall(Nodes, application, stop, [mnesia]),
   ok.
 
@@ -188,7 +215,8 @@ add_book_reservation(User, Isbn) ->
 -spec(delete_book_copy ( Isbn, Physical_copy_id) -> {ok} | Exception).
 delete_book_copy(Isbn, Physical_copy_id) ->
   F = fun() ->
-        %todo check che numero copie sia > numero di reservation sul libro
+        %check that number of available copies is strictly greater than the number of reservation for the specified book
+        copies_by_book(Isbn),
         %check there are no pending loan for that copy
         case loan_by_book_copy(Isbn, Physical_copy_id) of
           [] ->
@@ -264,6 +292,27 @@ delete_lent_book(User, Isbn, Id) ->
 
 %%--------------------------------------------------------------------
 %% @doc
+%%  This function is called to get and remove all ended loan
+%%  Type: -
+%%  In:   -
+%%  Out:  - ok -> No error
+%%        - Exception -> In case of error
+%% @end
+%%--------------------------------------------------------------------
+-spec(get_and_delete_ended_loans () -> {ok} | Exception).
+get_and_delete_ended_loans() ->
+  %todo va bene usarli di nuovo? scorro due volte il db
+  F = fun() ->
+        Res = all_ended_loans(),
+        delete_lent_book('_', '_', '_'),
+        Res
+      end,
+  Result_list = mnesia:activity(transaction, F),
+  {length(Result_list) , Result_list}.
+
+
+%%--------------------------------------------------------------------
+%% @doc
 %%  This function is called to remove all loan for a specified book
 %%  Type: -
 %%  In:   -
@@ -321,6 +370,28 @@ delete_book_reservation(User, Isbn) ->
 
 %%--------------------------------------------------------------------
 %% @doc
+%%  This function is called to get and remove all ended book
+%%  reservations
+%%  Type: -
+%%  In:   -
+%%  Out:  - ok -> No error
+%%        - Exception -> In case of error
+%% @end
+%%--------------------------------------------------------------------
+-spec(get_and_delete_ended_reservations () -> {ok} | Exception).
+get_and_delete_ended_reservations() ->
+  %todo va bene usarli di nuovo? scorro due volte il db
+  F = fun() ->
+        Res = all_ended_reservations(),
+        delete_book_reservation('_', '_'),
+        Res
+      end,
+  Result_list = mnesia:activity(transaction, F),
+  {length(Result_list) , Result_list}.
+
+
+%%--------------------------------------------------------------------
+%% @doc
 %%  This function is called to remove all book reservation for a
 %%  specified user
 %%  Type: -
@@ -366,11 +437,25 @@ delete_book_reservations_by_book(Isbn) ->
 -spec(copies_by_book (Isbn) -> {Counter, [tuple()]} | undefined | Exception).
 copies_by_book(Isbn) ->
   F = fun() ->
-    [{Isbn, Id} ||
-      #librarink_physical_book_copy{physical_copy_id = Id} <- mnesia:read(librarink_physical_book_copy, Isbn)]
+        [{Isbn, Id} ||
+          #librarink_physical_book_copy{physical_copy_id = Id} <- mnesia:read(librarink_physical_book_copy, Isbn)]
       end,
   Result_list = mnesia:activity(transaction, F),
   {length(Result_list) , Result_list}.
+
+
+%%--------------------------------------------------------------------
+%% @doc
+%%  This function is called to count and get all physical copies of
+%%  all books
+%%  Type: - Read operation
+%%  Out:  - {Counter, [tuples]} -> No error
+%%        - Exception -> In case of error
+%% @end
+%%--------------------------------------------------------------------
+-spec(all_copies_all_book () -> {Counter, [tuple()]} | undefined | Exception).
+all_copies_all_book() ->
+  copies_by_book('_').
 
 
 %%--------------------------------------------------------------------
@@ -450,17 +535,7 @@ lent_copies_by_book(Isbn) ->
           true ->
             undefined_book;
           false ->
-            Match = ets:fun2ms(
-              fun(#librarink_lent_book{ user = Record_user,
-                                        isbn=Record_isbn,
-                                        physical_copy_id = Record_id,
-                                        start_date = Record_start,
-                                        stop_date = Record_stop})
-                when Record_isbn =:= Isbn and Record_stop =:= null ->
-                {Record_user, Record_isbn, Record_id, Record_start, Record_stop}
-              end
-            ),
-            mnesia:select(librarink_lent_book, Match)
+            get_pending_loans('_', Isbn, '_')
         end
       end,
   Result_list = mnesia:activity(transaction, F),
@@ -469,7 +544,8 @@ lent_copies_by_book(Isbn) ->
 
 %%--------------------------------------------------------------------
 %% @doc
-%%  This function is called to get information about lent physical
+%%  This function is called to get information about pending lent
+%%  physical
 %%  book copies of a specified user
 %%  Type: -
 %%  In:   -
@@ -480,9 +556,7 @@ lent_copies_by_book(Isbn) ->
 -spec(loans_by_user (User) -> {ok} | Exception).
 loans_by_user(User) ->
   F = fun() ->
-        [{User, Isbn, Id, Start_date, Stop_date} ||
-          #librarink_lent_book{isbn = Isbn, physical_copy_id = Id, start_date = Start_date, stop_date = Stop_date}
-            <- mnesia:read({librarink_lent_book, User})]
+        get_pending_loans(User, '_', '_')
       end,
   Result_list = mnesia:activity(transaction, F),
   {length(Result_list), Result_list}.
@@ -504,17 +578,7 @@ loan_by_book_copy(Isbn, Copy_Id) ->
         {_ , List_of_copies} = copies_by_book(Isbn),
         case lists:member({Isbn, Copy_Id}, List_of_copies) of
           true ->
-            Match = ets:fun2ms(
-              fun(#librarink_lent_book{ user = Record_user,
-                                        isbn = Record_isbn,
-                                        physical_copy_id = Record_id,
-                                        start_date = Record_start,
-                                        stop_date = Record_stop})
-                when Record_isbn =:= Isbn and Record_id =:= Copy_Id and Record_stop =:= null ->
-                  {Record_user, Record_isbn, Record_id, Record_start, Record_stop}
-              end
-            ),
-            mnesia:select(librarink_lent_book, Match);
+            get_pending_loans('_', Isbn, Copy_Id);
           false ->
             undefined_book_copy
         end
@@ -524,23 +588,48 @@ loan_by_book_copy(Isbn, Copy_Id) ->
 
 %%--------------------------------------------------------------------
 %% @doc
-%%  This function is called to count and get information about books
-%%  reservations for a specified user
+%%  This function is called to get information about all pending loan
 %%  Type: -
 %%  In:   -
 %%  Out:  - ok -> No error
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(reservations_by_user (User) -> {ok} | Exception).
-reservations_by_user(User) ->
+-spec(all_pending_loans() -> {ok} | Exception).
+all_pending_loans() ->
   F = fun() ->
-    [{User, Isbn, Start_date, Stop_date, Cancelled} ||
-      #librarink_reserved_book{isbn = Isbn, start_date = Start_date, stop_date = Stop_date, canceled = Cancelled}
-        <- mnesia:read(librarink_reserved_book, User)]
+        get_pending_loans('_', '_', '_')
       end,
   Result_list = mnesia:activity(transaction, F),
-  {length(Result_list), Result_list}.
+  {length(Result_list) , Result_list}.
+
+
+%%--------------------------------------------------------------------
+%% @doc
+%%  This function is called to get information about ended loans
+%%  Type: -
+%%  In:   -
+%%  Out:  - ok -> No error
+%%        - Exception -> In case of error
+%% @end
+%%--------------------------------------------------------------------
+-spec(all_ended_loans () -> {ok} | Exception).
+all_ended_loans() ->
+  F = fun() ->
+        Match = ets:fun2ms(
+          fun(#librarink_lent_book{ user = Record_user,
+                                    isbn = Record_isbn,
+                                    physical_copy_id = Record_id,
+                                    start_date = Record_start,
+                                    stop_date = Record_stop})
+            when Record_stop =/= null ->
+            {Record_user, Record_isbn, Record_id, Record_start, Record_stop}
+          end
+        ),
+        mnesia:select(librarink_lent_book, Match)
+      end,
+  Result_list = mnesia:activity(transaction, F),
+  {length(Result_list) , Result_list}.
 
 
 %%--------------------------------------------------------------------
@@ -556,22 +645,22 @@ reservations_by_user(User) ->
 -spec(reservations_by_user_and_book ( User, Isbn ) -> {ok} | Exception).
 reservations_by_user_and_book(User,Isbn) ->
   F = fun() ->
-    case copies_by_book(Isbn) =:= {0, _} of
-      true ->
-        undefined_book;
-      false ->
-        Match = ets:fun2ms(
-          fun(#librarink_reserved_book{ user = Record_user,
-                                        isbn=Record_isbn,
-                                        start_date = Record_start,
-                                        stop_date = Record_stop,
-                                        canceled = Record_cancelled})
-            when Record_isbn =:= Isbn and Record_user =:= User and Record_stop =:= null and Record_cancelled =:= false ->
-            {Record_user, Record_isbn, Record_start, Record_stop, Record_cancelled}
-          end
-        ),
-        mnesia:select(librarink_reserved_book, Match)
-    end
+        case copies_by_book(Isbn) =:= {0, _} of
+          true ->
+            undefined_book;
+          false ->
+            Match = ets:fun2ms(
+              fun(#librarink_reserved_book{ user = Record_user,
+                                            isbn=Record_isbn,
+                                            start_date = Record_start,
+                                            stop_date = Record_stop,
+                                            canceled = Record_cancelled})
+                when Record_isbn =:= Isbn and Record_user =:= User and Record_stop =:= null ->
+                {Record_user, Record_isbn, Record_start, Record_stop, Record_cancelled}
+              end
+            ),
+            mnesia:select(librarink_reserved_book, Match)
+        end
       end,
   Result_list = mnesia:activity(transaction, F),
   {length(Result_list) , Result_list}.
@@ -579,8 +668,23 @@ reservations_by_user_and_book(User,Isbn) ->
 
 %%--------------------------------------------------------------------
 %% @doc
+%%  This function is called to count and get information about books
+%%  pending reservations for a specified user
+%%  Type: -
+%%  In:   -
+%%  Out:  - ok -> No error
+%%        - Exception -> In case of error
+%% @end
+%%--------------------------------------------------------------------
+-spec(reservations_by_user (User) -> {ok} | Exception).
+reservations_by_user(User) ->
+  reservations_by_user_and_book(User, '_').
+
+
+%%--------------------------------------------------------------------
+%% @doc
 %%  This function is called to count and get information about
-%%  pending reservation for a specified book
+%%  pending reservations for a specified book
 %%  Type: -
 %%  In:   -
 %%  Out:  - ok -> No error
@@ -590,6 +694,50 @@ reservations_by_user_and_book(User,Isbn) ->
 -spec(reservations_by_book ( Isbn ) -> {ok} | Exception).
 reservations_by_book(Isbn) ->
   reservations_by_user_and_book('_', Isbn).
+
+
+%%--------------------------------------------------------------------
+%% @doc
+%%  This function is called to count and get information about
+%%  pending reservations
+%%  Type: -
+%%  In:   -
+%%  Out:  - ok -> No error
+%%        - Exception -> In case of error
+%% @end
+%%--------------------------------------------------------------------
+-spec(all_pending_reservations () -> {ok} | Exception).
+all_pending_reservations() ->
+  reservations_by_user_and_book('_', '_').
+
+
+%%--------------------------------------------------------------------
+%% @doc
+%%  This function is called to count and get information about all
+%%  ended reservations
+%%  Type: -
+%%  In:   -
+%%  Out:  - ok -> No error
+%%        - Exception -> In case of error
+%% @end
+%%--------------------------------------------------------------------
+-spec(all_ended_reservations () -> {ok} | Exception).
+all_ended_reservations() ->
+  F = fun() ->
+        Match = ets:fun2ms(
+          fun(#librarink_reserved_book{ user = Record_user,
+                                        isbn=Record_isbn,
+                                        start_date = Record_start,
+                                        stop_date = Record_stop,
+                                        canceled = Record_cancelled})
+            when Record_stop =/= null ->
+            {Record_user, Record_isbn, Record_start, Record_stop, Record_cancelled}
+          end
+        ),
+        mnesia:select(librarink_reserved_book, Match)
+      end,
+  Result_list = mnesia:activity(transaction, F),
+  {length(Result_list) , Result_list}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%
@@ -618,7 +766,9 @@ terminate_loan_by_book( Isbn, Copy_id ) ->
             Stop_date = now_to_universal_time(timestamp()),
             Db_row = insert_element(1,Row,librarink_lent_book),
             mnesia:write(Db_row#librarink_lent_book{stop_date = Stop_date}),
-            mnesia:delete_object(Db_row)
+            mnesia:delete_object(Db_row);
+          _ ->
+            unexpected_error
         end
       end,
   mnesia:activity(transaction, F).
@@ -653,3 +803,43 @@ cancel_reservation_by_book_and_user(Isbn, User) ->
         end
       end,
   mnesia:activity(transaction, F).
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%% PRIVATE OPERATIONS
+%%%%%%%%%%%%%%%%%%%%%%
+
+%%--------------------------------------------------------------------
+%% @doc
+%%  This function is called to get information about pending loans
+%%  Type: -
+%%  In:   -
+%%  Out:  - ok -> No error
+%%        - Exception -> In case of error
+%% @end
+%%--------------------------------------------------------------------
+-spec(get_pending_loans (User, Isbn, Copy_Id ) -> {ok} | Exception).
+get_pending_loans(User, Isbn, Copy_Id) ->
+  %todo serve transaction?
+  Match = ets:fun2ms(
+    fun(#librarink_lent_book{ user = Record_user,
+                              isbn = Record_isbn,
+                              physical_copy_id = Record_id,
+                              start_date = Record_start,
+                              stop_date = Record_stop})
+      when Record_user =:= User and Record_isbn =:= Isbn and Record_id =:= Copy_Id and Record_stop =:= null ->
+      {Record_user, Record_isbn, Record_id, Record_start, Record_stop}
+    end
+  ),
+  mnesia:select(librarink_lent_book, Match).
+
+
+%_________________________________________________________________________________
+%todo prima di rimuovere loan o reserv devo controllare che siano cancellate o finite?
+%todo metti i tipi agli spec
+%todo metti a tutti gli spec e la desc
+%todo in loan e reservation vedi cosa fare pending e cosa accettare che sia finito
+%todo modifico con seletc, read, index_read?
+
+% todo valuta se servono macro
+% todo rivedi le spec e le descrizioni sopra. Chi davvero da una eccezione? vedi da manuale
