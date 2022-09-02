@@ -9,7 +9,7 @@ Build
 
 Build docs
 -----
-    $ rebar3 edoc
+    $ rebar3 medoc
 
 Manual test
 -----
