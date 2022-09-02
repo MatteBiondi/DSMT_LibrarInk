@@ -2,9 +2,9 @@
   <configuration default="false" name="WebSite" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 9.0.54" ALTERNATIVE_JRE_ENABLED="false">
     <option name="UPDATING_POLICY" value="redeploy-artifacts" />
     <deployment>
-      <artifact name="librarink-web:war">
+      <artifact name="librarink-web:war exploded">
         <settings>
-          <option name="CONTEXT_PATH" value="/librarink_web_war" />
+          <option name="CONTEXT_PATH" value="/librarink_web_war_exploded" />
         </settings>
       </artifact>
     </deployment>
@@ -82,7 +82,7 @@
     <method v="2">
       <option name="Make" enabled="true" />
       <option name="BuildArtifacts" enabled="true">
-        <artifact name="librarink-web:war" />
+        <artifact name="librarink-web:war exploded" />
       </option>
     </method>
   </configuration>
