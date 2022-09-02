@@ -11,6 +11,7 @@
 
 -include_lib("stdlib/include/ms_transform.hrl").
 -import(calendar, [now_to_universal_time/1]).
+-import(erlang, [insert_element/3, timestamp/0]).
 
 %% Definition of DB record
 -record(librarink_lent_book, {user, isbn, physical_copy_id, start_date, stop_date}).
@@ -34,8 +35,7 @@
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(install(ActiveNodes::list() , BackupNodes::list()) ->
-  install_succeeded | Exception).
+%-spec(install(ActiveNodes::list() , BackupNodes::list()) -> install_succeeded | exception).
 install(ActiveNodes, BackupNodes) ->
   %Create schema for all nodes received as parameter
   Nodes = ActiveNodes ++ BackupNodes,
@@ -85,7 +85,7 @@ install(ActiveNodes, BackupNodes) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(start_librarink_mnesia(Nodes::list()) ->   ok | Exception).
+%-spec(start_librarink_mnesia(Nodes::list()) ->   ok | exception).
 start_librarink_mnesia(Nodes) ->
   rpc:multicall(Nodes, application, start, [mnesia]),
   ok.
@@ -99,7 +99,7 @@ start_librarink_mnesia(Nodes) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(stop_librarink_mnesia(Nodes::list()) ->   ok | Exception).
+%-spec(stop_librarink_mnesia(Nodes::list()) ->   ok | exception).
 stop_librarink_mnesia(Nodes) ->
   rpc:multicall(Nodes, application, stop, [mnesia]),
   ok.
@@ -118,7 +118,7 @@ stop_librarink_mnesia(Nodes) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(add_book_copy ( Isbn, Physical_copy_id) -> {ok} | Exception).
+%-spec(add_book_copy ( Isbn, Physical_copy_id) -> {ok} | exception).
 add_book_copy(Isbn, Physical_copy_id) ->
   F = fun() ->
         mnesia:write(#librarink_physical_book_copy{ isbn = Isbn,
@@ -136,7 +136,7 @@ add_book_copy(Isbn, Physical_copy_id) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(from_reservation_to_loan ( User, Isbn ) -> {ok} | Exception).
+%-spec(from_reservation_to_loan ( User, Isbn ) -> {ok} | exception).
 from_reservation_to_loan(User, Isbn) ->
   F = fun() ->
         Timestamp =now_to_universal_time(timestamp()),
@@ -177,7 +177,7 @@ from_reservation_to_loan(User, Isbn) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(add_book_reservation ( User, Isbn) -> {ok} | Exception).
+%-spec(add_book_reservation ( User, Isbn) -> {ok} | exception).
 add_book_reservation(User, Isbn) ->
   F = fun() ->
         {_, Counter} =count_available_copies_by_book(Isbn),
@@ -212,7 +212,7 @@ add_book_reservation(User, Isbn) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(delete_book_copy ( Isbn, Physical_copy_id) -> {ok} | Exception).
+%-spec(delete_book_copy ( Isbn, Physical_copy_id) -> {ok} | exception).
 delete_book_copy(Isbn, Physical_copy_id) ->
   F = fun() ->
         %check that number of available copies is strictly greater than the number of reservation for the specified book
@@ -246,7 +246,7 @@ delete_book_copy(Isbn, Physical_copy_id) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(delete_all_book_copies ( Isbn ) -> {ok} | Exception).
+%-spec(delete_all_book_copies ( Isbn ) -> {ok} | exception).
 delete_all_book_copies(Isbn) ->
   F = fun() ->
         %check there are no pending loan or reservation for that book
@@ -271,7 +271,7 @@ delete_all_book_copies(Isbn) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(delete_lent_book (User, Isbn, Id) -> {ok} | Exception).
+%-spec(delete_lent_book (User, Isbn, Id) -> {ok} | exception).
 delete_lent_book(User, Isbn, Id) ->
   F = fun() ->
         To_delete = #librarink_lent_book{user = User, isbn = Isbn, physical_copy_id = Id},
@@ -299,7 +299,7 @@ delete_lent_book(User, Isbn, Id) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(get_and_delete_ended_loans () -> {ok} | Exception).
+%-spec(get_and_delete_ended_loans () -> {ok} | exception).
 get_and_delete_ended_loans() ->
   %todo va bene usarli di nuovo? scorro due volte il db
   F = fun() ->
@@ -320,7 +320,7 @@ get_and_delete_ended_loans() ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(delete_lent_by_book (Isbn) -> {ok} | Exception).
+%-spec(delete_lent_by_book (Isbn) -> {ok} | exception).
 delete_lent_by_book(Isbn) ->
   delete_lent_book('_', Isbn, '_').
 
@@ -335,7 +335,7 @@ delete_lent_by_book(Isbn) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(delete_lent_book_by_user (User) -> {ok} | Exception).
+%-spec(delete_lent_book_by_user (User) -> {ok} | exception).
 delete_lent_book_by_user(User) ->
   delete_lent_book(User, '_', '_').
 
@@ -349,7 +349,7 @@ delete_lent_book_by_user(User) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(delete_book_reservation (User, Isbn) -> {ok} | Exception).
+%-spec(delete_book_reservation (User, Isbn) -> {ok} | exception).
 delete_book_reservation(User, Isbn) ->
   F = fun() ->
         To_delete = #librarink_reserved_book{user = User, isbn = Isbn},
@@ -378,7 +378,7 @@ delete_book_reservation(User, Isbn) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(get_and_delete_ended_reservations () -> {ok} | Exception).
+%-spec(get_and_delete_ended_reservations () -> {ok} | exception).
 get_and_delete_ended_reservations() ->
   %todo va bene usarli di nuovo? scorro due volte il db
   F = fun() ->
@@ -400,7 +400,7 @@ get_and_delete_ended_reservations() ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(delete_books_reservation_by_user (User) -> {ok} | Exception).
+%-spec(delete_books_reservation_by_user (User) -> {ok} | exception).
 delete_books_reservation_by_user(User) ->
   delete_book_reservation(User, '_').
 
@@ -415,7 +415,7 @@ delete_books_reservation_by_user(User) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(delete_book_reservations_by_book (Isbn) -> {ok} | Exception).
+%-spec(delete_book_reservations_by_book (Isbn) -> {ok} | exception).
 delete_book_reservations_by_book(Isbn) ->
   delete_book_reservation('_', Isbn).
 
@@ -434,7 +434,7 @@ delete_book_reservations_by_book(Isbn) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(copies_by_book (Isbn) -> {Counter, [tuple()]} | undefined | Exception).
+%-spec(copies_by_book (Isbn) -> {Counter, [tuple()]} | undefined | exception).
 copies_by_book(Isbn) ->
   F = fun() ->
         [{Isbn, Id} ||
@@ -453,7 +453,7 @@ copies_by_book(Isbn) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(all_copies_all_book () -> {Counter, [tuple()]} | undefined | Exception).
+%-spec(all_copies_all_book () -> {Counter, [tuple()]} | undefined | exception).
 all_copies_all_book() ->
   copies_by_book('_').
 
@@ -468,7 +468,7 @@ all_copies_all_book() ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(count_available_copies_by_book (Isbn) -> {ok} | Exception).
+%-spec(count_available_copies_by_book (Isbn) -> {ok} | exception).
 count_available_copies_by_book(Isbn) ->
   F = fun() ->
         All_copies = copies_by_book(Isbn),
@@ -498,7 +498,7 @@ count_available_copies_by_book(Isbn) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(list_available_copies_by_book (Isbn) -> {ok} | Exception).
+%-spec(list_available_copies_by_book (Isbn) -> {ok} | exception).
 list_available_copies_by_book(Isbn) ->
   F = fun() ->
         All_copies = copies_by_book(Isbn),
@@ -528,10 +528,11 @@ list_available_copies_by_book(Isbn) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(lent_copies_by_book (Isbn) -> {ok} | Exception).
+%-spec(lent_copies_by_book (Isbn) -> {ok} | exception).
 lent_copies_by_book(Isbn) ->
   F = fun() ->
-        case copies_by_book(Isbn)  =:= {0, _} of
+        {Copies_counter, _} = copies_by_book(Isbn),
+        case   Copies_counter == 0 of
           true ->
             undefined_book;
           false ->
@@ -553,7 +554,7 @@ lent_copies_by_book(Isbn) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(loans_by_user (User) -> {ok} | Exception).
+%-spec(loans_by_user (User) -> {ok} | exception).
 loans_by_user(User) ->
   F = fun() ->
         get_pending_loans(User, '_', '_')
@@ -572,7 +573,7 @@ loans_by_user(User) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(loan_by_book_copy ( Isbn, Copy_Id ) -> {ok} | Exception).
+%-spec(loan_by_book_copy ( Isbn, Copy_Id ) -> {ok} | exception).
 loan_by_book_copy(Isbn, Copy_Id) ->
   F = fun() ->
         {_ , List_of_copies} = copies_by_book(Isbn),
@@ -595,7 +596,7 @@ loan_by_book_copy(Isbn, Copy_Id) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(all_pending_loans() -> {ok} | Exception).
+%-spec(all_pending_loans() -> {ok} | exception).
 all_pending_loans() ->
   F = fun() ->
         get_pending_loans('_', '_', '_')
@@ -613,7 +614,7 @@ all_pending_loans() ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(all_ended_loans () -> {ok} | Exception).
+%-spec(all_ended_loans () -> {ok} | exception).
 all_ended_loans() ->
   F = fun() ->
         Match = ets:fun2ms(
@@ -642,10 +643,11 @@ all_ended_loans() ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(reservations_by_user_and_book ( User, Isbn ) -> {ok} | Exception).
+%-spec(reservations_by_user_and_book ( User, Isbn ) -> {ok} | exception).
 reservations_by_user_and_book(User,Isbn) ->
   F = fun() ->
-        case copies_by_book(Isbn) =:= {0, _} of
+        {Copies_counter , _} = copies_by_book(Isbn),
+        case Copies_counter == 0 of
           true ->
             undefined_book;
           false ->
@@ -655,7 +657,7 @@ reservations_by_user_and_book(User,Isbn) ->
                                             start_date = Record_start,
                                             stop_date = Record_stop,
                                             canceled = Record_cancelled})
-                when Record_isbn =:= Isbn and Record_user =:= User and Record_stop =:= null ->
+                when Record_isbn =:= Isbn, Record_user =:= User, Record_stop =:= null ->
                 {Record_user, Record_isbn, Record_start, Record_stop, Record_cancelled}
               end
             ),
@@ -676,7 +678,7 @@ reservations_by_user_and_book(User,Isbn) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(reservations_by_user (User) -> {ok} | Exception).
+%-spec(reservations_by_user (User) -> {ok} | exception).
 reservations_by_user(User) ->
   reservations_by_user_and_book(User, '_').
 
@@ -691,7 +693,7 @@ reservations_by_user(User) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(reservations_by_book ( Isbn ) -> {ok} | Exception).
+%-spec(reservations_by_book ( Isbn ) -> {ok} | exception).
 reservations_by_book(Isbn) ->
   reservations_by_user_and_book('_', Isbn).
 
@@ -706,7 +708,7 @@ reservations_by_book(Isbn) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(all_pending_reservations () -> {ok} | Exception).
+%-spec(all_pending_reservations () -> {ok} | exception).
 all_pending_reservations() ->
   reservations_by_user_and_book('_', '_').
 
@@ -721,7 +723,7 @@ all_pending_reservations() ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(all_ended_reservations () -> {ok} | Exception).
+%-spec(all_ended_reservations () -> {ok} | exception).
 all_ended_reservations() ->
   F = fun() ->
         Match = ets:fun2ms(
@@ -754,7 +756,7 @@ all_ended_reservations() ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(terminate_loan_by_book ( Isbn, Copy_id ) -> {ok} | Exception).
+%-spec(terminate_loan_by_book ( Isbn, Copy_id ) -> {ok} | exception).
 terminate_loan_by_book( Isbn, Copy_id ) ->
   F = fun() ->
         case loan_by_book_copy(Isbn, Copy_id) of
@@ -784,7 +786,7 @@ terminate_loan_by_book( Isbn, Copy_id ) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(cancel_reservation_by_book_and_user ( Isbn, User ) -> {ok} | Exception).
+%-spec(cancel_reservation_by_book_and_user ( Isbn, User ) -> {ok} | exception).
 cancel_reservation_by_book_and_user(Isbn, User) ->
   F = fun() ->
         %vedi che le info siano esistenti, se tale libro esiste
@@ -818,7 +820,7 @@ cancel_reservation_by_book_and_user(Isbn, User) ->
 %%        - Exception -> In case of error
 %% @end
 %%--------------------------------------------------------------------
--spec(get_pending_loans (User, Isbn, Copy_Id ) -> {ok} | Exception).
+%-spec(get_pending_loans (User, Isbn, Copy_Id ) -> {ok} | exception).
 get_pending_loans(User, Isbn, Copy_Id) ->
   %todo serve transaction?
   Match = ets:fun2ms(
@@ -827,7 +829,7 @@ get_pending_loans(User, Isbn, Copy_Id) ->
                               physical_copy_id = Record_id,
                               start_date = Record_start,
                               stop_date = Record_stop})
-      when Record_user =:= User and Record_isbn =:= Isbn and Record_id =:= Copy_Id and Record_stop =:= null ->
+      when Record_user =:= User, Record_isbn =:= Isbn, Record_id =:= Copy_Id, Record_stop =:= null ->
       {Record_user, Record_isbn, Record_id, Record_start, Record_stop}
     end
   ),
