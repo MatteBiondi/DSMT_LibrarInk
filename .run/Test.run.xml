@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Test" type="RebarEunitRunConfigurationType" factoryName="Erlang Rebar Eunit">
+    <module name="librarink-erlang" />
+    <option name="command" value="eunit" />
+    <option name="skipDependencies" value="false" />
+    <envs />
+    <method v="2" />
+  </configuration>
+</component>

@@ -1,0 +1,9 @@
+@author Biondi Matteo <m.biond7@studenti.unipi.it>
+@author Cristofani Federico <f.cristofani@studenti.unipi.it>
+@author Tumminelli Gianluca <g.tumminelli@studenti.unipi.it>
+@version 1.0.0
+@title Welcome to the Librarink application!
+@doc
+ Librarink it's an Erlang server able to handle the concurrency of a library web-application on which users can reserve
+ books.
+@end
