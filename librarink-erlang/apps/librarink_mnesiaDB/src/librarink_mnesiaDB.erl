@@ -42,9 +42,6 @@ install(ActiveNodes, BackupNodes) ->
   mnesia:create_schema(Nodes),
   %Activate Mnesia in all nodes
   rpc:multicall(Nodes, application, start, [mnesia]),
-  %Define Mnesia DB directory
-  DB_Directory = application:get_env(db_dir),
-  application:set_env(mnesia, dir, DB_Directory),
   %Create tables if not exist
   case mnesia:wait_for_tables([ librarink_lent_book,
                                 librarink_reserved_book,
