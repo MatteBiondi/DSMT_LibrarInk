@@ -26,13 +26,14 @@
 %%%%%%%%%%%%%%%%%%%%%%
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to start Mnesia, create schema and create
 %%  all the tables
 %%  In:   - ActiveNodes: List of active nodes
 %%        - BackupNodes: List of backup nodes
 %%  Out:  - install_succeeded -> No error
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(install(ActiveNodes::list() , BackupNodes::list()) -> install_succeeded ).
@@ -75,11 +76,12 @@ install(ActiveNodes, BackupNodes) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to start Mnesia
 %%  In:   - Nodes: List of nodes
 %%  Out:  - ok -> No error
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(start_librarink_mnesia(Nodes::list()) ->   ok ).
@@ -89,11 +91,12 @@ start_librarink_mnesia(Nodes) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to stop Mnesia
 %%  In:   - Nodes: List of nodes
 %%  Out:  - ok -> No error
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(stop_librarink_mnesia(Nodes::list()) ->   ok ).
@@ -106,13 +109,14 @@ stop_librarink_mnesia(Nodes) ->
 %%%%%%%%%%%%%%%%%%%%%%
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to add a physical book copy
 %%  Type: - Insert operation
 %%  In:   - Isbn: Book's ISBN
 %%        - Physical_copy_id: Book's copy id
 %%  Out:  - ok -> No error
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(add_book_copy ( Isbn::string(), Physical_copy_id::string()) -> ok).
@@ -125,7 +129,7 @@ add_book_copy(Isbn, Physical_copy_id) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to transform a book reservation in a book
 %%  loan
 %%  Type: - Remove and Insert operation
@@ -137,6 +141,7 @@ add_book_copy(Isbn, Physical_copy_id) ->
 %%        - undefined_book -> The ISBN has no copies
 %%        - unexpected_error -> Unexpected error
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(from_reservation_to_loan ( User::string() , Isbn::string() )
@@ -177,7 +182,7 @@ from_reservation_to_loan(User, Isbn) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to reserve a book for a user
 %%  Type: - Insert operation
 %%  In:   - User: User's identifier
@@ -188,6 +193,7 @@ from_reservation_to_loan(User, Isbn) ->
 %%        - book_already_reserved -> The couple User - ISBN already exists
 %%        - undefined_book -> The ISBN has no copies
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(add_book_reservation ( User::string(), Isbn::string()) ->
@@ -227,7 +233,7 @@ add_book_reservation(User, Isbn) ->
 %%%%%%%%%%%%%%%%%%%%%%
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to remove a specified physical book copy
 %%  Type: - Delete operation
 %%  In:   - Isbn: Book's identifier
@@ -239,6 +245,7 @@ add_book_reservation(User, Isbn) ->
 %%        - undefined_book  -> The ISBN has no copies
 %%        - unexpected_error -> Unexpected error occurs
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(delete_book_copy ( Isbn::string(), Physical_copy_id::string()) ->
@@ -275,7 +282,7 @@ delete_book_copy(Isbn, Physical_copy_id) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to remove all physical copies of a
 %%  specified book
 %%  Type: - Delete operation
@@ -285,6 +292,7 @@ delete_book_copy(Isbn, Physical_copy_id) ->
 %%        - undefined_book -> The ISBN has no copies
 %%        - unexpected_error -> Unexpected error occurs
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(delete_all_book_copies ( Isbn::string() ) ->
@@ -311,7 +319,7 @@ delete_all_book_copies(Isbn) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to remove a specified book loan
 %%  Type: - Delete operation
 %%  In:   - User: User's identifier
@@ -320,6 +328,7 @@ delete_all_book_copies(Isbn) ->
 %%  Out:  - ok -> No error
 %%        - error_pending_loan -> This book is currently assigned to a user and loan is not terminated
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(delete_lent_book (User::string(), Isbn::string(), Id::string()) ->
@@ -343,12 +352,13 @@ delete_lent_book(User, Isbn, Id) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to get and remove all ended loan
 %%  Type: - Read and delete operation
 %%  In:   No input
 %%  Out:  - {Records_counter, Records_list} -> No error
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(get_and_delete_ended_loans () -> {Records_counter::pos_integer(), Records_list::list(tuple())}).
@@ -362,13 +372,14 @@ get_and_delete_ended_loans() ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to remove all loan for a specified book
 %%  Type: - Delete operation
 %%  In:   - Isbn: Book's identifier
 %%  Out:  - ok -> No error
 %%        - error_pending_loan -> This book is currently assigned to at least one user and loan is not terminated
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(delete_lent_by_book (Isbn::string()) -> ok | error_pending_loan).
@@ -377,7 +388,7 @@ delete_lent_by_book(Isbn) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to remove all book loans for a specified
 %%  user
 %%  Type: - Delete operation
@@ -385,6 +396,7 @@ delete_lent_by_book(Isbn) ->
 %%  Out:  - ok -> No error
 %%        - error_pending_loan -> Some books are currently assigned to the user and some loans are not terminated
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(delete_lent_book_by_user (User::string()) -> ok | error_pending_loan).
@@ -393,7 +405,7 @@ delete_lent_book_by_user(User) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to remove a specified book reservation
 %%  Type: - Delete operation
 %%  In:   - User: User's identifier
@@ -401,6 +413,7 @@ delete_lent_book_by_user(User) ->
 %%  Out:  - ok -> No error
 %%        - error_pending_reservation -> This book is currently assigned to the user and reservation is not terminated
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(delete_book_reservation (User::string(), Isbn::string()) -> ok | error_pending_reservation).
@@ -423,13 +436,14 @@ delete_book_reservation(User, Isbn) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to get and remove all ended book
 %%  reservations
 %%  Type: - Read and delete operation
 %%  In:   No input
 %%  Out:  - {Records_counter, Records_list} -> No error
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(get_and_delete_ended_reservations () -> {Records_counter::pos_integer(), Records_list::list(tuple())}).
@@ -443,7 +457,7 @@ get_and_delete_ended_reservations() ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to remove all book reservation for a
 %%  specified user
 %%  Type: - Delete operation
@@ -451,6 +465,7 @@ get_and_delete_ended_reservations() ->
 %%  Out:  - ok -> No error
 %%        - error_pending_reservation -> Some books are currently assigned the user and some reservations are not terminated
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(delete_books_reservation_by_user (User::string()) -> ok | error_pending_reservation).
@@ -459,7 +474,7 @@ delete_books_reservation_by_user(User) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to remove all book reservation for a
 %%  specified book
 %%  Type: - Delete operation
@@ -467,6 +482,7 @@ delete_books_reservation_by_user(User) ->
 %%  Out:  - ok -> No error
 %%        - error_pending_reservation -> This book is currently assigned to a user and reservation is not terminated
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(delete_book_reservations_by_book (Isbn::string()) -> ok | error_pending_reservation).
@@ -479,13 +495,14 @@ delete_book_reservations_by_book(Isbn) ->
 %%%%%%%%%%%%%%%%%%%%%%
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to count and get all physical copies of a
 %%  specified book
 %%  Type: - Read operation
 %%  In:   - Isbn: Selected book's ISBN
 %%  Out:  - {Records_counter, Records_list} -> No error
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(copies_by_book (Isbn::string()) -> {Records_counter::pos_integer(), Records_list::list(tuple())}).
@@ -500,13 +517,14 @@ copies_by_book(Isbn) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to count and get all physical copies of
 %%  all books
 %%  Type: - Read operation
 %%  In:   No input
 %%  Out:  - {Records_counter, Records_list} -> No error
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(all_copies_all_book () -> {Records_counter::pos_integer(), Records_list::list(tuple())}).
@@ -515,7 +533,7 @@ all_copies_all_book() ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to count available physical copies
 %%  of a specified book
 %%  Type: - Read operation
@@ -524,6 +542,7 @@ all_copies_all_book() ->
 %%        - unexpected_error -> Unexpected error occurs
 %%        - undefined_book -> There are no copies for the selected book
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(count_available_copies_by_book (Isbn::string()) ->
@@ -548,7 +567,7 @@ count_available_copies_by_book(Isbn) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to get available physical copies
 %%  of a specified book
 %%  Type: - Read operation
@@ -557,6 +576,7 @@ count_available_copies_by_book(Isbn) ->
 %%        - unexpected_error -> Unexpected error occurs
 %%        - undefined_book -> There are no copies for the selected book
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(list_available_copies_by_book (Isbn::string()) ->
@@ -582,7 +602,7 @@ list_available_copies_by_book(Isbn) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to count and get lent physical copies of a
 %%  specified book
 %%  Type: - Read operation
@@ -590,6 +610,7 @@ list_available_copies_by_book(Isbn) ->
 %%  Out:  - {Records_counter, Records_list} -> No error
 %%        - undefined_book -> There are no copies for the selected book
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(lent_copies_by_book (Isbn::string()) ->
@@ -609,13 +630,14 @@ lent_copies_by_book(Isbn) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to get information about pending lent
 %%  physical book copies of a specified user
 %%  Type: - Read operation
 %%  In:   - User: User's identifier
 %%  Out:  - {Records_counter, Records_list} -> No error
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(loans_by_user (User::string()) -> {Records_counter::pos_integer(), Records_list::list(tuple())}).
@@ -628,7 +650,7 @@ loans_by_user(User) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to get information about pending loan
 %%  for a specified book copy
 %%  Type: - Read operation
@@ -637,6 +659,7 @@ loans_by_user(User) ->
 %%  Out:  - {Records_counter, Records_list} -> No error
 %%        - undefined_book_copy -> There are no copies with the specified id for the selected book
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(loan_by_book_copy ( Isbn::string(), Copy_Id::string() ) ->
@@ -655,12 +678,13 @@ loan_by_book_copy(Isbn, Copy_Id) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to get information about all pending loan
 %%  Type: - Read operation
 %%  In:   No input
 %%  Out:  - {Records_counter, Records_list} -> No error
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(all_pending_loans() -> {Records_counter::pos_integer(), Records_list::list(tuple())}).
@@ -673,12 +697,13 @@ all_pending_loans() ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to get information about ended loans
 %%  Type: - Read operation
 %%  In:   No input
 %%  Out:  - {Records_counter, Records_list} -> No error
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(all_ended_loans () -> {Records_counter::pos_integer(), Records_list::list(tuple())}).
@@ -701,7 +726,7 @@ all_ended_loans() ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to get information about pending
 %%  reservation for a specified book and user
 %%  Type: - Read operation
@@ -710,6 +735,7 @@ all_ended_loans() ->
 %%  Out:  - {Records_counter, Records_list} -> No error
 %%        - undefined_book -> There are no copies for the selected book
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(reservations_by_user_and_book ( User::string(), Isbn::string() ) ->
@@ -736,7 +762,7 @@ reservations_by_user_and_book(User,Isbn) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to count and get information about books
 %%  pending reservations for a specified user
 %%  Type: - Read operation
@@ -744,6 +770,7 @@ reservations_by_user_and_book(User,Isbn) ->
 %%  Out:  - {Records_counter, Records_list} -> No error
 %%        - undefined_book -> There are no books
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(reservations_by_user (User::string()) ->
@@ -753,7 +780,7 @@ reservations_by_user(User) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to count and get information about
 %%  pending reservations for a specified book
 %%  Type: - Read operation
@@ -761,6 +788,7 @@ reservations_by_user(User) ->
 %%  Out:  - {Records_counter, Records_list} -> No error
 %%        - undefined_book -> There are no copies for the selected book
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(reservations_by_book ( Isbn::string() ) ->
@@ -770,7 +798,7 @@ reservations_by_book(Isbn) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to count and get information about
 %%  pending reservations
 %%  Type: - Read operation
@@ -778,6 +806,7 @@ reservations_by_book(Isbn) ->
 %%  Out:  - {Records_counter, Records_list} -> No error
 %%        - undefined_book -> There are no books
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(all_pending_reservations() -> {Records_counter::pos_integer(), Records_list::list(tuple())} | undefined_book).
@@ -786,13 +815,14 @@ all_pending_reservations() ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to count and get information about all
 %%  ended reservations
 %%  Type: - Read operation
 %%  In:   No input
 %%  Out:  - {Records_counter, Records_list} -> No error
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(all_ended_reservations() -> {Records_counter::pos_integer(), Records_list::list(tuple())}).
@@ -819,7 +849,7 @@ all_ended_reservations() ->
 %%%%%%%%%%%%%%%%%%%%%%
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to terminate a book loan for a specified
 %%  book copy
 %%  Type: - Update operation
@@ -830,6 +860,7 @@ all_ended_reservations() ->
 %%        - error_no_loan_found -> The selected copy has no associated pending loan
 %%        - unexpected_error -> Unexpected error occurs
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(terminate_loan_by_book ( Isbn::string(), Copy_id::string() ) ->
@@ -857,7 +888,7 @@ terminate_loan_by_book( Isbn, Copy_id ) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc
+%% @doc <pre>
 %%  This function is called to cancel a book reservation for a
 %%  specified book and user
 %%  Type: - Update operation
@@ -868,6 +899,7 @@ terminate_loan_by_book( Isbn, Copy_id ) ->
 %%        - error_no_reservation_found -> The selected book has no associated pending reservation
 %%        - error_cancellation_failed -> Cancellation fails because of an unexpected error
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(cancel_reservation_by_book_and_user ( Isbn::string(), User::string() ) ->
@@ -900,7 +932,7 @@ cancel_reservation_by_book_and_user(Isbn, User) ->
 
 %%--------------------------------------------------------------------
 %% @private
-%% @doc
+%% @doc <pre>
 %%  This function is called to get information about pending loans
 %%  Type: - Read operation
 %%  In:   - User: User's identifier
@@ -908,6 +940,7 @@ cancel_reservation_by_book_and_user(Isbn, User) ->
 %%        - Copy_Id: Book's copy id
 %%  Out:  - {Records_counter, Records_list} -> No error
 %%        - Throws an exception in case of error
+%% </pre>
 %% @end
 %%--------------------------------------------------------------------
 -spec(get_pending_loans (User::string(), Isbn::string(), Copy_Id::string() ) ->
