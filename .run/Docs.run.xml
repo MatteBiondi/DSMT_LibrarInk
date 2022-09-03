@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Docs" type="RebarRunConfigurationType" factoryName="Erlang Rebar">
+    <module name="librarink-erlang" />
+    <option name="command" value="medoc" />
+    <option name="skipDependencies" value="true" />
+    <envs />
+    <method v="2">
+      <option name="LaunchBrowser.Before.Run" url="http://localhost:63342/DSMT_LibrarInk/librarink-erlang/doc/index.html" />
+    </method>
+  </configuration>
+</component>

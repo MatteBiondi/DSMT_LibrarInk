@@ -78,4 +78,7 @@ deps
 .rebar3
 _build/
 _checkouts/
-doc/
+
+librarink-erlang/doc/*
+!librarink-erlang/doc/images
+

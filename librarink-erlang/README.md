@@ -9,7 +9,8 @@ Build
 
 Build docs
 -----
-    $ rebar3 medoc
+    $ rebar3 medoc          
+    $ rebar3 as docs medoc      # To include private functions docs
 
 Manual test
 -----

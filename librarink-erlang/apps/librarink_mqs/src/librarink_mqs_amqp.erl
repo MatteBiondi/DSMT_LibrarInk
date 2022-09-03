@@ -1,19 +1,24 @@
 %%%-------------------------------------------------------------------
-%%% @author Federico
-%%% @copyright (C) 2022, <COMPANY>
 %%% @doc
-%%%
+%%% Wrapper module that gives a further abstraction of amqp protocol, implemented by the library
+%%% <a href="https://github.com/rabbitmq/rabbitmq-server/tree/main/deps/amqp_client" target="_blank">amqp_client</a>
+%%% distributed by RabbitMQ. For further information about amqp protocol follows this
+%%% <a href="https://www.rabbitmq.com/protocol.html" target="_blank">link</a>.
 %%% @end
 %%% Created : 01. set 2022 17:49
 %%%-------------------------------------------------------------------
 -module(librarink_mqs_amqp).
--author("Federico").
 
 %% API
 -export([start_connection/1, declare_queue/2, bind_queue/5, unbind_queue/4, start_consumer/3, consumer/3,
   close_connection/2]).
+
 -include_lib("amqp_client/include/amqp_client.hrl").
 
+%% @doc
+%% Connect to the MQS broker at the specified address and open a channel to start communication.
+%% @end
+-spec(start_connection(Host :: string()) -> {ok, Connection :: pid(), Channel :: pid()}).
 start_connection(Host) ->
   % Connect to broker
   {ok, Connection} =
@@ -23,13 +28,22 @@ start_connection(Host) ->
     amqp_connection:open_channel(Connection),
   {ok, Connection, Channel}.
 
+%% @doc
+%% Declare a queue on specified opened channel.
+%% @end
+-spec(declare_queue(Channel :: pid(), QueueName :: binary()) -> {ok, Queue :: binary()}).
 declare_queue(Channel, QueueName)->
 
   % Declare queue
   #'queue.declare_ok'{queue = Queue} =
     amqp_channel:call(Channel, #'queue.declare'{queue=QueueName, exclusive = true}),
-  {ok, [Queue]}.
+  {ok, Queue}.
 
+%% @doc
+%% Bind selected queue on specified channel with a new exchange defined by the parameters passed as arguments.
+%% @end
+-spec(bind_queue(Channel :: pid(), Queue :: binary(), ExchangeName :: binary(), ExchangeType :: binary(), RoutingKey
+:: binary()) -> ok).
 bind_queue(Channel, Queue, ExchangeName, ExchangeType, RoutingKey) ->
 
   % Declare exchange
@@ -50,17 +64,28 @@ bind_queue(Channel, Queue, ExchangeName, ExchangeType, RoutingKey) ->
     }),
   ok.
 
+%% @private
+%% @doc
+%% Support function to handle the subscription of consumer with all queues passed as argument.
+%% @end
 start_consumer(_Channel, _Consumer, [], Tags) -> Tags;
 start_consumer(Channel, Consumer, [Queue|Tail], Tags) ->
   #'basic.consume_ok'{consumer_tag = Tag} = amqp_channel:subscribe(Channel, #'basic.consume'{queue = Queue}, Consumer),
   start_consumer(Channel, Consumer, Tail, [Tag] ++ Tags).
+
+%% @doc
+%% Spawn new process dedicated to consume messages received on registered queues. The consume action is defined by
+%% the callback function passed as argument.
+%% @end
+-spec(start_consumer({Connection :: pid(), Channel :: pid()}, Queues :: list(), Callback :: mfa()) ->
+  {ok, Consumer :: pid(), Tags :: list()}).
 start_consumer({Connection, Channel}, Queues, Callback) ->
   Consumer = spawn_link(?MODULE, consumer, [Connection, Channel, Callback]),
   {ok, Consumer, start_consumer(Channel, Consumer, Queues, [])}.
 
-
-%% @private
-%% @doc Handling requests
+%% @doc
+%% Remove from selected queue the binding with the exchange passed as arguments.
+%% @end
 -spec(unbind_queue(Channel :: pid(), Queue :: binary(),ExchangeName :: binary(), RoutingKey :: binary()) ->
   Ret :: #'queue.unbind_ok'{}).
 unbind_queue(Channel, Queue, ExchangeName, RoutingKey) when is_binary(Queue), is_binary(ExchangeName), is_binary(RoutingKey) ->
@@ -71,36 +96,45 @@ unbind_queue(Channel, Queue, ExchangeName, RoutingKey) when is_binary(Queue), is
   }),
   ok.
 
+%% @doc
+%% Close connection with MQS broker.
+%% @end
+-spec(close_connection(Connection :: pid(), Channel :: pid()) -> none()).
 close_connection(Connection, Channel) ->
   ok = amqp_channel:close(Channel),
   ok = amqp_connection:close(Connection).
 
+%% @doc
+%% Consumer process body. The messages received on queues, after sending the ack, are processed with callback.
+%% @end
+-spec(consumer(Connection :: pid(), Channel :: pid(), Callback :: mfa()) -> none()).
 consumer(Connection, Channel, Callback) ->
-  process_flag(trap_exit, true),
+  process_flag(trap_exit, true), %% Trap exit in order to close connection in case of MQS process crash
   case is_process_alive(Channel) of
     true ->
       receive
-        #'basic.consume_ok'{} ->
+        #'basic.consume_ok'{} -> %% Message received after consumer subscription
           io:format("[~p] Basic.consume_ok~n", [self()]),
           consumer(Connection, Channel, Callback);
-        {#'basic.deliver'{delivery_tag = Tag}, #amqp_msg{payload = Msg}} ->
+        {#'basic.deliver'{delivery_tag = Tag}, #amqp_msg{payload = Msg}} -> %% Message received on queues
           io:format("~p Consumer: ~p~n",[self(), Msg]),
-          amqp_channel:cast(Channel, #'basic.ack'{delivery_tag = Tag}),
+          amqp_channel:cast(Channel, #'basic.ack'{delivery_tag = Tag}), %% Send ack to broker
           Callback(Msg),
           consumer(Connection, Channel, Callback);
-        #'basic.cancel_ok'{} ->
+        #'basic.cancel_ok'{} -> %% Message received after consumer cancellation
           io:format("[~p] Cancel~n",[self()]),
           cancel;
-        {'EXIT',_Pid, Reason}  ->
+        {'EXIT',_Pid, Reason}  -> %% Message received if the MQS process that has spawned the consumer crashed
           io:format("[~p] MQS process crashed: ~p~n",[self(), Reason]),
           close_connection(Connection, Channel);
-        Any ->
+        Any -> %% Catch all clause
           io:format("[~p] Unexpected message: ~p~n",[self(), Any])
       end;
     _False ->
       io:format("Inactive channel~n"),
       close_connection(Connection, Channel)
   end.
+
 
 %%produce(Channel, ExchangeName, ExchangeType, Payload)->
 %%  produce(Channel, ExchangeName, ExchangeType, "", Payload).
