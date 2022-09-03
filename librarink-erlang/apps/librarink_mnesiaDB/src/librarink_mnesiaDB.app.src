@@ -3,7 +3,7 @@
   {vsn, "0.1.0"},
   {registered, []},
   {applications, [kernel, stdlib, mnesia]},
-  {env,[{db_dir, "/librarink_db_files/data"}]},
+  {env,[]},
   {modules, [librarink_mnesiaDB]},
 
   {licenses, ["Apache-2.0"]},
