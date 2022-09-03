@@ -42,9 +42,6 @@ install(ActiveNodes, BackupNodes) ->
   mnesia:create_schema(Nodes),
   %Activate Mnesia in all nodes
   rpc:multicall(Nodes, application, start, [mnesia]),
-  %Define Mnesia DB directory
-  DB_Directory = application:get_env(db_dir),
-  application:set_env(mnesia, dir, DB_Directory),
   %Create tables if not exist
   case mnesia:wait_for_tables([ librarink_lent_book,
                                 librarink_reserved_book,
@@ -180,19 +177,25 @@ from_reservation_to_loan(User, Isbn) ->
 %-spec(add_book_reservation ( User, Isbn) -> {ok} | exception).
 add_book_reservation(User, Isbn) ->
   F = fun() ->
-        {_, Counter} =count_available_copies_by_book(Isbn),
+        {Reservations_counter, _} = reservations_by_user_and_book(User, Isbn),
         if
-          Counter == 0 ->
-            unavailable_copies_to_reserve;
-          Counter > 0->
-            mnesia:write(#librarink_reserved_book{
-              user = User,
-              isbn = Isbn,
-              start_date = now_to_universal_time(timestamp()),
-              stop_date = null,
-              canceled = false});
+          Reservations_counter == 0 ->
+            {_, Counter} =count_available_copies_by_book(Isbn),
+            if
+              Counter == 0 ->
+                unavailable_copies_to_reserve;
+              Counter > 0->
+                mnesia:write(#librarink_reserved_book{
+                  user = User,
+                  isbn = Isbn,
+                  start_date = now_to_universal_time(timestamp()),
+                  stop_date = null,
+                  canceled = false});
+              true ->
+                error_insert_failed
+            end;
           true ->
-            error_insert_failed
+            book_already_reserved
         end
       end,
   mnesia:activity(transaction, F).
@@ -220,7 +223,7 @@ delete_book_copy(Isbn, Physical_copy_id) ->
         %check there are no pending loan for that copy
         case loan_by_book_copy(Isbn, Physical_copy_id) of
           [] ->
-            To_delete = #librarink_physical_book_copy{isbn = Isbn, physical_copy_id = Physical_copy_id},
+            To_delete = #librarink_physical_book_copy{isbn = Isbn, physical_copy_id = Physical_copy_id, _ = '_'},
             List = mnesia:match_object(To_delete),
             lists:foreach(
               fun(Row) ->
@@ -274,7 +277,7 @@ delete_all_book_copies(Isbn) ->
 %-spec(delete_lent_book (User, Isbn, Id) -> {ok} | exception).
 delete_lent_book(User, Isbn, Id) ->
   F = fun() ->
-        To_delete = #librarink_lent_book{user = User, isbn = Isbn, physical_copy_id = Id},
+        To_delete = #librarink_lent_book{user = User, isbn = Isbn, physical_copy_id = Id, _ = '_'},
         List = mnesia:match_object(To_delete),
         lists:foreach(
           fun(Row) ->
@@ -301,7 +304,6 @@ delete_lent_book(User, Isbn, Id) ->
 %%--------------------------------------------------------------------
 %-spec(get_and_delete_ended_loans () -> {ok} | exception).
 get_and_delete_ended_loans() ->
-  %todo va bene usarli di nuovo? scorro due volte il db
   F = fun() ->
         Res = all_ended_loans(),
         delete_lent_book('_', '_', '_'),
@@ -352,7 +354,7 @@ delete_lent_book_by_user(User) ->
 %-spec(delete_book_reservation (User, Isbn) -> {ok} | exception).
 delete_book_reservation(User, Isbn) ->
   F = fun() ->
-        To_delete = #librarink_reserved_book{user = User, isbn = Isbn},
+        To_delete = #librarink_reserved_book{user = User, isbn = Isbn, _ = '_'},
         List = mnesia:match_object(To_delete),
         lists:foreach(
           fun(Row) ->
@@ -380,7 +382,6 @@ delete_book_reservation(User, Isbn) ->
 %%--------------------------------------------------------------------
 %-spec(get_and_delete_ended_reservations () -> {ok} | exception).
 get_and_delete_ended_reservations() ->
-  %todo va bene usarli di nuovo? scorro due volte il db
   F = fun() ->
         Res = all_ended_reservations(),
         delete_book_reservation('_', '_'),
@@ -437,8 +438,9 @@ delete_book_reservations_by_book(Isbn) ->
 %-spec(copies_by_book (Isbn) -> {Counter, [tuple()]} | undefined | exception).
 copies_by_book(Isbn) ->
   F = fun() ->
-        [{Isbn, Id} ||
-          #librarink_physical_book_copy{physical_copy_id = Id} <- mnesia:read(librarink_physical_book_copy, Isbn)]
+        Record=#librarink_physical_book_copy{isbn = Isbn,_='_'},
+        [ {Row_isbn, Row_id} ||
+          #librarink_physical_book_copy{isbn = Row_isbn, physical_copy_id = Row_id} <- mnesia:match_object(Record)]
       end,
   Result_list = mnesia:activity(transaction, F),
   {length(Result_list) , Result_list}.
@@ -507,8 +509,8 @@ list_available_copies_by_book(Isbn) ->
             undefined_book;
           {Counter, List_of_copies} when Counter > 0->
             {_,Lent_copies} = lent_copies_by_book(Isbn),
-            Extracted_lent_copies = [{Isbn, Id} ||
-              #librarink_lent_book{physical_copy_id = Id} <- Lent_copies],
+            Extracted_lent_copies = [{Row_isbn, Row_id} ||
+              #librarink_lent_book{isbn = Row_isbn, physical_copy_id = Row_id} <- Lent_copies],
             Not_lent_copies = List_of_copies -- Extracted_lent_copies,
             {ok, Not_lent_copies};
           _ ->
@@ -651,17 +653,14 @@ reservations_by_user_and_book(User,Isbn) ->
           true ->
             undefined_book;
           false ->
-            Match = ets:fun2ms(
-              fun(#librarink_reserved_book{ user = Record_user,
-                                            isbn=Record_isbn,
-                                            start_date = Record_start,
-                                            stop_date = Record_stop,
-                                            canceled = Record_cancelled})
-                when Record_isbn =:= Isbn, Record_user =:= User, Record_stop =:= null ->
-                {Record_user, Record_isbn, Record_start, Record_stop, Record_cancelled}
-              end
-            ),
-            mnesia:select(librarink_reserved_book, Match)
+            Record=#librarink_reserved_book{user = User, isbn = Isbn, stop_date = null,  _='_'},
+            [{Record_user, Record_isbn, Record_start, Record_stop, Record_cancelled} ||
+              #librarink_reserved_book{ user = Record_user,
+                                        isbn = Record_isbn,
+                                        start_date = Record_start,
+                                        stop_date = Record_stop,
+                                        canceled = Record_cancelled}
+                <- mnesia:match_object(Record)]
         end
       end,
   Result_list = mnesia:activity(transaction, F),
@@ -812,6 +811,7 @@ cancel_reservation_by_book_and_user(Isbn, User) ->
 %%%%%%%%%%%%%%%%%%%%%%
 
 %%--------------------------------------------------------------------
+%% @private
 %% @doc
 %%  This function is called to get information about pending loans
 %%  Type: -
@@ -822,22 +822,17 @@ cancel_reservation_by_book_and_user(Isbn, User) ->
 %%--------------------------------------------------------------------
 %-spec(get_pending_loans (User, Isbn, Copy_Id ) -> {ok} | exception).
 get_pending_loans(User, Isbn, Copy_Id) ->
-  %todo serve transaction?
-  Match = ets:fun2ms(
-    fun(#librarink_lent_book{ user = Record_user,
-                              isbn = Record_isbn,
-                              physical_copy_id = Record_id,
-                              start_date = Record_start,
-                              stop_date = Record_stop})
-      when Record_user =:= User, Record_isbn =:= Isbn, Record_id =:= Copy_Id, Record_stop =:= null ->
-      {Record_user, Record_isbn, Record_id, Record_start, Record_stop}
-    end
-  ),
-  mnesia:select(librarink_lent_book, Match).
+  Record=#librarink_lent_book{user = User, isbn = Isbn, physical_copy_id = Copy_Id, stop_date = null,  _='_'},
+  [{Record_user, Record_isbn, Record_id, Record_start, Record_stop} ||
+    #librarink_lent_book{ user = Record_user,
+                          isbn = Record_isbn,
+                          physical_copy_id = Record_id,
+                          start_date = Record_start,
+                          stop_date = Record_stop}
+      <- mnesia:match_object(Record)].
 
 
 %_________________________________________________________________________________
 %todo metti i tipi agli spec
 %todo metti a tutti gli spec e la desc
-%todo modifico con seletc, read, index_read?
 %todo rivedi le spec e le descrizioni sopra. Chi davvero da una eccezione? vedi da manuale
