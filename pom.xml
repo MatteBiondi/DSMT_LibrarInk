@@ -10,6 +10,8 @@
   <version>1.0.0-SNAPSHOT</version>
   <modules>
     <module>librarink-web</module>
+      <module>ejb-interfaces</module>
+    <module>ejb-implements</module>
   </modules>
 
   <name>DSMT_LibrarInk</name>
