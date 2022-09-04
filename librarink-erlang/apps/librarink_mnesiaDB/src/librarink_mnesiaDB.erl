@@ -337,7 +337,7 @@ delete_lent_book(User, Isbn, Id) ->
   F = fun() ->
         To_delete = #librarink_lent_book{user = User, isbn = Isbn, physical_copy_id = Id, _ = '_'},
         List = mnesia:match_object(To_delete),
-        lists:foreach(
+        lists:map(
           fun(Row) ->
             if
               Row#librarink_lent_book.stop_date =/= null ->
@@ -421,7 +421,7 @@ delete_book_reservation(User, Isbn) ->
   F = fun() ->
         To_delete = #librarink_reserved_book{user = User, isbn = Isbn, _ = '_'},
         List = mnesia:match_object(To_delete),
-        lists:foreach(
+        lists:map(
           fun(Row) ->
             if
               Row#librarink_reserved_book.stop_date =/= null ->
