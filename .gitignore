@@ -80,5 +80,4 @@ _build/
 _checkouts/
 
 librarink-erlang/doc/*
-!librarink-erlang/doc/images
-
+librarink_db_files/
