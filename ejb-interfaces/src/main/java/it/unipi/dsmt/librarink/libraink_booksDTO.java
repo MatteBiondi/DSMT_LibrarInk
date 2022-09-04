@@ -1,6 +1,8 @@
 package it.unipi.dsmt.librarink;
 
-public class libraink_booksDTO {
+import java.io.Serializable;
+
+public class libraink_booksDTO implements Serializable {
     String isbn;
     String book_title;
     String genre;

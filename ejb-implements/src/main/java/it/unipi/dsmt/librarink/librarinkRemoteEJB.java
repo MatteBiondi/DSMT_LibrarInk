@@ -1,7 +1,8 @@
 package it.unipi.dsmt.librarink;
 
+import javax.ejb.Stateless;
 import java.util.List;
-
+@Stateless
 public class librarinkRemoteEJB implements LibrainkRemote{
     @Override
     public List<libraink_usersDTO> listUsers() {

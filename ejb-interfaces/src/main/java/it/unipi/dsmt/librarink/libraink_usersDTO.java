@@ -1,8 +1,9 @@
 package it.unipi.dsmt.librarink;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class libraink_usersDTO {
+public class libraink_usersDTO implements Serializable {
     private String name;
     private String surname;
     private String address;

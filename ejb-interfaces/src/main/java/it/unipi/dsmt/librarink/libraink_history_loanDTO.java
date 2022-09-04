@@ -1,8 +1,9 @@
 package it.unipi.dsmt.librarink;
 
+import java.io.Serializable;
 import java.sql.Date;
 
-public class libraink_history_loanDTO {
+public class libraink_history_loanDTO implements Serializable {
     String user_email;
     String isbn;
     String id_copy;

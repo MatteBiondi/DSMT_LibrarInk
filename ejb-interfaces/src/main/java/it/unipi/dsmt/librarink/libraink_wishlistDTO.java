@@ -1,6 +1,8 @@
 package it.unipi.dsmt.librarink;
 
-public class libraink_wishlistDTO {
+import java.io.Serializable;
+
+public class libraink_wishlistDTO implements Serializable {
     String email_user;
     String isbn;
 
