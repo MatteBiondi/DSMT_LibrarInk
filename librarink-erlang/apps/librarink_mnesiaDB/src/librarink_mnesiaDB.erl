@@ -337,16 +337,22 @@ delete_lent_book(User, Isbn, Id) ->
   F = fun() ->
         To_delete = #librarink_lent_book{user = User, isbn = Isbn, physical_copy_id = Id, _ = '_'},
         List = mnesia:match_object(To_delete),
-        lists:foreach(
-          fun(Row) ->
-            if
-              Row#librarink_lent_book.stop_date =/= null ->
-                mnesia:delete_object(Row);
-              true ->
-                error_pending_loan
-            end
-          end, List
-        )
+        case List of
+          [] ->
+            ok;
+          _ ->
+            [Res|_] = lists:map(
+              fun(Row) ->
+                if
+                  Row#librarink_lent_book.stop_date =/= null ->
+                    mnesia:delete_object(Row);
+                  true ->
+                    error_pending_loan
+                end
+              end, List
+            ),
+            Res
+        end
       end,
   mnesia:activity(transaction, F).
 
@@ -421,16 +427,22 @@ delete_book_reservation(User, Isbn) ->
   F = fun() ->
         To_delete = #librarink_reserved_book{user = User, isbn = Isbn, _ = '_'},
         List = mnesia:match_object(To_delete),
-        lists:foreach(
-          fun(Row) ->
-            if
-              Row#librarink_reserved_book.stop_date =/= null ->
-                mnesia:delete_object(Row);
-              true ->
-                error_pending_reservation
-            end
-          end, List
-        )
+        case List of
+          [] ->
+            ok;
+          _ ->
+            [Res|_] = lists:map(
+              fun(Row) ->
+                if
+                  Row#librarink_reserved_book.stop_date =/= null ->
+                    mnesia:delete_object(Row);
+                  true ->
+                    error_pending_reservation
+                end
+              end, List
+            ),
+            Res
+        end
       end,
   mnesia:activity(transaction, F).
 
