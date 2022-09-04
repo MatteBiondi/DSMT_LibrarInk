@@ -622,11 +622,11 @@ lent_copies_by_book(Isbn) ->
           true ->
             undefined_book;
           false ->
-            get_pending_loans('_', Isbn, '_')
+            Result_list = get_pending_loans('_', Isbn, '_'),
+            {length(Result_list) , Result_list}
         end
       end,
-  Result_list = mnesia:activity(transaction, F),
-  {length(Result_list) , Result_list}.
+  mnesia:activity(transaction, F).
 
 
 %%--------------------------------------------------------------------
@@ -669,7 +669,8 @@ loan_by_book_copy(Isbn, Copy_Id) ->
         {_ , List_of_copies} = copies_by_book(Isbn),
         case lists:member({Isbn, Copy_Id}, List_of_copies) of
           true ->
-            get_pending_loans('_', Isbn, Copy_Id);
+            Result_list = get_pending_loans('_', Isbn, Copy_Id),
+            {length(Result_list), Result_list};
           false ->
             undefined_book_copy
         end
@@ -748,17 +749,18 @@ reservations_by_user_and_book(User,Isbn) ->
             undefined_book;
           false ->
             Record=#librarink_reserved_book{user = User, isbn = Isbn, stop_date = null,  _='_'},
-            [{Record_user, Record_isbn, Record_start, Record_stop, Record_cancelled} ||
+            Result_list = [{Record_user, Record_isbn, Record_start, Record_stop, Record_cancelled} ||
               #librarink_reserved_book{ user = Record_user,
                                         isbn = Record_isbn,
                                         start_date = Record_start,
                                         stop_date = Record_stop,
                                         canceled = Record_cancelled}
-                <- mnesia:match_object(Record)]
+                <- mnesia:match_object(Record)],
+            {length(Result_list) , Result_list}
         end
       end,
-  Result_list = mnesia:activity(transaction, F),
-  {length(Result_list) , Result_list}.
+  mnesia:activity(transaction, F).
+
 
 
 %%--------------------------------------------------------------------
