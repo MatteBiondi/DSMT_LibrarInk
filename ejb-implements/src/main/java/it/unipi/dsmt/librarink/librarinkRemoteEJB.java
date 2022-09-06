@@ -6,18 +6,60 @@ import it.unipi.dsmt.librarink.entities.Users;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 @Stateless
 public class librarinkRemoteEJB implements LibrainkRemote{
     @PersistenceContext
     private EntityManager entityManager;
     @Override
-    public List<libraink_usersDTO> listUsers() {
-        return null;
+    public List<libraink_usersDTO> listUsers(libraink_usersDTO usersFilter) {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        StringBuilder jpql = new StringBuilder();
+        jpql.append("select u, coalesce(size(c.languages),0) from users u where 1 = 1 ");
+        if (usersFilter.getName() != null && !usersFilter.getName().isEmpty()){
+            jpql.append(" and lower(u.name) like concat('%', lower(:name), '%') ");
+            parameters.put("name", usersFilter.getName());
+        }
+        if (usersFilter.getSurname() != null && !usersFilter.getSurname().isEmpty()){
+            jpql.append(" and lower(u.surname) like concat('%', lower(:surname), '%') ");
+            parameters.put("surname", usersFilter.getSurname());
+        }
+        if (usersFilter.getPassword() != null && !usersFilter.getPassword().isEmpty()){
+            jpql.append(" and lower(u.password) like concat('%', lower(:password), '%') ");
+            parameters.put("password", usersFilter.getSurname());
+        }
+        jpql.append(" group by u ");
+        Query query = entityManager.createQuery(jpql.toString());
+        for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
+            query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
+        }
+        List<Object[]> usersList = query.getResultList();
+        List<libraink_usersDTO> toReturnList = new ArrayList<libraink_usersDTO>();
+        if (usersList != null && !usersList.isEmpty()) {
+            for(Object[] usersInfo: usersList){
+                Users user = (Users)usersInfo[0];
+                Integer numLanguages = ((Number)usersInfo[1]).intValue();
+                libraink_usersDTO usersdto = new libraink_usersDTO();
+                usersdto.setPassword(user.getPassword());
+                usersdto.setName(user.getName());
+                usersdto.setSurname(user.getSurname());
+                usersdto.setEmail(user.getEmail());
+                usersdto.setAddress(user.getAddress());
+                usersdto.setBirthday(user.getBirthday());
+                usersdto.setImage(user.getImage());
+                toReturnList.add(usersdto);
+            }
+        }
+        return toReturnList;
     }
 
     @Override
-    public List<libraink_booksDTO> listBooks() {
+    public List<libraink_booksDTO> listBooks(libraink_booksDTO booksFilter) {
         return null;
     }
 
