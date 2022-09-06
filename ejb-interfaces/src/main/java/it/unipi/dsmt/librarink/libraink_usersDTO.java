@@ -1,7 +1,8 @@
 package it.unipi.dsmt.librarink;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Date;
+
 
 public class libraink_usersDTO implements Serializable {
     private String name;

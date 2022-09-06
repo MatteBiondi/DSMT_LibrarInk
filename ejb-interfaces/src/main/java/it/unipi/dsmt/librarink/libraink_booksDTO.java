@@ -13,6 +13,8 @@ public class libraink_booksDTO implements Serializable {
     String image_url_s;
     String image_url_m;
     String image_url_l;
+    String description;
+
 
     public String getIsbn() {
         return isbn;
@@ -54,6 +56,8 @@ public class libraink_booksDTO implements Serializable {
         return image_url_l;
     }
 
+    public String getDescription() {return description;}
+
     public void setIsbn(String isbn) {
         this.isbn = isbn;
     }
@@ -92,6 +96,10 @@ public class libraink_booksDTO implements Serializable {
 
     public void setImage_url_l(String image_url_l) {
         this.image_url_l = image_url_l;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
