@@ -60,7 +60,48 @@ public class librarinkRemoteEJB implements LibrainkRemote{
 
     @Override
     public List<libraink_booksDTO> listBooks(libraink_booksDTO booksFilter) {
-        return null;
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        StringBuilder jpql = new StringBuilder();
+        jpql.append("select b, coalesce(size(b.languages),0) from users b where 1 = 1 ");
+        if (booksFilter.getBook_title() != null && !booksFilter.getBook_title().isEmpty()){
+            jpql.append(" and lower(b.book_title) like concat('%', lower(:book_title), '%') ");
+            parameters.put("book", booksFilter.getBook_title());
+        }
+        if (booksFilter.getPublisher() != null && !booksFilter.getPublisher().isEmpty()){
+            jpql.append(" and lower(b.publisher) like concat('%', lower(:publisher), '%') ");
+            parameters.put("publisher", booksFilter.getPublisher());
+        }
+        if (booksFilter.getBook_author() != null && !booksFilter.getBook_author().isEmpty()){
+            jpql.append(" and lower(b.book_author) like concat('%', lower(:book_author), '%') ");
+            parameters.put("book_author", booksFilter.getBook_author());
+        }
+        jpql.append(" group by b ");
+        Query query = entityManager.createQuery(jpql.toString());
+        for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
+            query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
+        }
+        List<Object[]> booksList = query.getResultList();
+        List<libraink_booksDTO> toReturnList = new ArrayList<libraink_booksDTO>();
+        if (booksList != null && !booksList.isEmpty()) {
+            for(Object[] booksInfo : booksList){
+                Books book = (Books) booksInfo[0];
+                Integer numLanguages = ((Number) booksInfo[1]).intValue();
+                libraink_booksDTO bookDTO = new libraink_booksDTO();
+                bookDTO.setIsbn(book.getIsbn());
+                bookDTO.setBook_title(book.getBook_title());
+                bookDTO.setGenre(book.getGenre());
+                bookDTO.setPublisher(book.getPublisher());
+                bookDTO.setImage_url_s(book.getImage_url_s());
+                bookDTO.setImage_url_m(book.getImage_url_m());
+                bookDTO.setImage_url_l(book.getImage_url_l());
+                bookDTO.setDescription(book.getDescription());
+                bookDTO.setYear_of_publication(book.getYear_of_publication());
+                bookDTO.setSum_of_stars(book.getSum_of_stars());
+                bookDTO.setNumber_of_review(book.getNumber_of_review());
+                toReturnList.add(bookDTO);
+            }
+        }
+        return toReturnList;
     }
 
     @Override
