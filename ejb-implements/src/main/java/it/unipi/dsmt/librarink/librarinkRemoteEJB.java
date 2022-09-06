@@ -69,6 +69,29 @@ public class librarinkRemoteEJB implements LibrainkRemote{
     }
 
     @Override
+    public boolean deleteUserByEmail(String email) {
+        Users user = entityManager.find(Users.class,email);
+        if (user!=null)
+        {
+            entityManager.remove(user);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean deleteBookByIsbn(String isbn) {
+        Books book = entityManager.find(Books.class,isbn);
+        if (book!=null)
+        {
+            entityManager.remove(book);
+            return true;
+        }
+        return false;
+
+    }
+
+    @Override
     public libraink_usersDTO saveOrUpdateUser(libraink_usersDTO userDTO,boolean update) {
         Users user = null;
         if (!update) {
