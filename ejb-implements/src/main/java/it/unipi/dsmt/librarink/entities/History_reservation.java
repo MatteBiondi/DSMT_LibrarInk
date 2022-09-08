@@ -73,4 +73,7 @@ public class History_reservation {
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
+    public History_reservationKey getHistory_reservationKey(){
+        return new History_reservationKey(user_email,isbn,id_copy,start_date);
+    }
 }

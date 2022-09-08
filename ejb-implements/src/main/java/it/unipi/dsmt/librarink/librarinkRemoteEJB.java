@@ -1,12 +1,12 @@
 package it.unipi.dsmt.librarink;
 
-import it.unipi.dsmt.librarink.entities.Books;
-import it.unipi.dsmt.librarink.entities.Users;
+import it.unipi.dsmt.librarink.entities.*;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -105,17 +105,45 @@ public class librarinkRemoteEJB implements LibrainkRemote{
     }
 
     @Override
-    public List<libraink_history_loanDTO> listHistoryLoan() {
+    public List<libraink_history_loanDTO> listHistoryLoan(libraink_history_loanDTO history_loanFilter) {
         return null;
     }
 
     @Override
-    public List<libraink_wishlistDTO> listWishlist() {
-        return null;
+    public List<libraink_wishlistDTO> listWishlist(libraink_wishlistDTO wishlistFilter) {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        StringBuilder jpql = new StringBuilder();
+        jpql.append("select w, coalesce(size(w.languages),0) from users w where 1 = 1 ");
+        if (wishlistFilter.getEmail_user() != null && !wishlistFilter.getEmail_user().isEmpty()){
+            jpql.append(" and lower(w.email_user) like concat('%', lower(:email_user), '%') ");
+            parameters.put("email_user", wishlistFilter.getEmail_user());
+        }
+        if (wishlistFilter.getIsbn() != null && !wishlistFilter.getIsbn().isEmpty()){
+            jpql.append(" and lower(u.isbn) like concat('%', lower(:isbn), '%') ");
+            parameters.put("isbn", wishlistFilter.getIsbn());
+        }
+        jpql.append(" group by w ");
+        Query query = entityManager.createQuery(jpql.toString());
+        for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
+            query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
+        }
+        List<Object[]> wishlistList = query.getResultList();
+        List<libraink_wishlistDTO> toReturnList = new ArrayList<libraink_wishlistDTO>();
+        if (wishlistList != null && !wishlistList.isEmpty()) {
+            for(Object[] wishlistInfo: wishlistList){
+                Wishlist wishlist = (Wishlist) wishlistInfo[0];
+                Integer numLanguages = ((Number)wishlistInfo[1]).intValue();
+                libraink_wishlistDTO wishlistDTO = new libraink_wishlistDTO();
+                wishlistDTO.setIsbn(wishlist.getIsbn());
+                wishlistDTO.setEmail_user(wishlist.getEmail_user());
+                toReturnList.add(wishlistDTO);
+            }
+        }
+        return toReturnList;
     }
 
     @Override
-    public List<libraink_history_reservationDTO> listHistoryReservation() {
+    public List<libraink_history_reservationDTO> listHistoryReservation(libraink_history_reservationDTO history_reservationFilter) {
         return null;
     }
 
@@ -152,6 +180,43 @@ public class librarinkRemoteEJB implements LibrainkRemote{
     }
 
     @Override
+    public libraink_wishlistDTO findWishlistByKey(String user_email, String isbn) {
+        WishListKey wishListKey=new WishListKey(user_email,isbn);
+        Wishlist wishlist = entityManager.find(Wishlist.class,wishListKey);
+        libraink_wishlistDTO wishlistDTO = new libraink_wishlistDTO();
+        wishlistDTO.setIsbn(wishlist.getIsbn());
+        wishlistDTO.setEmail_user(wishlist.getEmail_user());
+        return wishlistDTO;
+    }
+
+    @Override
+    public libraink_history_loanDTO findHistoryLoanByKeys(String user_email, String isbn, String id_copy, Date start_date) {
+        History_loanKey history_loanKey=new History_loanKey(user_email,isbn,id_copy,start_date);
+        History_loan history_loan = entityManager.find(History_loan.class,history_loanKey);
+        libraink_history_loanDTO history_loanDTO = new libraink_history_loanDTO();
+        history_loanDTO.setIsbn(history_loan.getIsbn());
+        history_loanDTO.setEnd_date(history_loan.getEnd_date());
+        history_loanDTO.setId_copy(history_loan.getId_copy());
+        history_loanDTO.setUser_email(history_loan.getUser_email());
+        history_loanDTO.setStart_date(history_loan.getStart_date());
+        return history_loanDTO;
+    }
+
+    @Override
+    public libraink_history_reservationDTO findHistoryReservationByKeys(String user_email, String isbn, String id_copy, Date start_date) {
+        History_reservationKey history_reservationKey=new History_reservationKey(user_email,isbn,id_copy,start_date);
+        History_reservation history_reservation = entityManager.find(History_reservation.class,history_reservationKey);
+        libraink_history_reservationDTO history_reservationDTO = new libraink_history_reservationDTO();
+        history_reservationDTO.setIsbn(history_reservation.getIsbn());
+        history_reservationDTO.setEnd_date(history_reservation.getEnd_date());
+        history_reservationDTO.setId_copy(history_reservation.getId_copy());
+        history_reservationDTO.setUser_email(history_reservation.getUser_email());
+        history_reservationDTO.setStart_date(history_reservation.getStart_date());
+        history_reservationDTO.setDeleted(history_reservation.isDeleted());
+        return history_reservationDTO;
+    }
+
+    @Override
     public boolean deleteUserByEmail(String email) {
         Users user = entityManager.find(Users.class,email);
         if (user!=null)
@@ -172,6 +237,42 @@ public class librarinkRemoteEJB implements LibrainkRemote{
         }
         return false;
 
+    }
+
+    @Override
+    public boolean deleteWishlistByKey(String user_email, String isbn) {
+        WishListKey wishListKey = new WishListKey(user_email,isbn);
+        Wishlist wishlist = entityManager.find(Wishlist.class,wishListKey);
+        if(wishlist!=null)
+        {
+            entityManager.remove(wishlist);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean deleteHistoryLoanByKeys(String user_email, String isbn, String id_copy, Date start_date) {
+        History_loanKey history_loanKey = new History_loanKey(user_email,isbn,id_copy,start_date);
+        History_loan history_loan = entityManager.find(History_loan.class,history_loanKey);
+        if(history_loan!=null)
+        {
+            entityManager.remove(history_loan);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean deleteHistoryReservationByKeys(String user_email, String isbn, String id_copy, Date start_date) {
+        History_reservationKey history_reservationKey = new History_reservationKey(user_email,isbn,id_copy,start_date);
+        History_reservation history_reservation = entityManager.find(History_reservation.class,history_reservationKey);
+        if(history_reservation!=null)
+        {
+            entityManager.remove(history_reservation);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -232,5 +333,93 @@ public class librarinkRemoteEJB implements LibrainkRemote{
             entityManager.merge(book);
         }
         return bookDTO;
+    }
+
+    @Override
+    public libraink_wishlistDTO saveOrUpdateWishlist(libraink_wishlistDTO wishlistDTO, boolean update) {
+        Wishlist wishlist = null;
+        if(!update)
+        {
+            wishlist=new Wishlist();
+        }
+        else
+        {
+            wishlist=entityManager.find(Wishlist.class,new WishListKey(wishlistDTO.getEmail_user(),wishlistDTO.getIsbn()));
+
+
+        }
+        wishlist.setIsbn(wishlistDTO.getIsbn());
+        wishlist.setEmail_user(wishlistDTO.getEmail_user());
+        if(!update)
+        {
+            entityManager.persist(wishlist);
+        }
+        else
+        {
+            entityManager.merge(wishlist);
+        }
+        return wishlistDTO;
+    }
+
+    @Override
+    public libraink_history_reservationDTO saveOrUpdateHistory_reservation(libraink_history_reservationDTO history_reservationDTO, boolean update) {
+        History_reservation history_reservation=null;
+        if(!update)
+        {
+            history_reservation=new History_reservation();
+        }
+        else
+        {
+            history_reservation=entityManager.find(History_reservation.class,new History_reservationKey(
+                    history_reservationDTO.getUser_email(), history_reservationDTO.getIsbn(),
+                    history_reservationDTO.getId_copy(),history_reservationDTO.getStart_date()));
+        }
+
+        history_reservation.setIsbn(history_reservationDTO.getIsbn());
+        history_reservation.setEnd_date(history_reservationDTO.getEnd_date());
+        history_reservation.setId_copy(history_reservationDTO.getId_copy());
+        history_reservation.setUser_email(history_reservationDTO.getUser_email());
+        history_reservation.setStart_date(history_reservationDTO.getStart_date());
+        history_reservation.setDeleted(history_reservationDTO.isDeleted());
+        if(!update)
+        {
+            entityManager.persist(history_reservation);
+        }
+        else
+        {
+            entityManager.merge(history_reservation);
+        }
+        return history_reservationDTO;
+    }
+
+    @Override
+    public libraink_history_loanDTO saveOrUpdateHistory_loan(libraink_history_loanDTO history_loanDTO, boolean update) {
+        History_loan history_loan=null;
+        if(!update)
+        {
+            history_loan=new History_loan();
+        }
+        else
+        {
+            history_loan=entityManager.find(History_loan.class,new History_loanKey(
+                    history_loanDTO.getUser_email(), history_loanDTO.getIsbn(),
+                    history_loanDTO.getId_copy(),history_loanDTO.getStart_date()));
+        }
+
+        history_loan.setIsbn(history_loanDTO.getIsbn());
+        history_loan.setEnd_date(history_loanDTO.getEnd_date());
+        history_loan.setId_copy(history_loanDTO.getId_copy());
+        history_loan.setUser_email(history_loanDTO.getUser_email());
+        history_loan.setStart_date(history_loanDTO.getStart_date());
+
+        if(!update)
+        {
+            entityManager.persist(history_loan);
+        }
+        else
+        {
+            entityManager.merge(history_loan);
+        }
+        return history_loanDTO;
     }
 }
