@@ -62,7 +62,7 @@ public class librarinkRemoteEJB implements LibrainkRemote{
     public List<libraink_booksDTO> listBooks(libraink_booksDTO booksFilter) {
         Map<String, Object> parameters = new HashMap<String, Object>();
         StringBuilder jpql = new StringBuilder();
-        jpql.append("select b, coalesce(size(b.languages),0) from users b where 1 = 1 ");
+        jpql.append("select b, coalesce(size(b.languages),0) from books b where 1 = 1 ");
         if (booksFilter.getBook_title() != null && !booksFilter.getBook_title().isEmpty()){
             jpql.append(" and lower(b.book_title) like concat('%', lower(:book_title), '%') ");
             parameters.put("book", booksFilter.getBook_title());
@@ -106,20 +106,57 @@ public class librarinkRemoteEJB implements LibrainkRemote{
 
     @Override
     public List<libraink_history_loanDTO> listHistoryLoan(libraink_history_loanDTO history_loanFilter) {
-        return null;
+
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        StringBuilder jpql = new StringBuilder();
+        jpql.append("select l, coalesce(size(l.languages),0) from history_loan l where 1 = 1 ");
+        if (history_loanFilter.getUser_email() != null && !history_loanFilter.getUser_email().isEmpty()){
+            jpql.append(" and lower(l.user_email) like concat('%', lower(:user_email), '%') ");
+            parameters.put("user_email", history_loanFilter.getUser_email());
+        }
+        if (history_loanFilter.getIsbn() != null && !history_loanFilter.getIsbn().isEmpty()){
+            jpql.append(" and lower(l.isbn) like concat('%', lower(:isbn), '%') ");
+            parameters.put("isbn", history_loanFilter.getIsbn());
+        }
+        if (history_loanFilter.getId_copy() != null && !history_loanFilter.getId_copy().isEmpty()){
+            jpql.append(" and lower(l.id_copy) like concat('%', lower(:id_copy), '%') ");
+            parameters.put("id_copy", history_loanFilter.getIsbn());
+        }
+        jpql.append(" group by l ");
+        Query query = entityManager.createQuery(jpql.toString());
+        for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
+            query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
+        }
+        List<Object[]> history_loanList = query.getResultList();
+        List<libraink_history_loanDTO> toReturnList = new ArrayList<libraink_history_loanDTO>();
+        if (history_loanList != null && !history_loanList.isEmpty()) {
+            for(Object[] history_loanInfo: history_loanList){
+                History_loan history_loan = (History_loan) history_loanInfo[0];
+                Integer numLanguages = ((Number)history_loanInfo[1]).intValue();
+                libraink_history_loanDTO history_loanDTO = new libraink_history_loanDTO();
+                history_loanDTO.setIsbn(history_loan.getIsbn());
+                history_loanDTO.setEnd_date(history_loan.getEnd_date());
+                history_loanDTO.setId_copy(history_loan.getId_copy());
+                history_loanDTO.setUser_email(history_loan.getUser_email());
+                history_loanDTO.setStart_date(history_loan.getStart_date());
+                toReturnList.add(history_loanDTO);
+            }
+        }
+        return toReturnList;
     }
 
     @Override
     public List<libraink_wishlistDTO> listWishlist(libraink_wishlistDTO wishlistFilter) {
         Map<String, Object> parameters = new HashMap<String, Object>();
         StringBuilder jpql = new StringBuilder();
-        jpql.append("select w, coalesce(size(w.languages),0) from users w where 1 = 1 ");
+        jpql.append("select w, coalesce(size(w.languages),0) from wishlist w where 1 = 1 ");
         if (wishlistFilter.getEmail_user() != null && !wishlistFilter.getEmail_user().isEmpty()){
             jpql.append(" and lower(w.email_user) like concat('%', lower(:email_user), '%') ");
             parameters.put("email_user", wishlistFilter.getEmail_user());
         }
         if (wishlistFilter.getIsbn() != null && !wishlistFilter.getIsbn().isEmpty()){
-            jpql.append(" and lower(u.isbn) like concat('%', lower(:isbn), '%') ");
+            jpql.append(" and lower(w.isbn) like concat('%', lower(:isbn), '%') ");
             parameters.put("isbn", wishlistFilter.getIsbn());
         }
         jpql.append(" group by w ");
@@ -144,7 +181,43 @@ public class librarinkRemoteEJB implements LibrainkRemote{
 
     @Override
     public List<libraink_history_reservationDTO> listHistoryReservation(libraink_history_reservationDTO history_reservationFilter) {
-        return null;
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        StringBuilder jpql = new StringBuilder();
+        jpql.append("select r, coalesce(size(r.languages),0) from history_reservation r where 1 = 1 ");
+        if (history_reservationFilter.getUser_email() != null && !history_reservationFilter.getUser_email().isEmpty()){
+            jpql.append(" and lower(r.user_email) like concat('%', lower(:user_email), '%') ");
+            parameters.put("user_email", history_reservationFilter.getUser_email());
+        }
+        if (history_reservationFilter.getIsbn() != null && !history_reservationFilter.getIsbn().isEmpty()){
+            jpql.append(" and lower(r.isbn) like concat('%', lower(:isbn), '%') ");
+            parameters.put("isbn", history_reservationFilter.getIsbn());
+        }
+        if (history_reservationFilter.getId_copy() != null && !history_reservationFilter.getId_copy().isEmpty()){
+            jpql.append(" and lower(r.id_copy) like concat('%', lower(:id_copy), '%') ");
+            parameters.put("id_copy", history_reservationFilter.getIsbn());
+        }
+        jpql.append(" group by r ");
+        Query query = entityManager.createQuery(jpql.toString());
+        for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
+            query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
+        }
+        List<Object[]> history_reservationList = query.getResultList();
+        List<libraink_history_reservationDTO> toReturnList = new ArrayList<libraink_history_reservationDTO>();
+        if (history_reservationList != null && !history_reservationList.isEmpty()) {
+            for(Object[] history_reservationInfo: history_reservationList){
+                History_reservation history_reservation = (History_reservation) history_reservationInfo[0];
+                Integer numLanguages = ((Number)history_reservationInfo[1]).intValue();
+                libraink_history_reservationDTO history_reservationDTO = new libraink_history_reservationDTO();
+                history_reservationDTO.setIsbn(history_reservation.getIsbn());
+                history_reservationDTO.setEnd_date(history_reservation.getEnd_date());
+                history_reservationDTO.setId_copy(history_reservation.getId_copy());
+                history_reservationDTO.setUser_email(history_reservation.getUser_email());
+                history_reservationDTO.setStart_date(history_reservation.getStart_date());
+                history_reservationDTO.setDeleted(history_reservation.isDeleted());
+                toReturnList.add(history_reservationDTO);
+            }
+        }
+        return toReturnList;
     }
 
     @Override
