@@ -68,5 +68,5 @@ start_child(MasterPid) ->
 %% @end
 -spec(stop_child(MasterPid :: pid()) -> none()).
 stop_child(MasterPid) ->
-  supervisor:terminate_child(librarink_mqs_sup, MasterPid),
-  supervisor:delete_child(librarink_mqs_sup, MasterPid).
+  supervisor:terminate_child(?SERVER, MasterPid),
+  supervisor:delete_child(?SERVER, MasterPid).

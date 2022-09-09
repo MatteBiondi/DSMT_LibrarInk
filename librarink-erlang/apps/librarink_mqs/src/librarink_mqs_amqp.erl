@@ -11,7 +11,7 @@
 
 %% API
 -export([start_connection/1, declare_queue/2, bind_queue/5, unbind_queue/4, start_consumer/3, consumer/3,
-  close_connection/2]).
+  close_connection/2, produce/5, produce_once/5]).
 
 -include_lib("amqp_client/include/amqp_client.hrl").
 
@@ -135,22 +135,23 @@ consumer(Connection, Channel, Callback) ->
       close_connection(Connection, Channel)
   end.
 
+produce(Channel, ExchangeName, ExchangeType, RoutingKey, Payload)->
 
-%%produce(Channel, ExchangeName, ExchangeType, Payload)->
-%%  produce(Channel, ExchangeName, ExchangeType, "", Payload).
-%%produce(Channel, ExchangeName, ExchangeType, RoutingKey, Payload)->
-%%
-%%  %% Declare exchange
-%%  amqp_channel:call(
-%%    Channel,
-%%    #'exchange.declare'{exchange = list_to_binary(ExchangeName), type = list_to_binary(ExchangeType)}
-%%  ),
-%%
-%%  %% Build message
-%%  Publish = #'basic.publish'{exchange = list_to_binary(ExchangeName), routing_key = list_to_binary(RoutingKey)},
-%%  Props = #'P_basic'{delivery_mode = 2}, %% persistent message
-%%  Msg = #amqp_msg{props = Props, payload = list_to_binary(Payload)},
-%%
-%%  %% Send message
-%%  amqp_channel:cast(Channel, Publish, Msg),
-%%  ok.
+  %% Declare exchange
+  amqp_channel:call(
+    Channel,
+    #'exchange.declare'{exchange = ExchangeName, type = ExchangeType}
+  ),
+
+  %% Build message
+  Publish = #'basic.publish'{exchange = ExchangeName, routing_key = RoutingKey},
+  Props = #'P_basic'{delivery_mode = 2}, %% persistent message
+  Msg = #amqp_msg{props = Props, payload = Payload},
+
+  %% Send message
+  amqp_channel:cast(Channel, Publish, Msg).
+
+produce_once(Host, ExchangeName, ExchangeType, RoutingKey, Payload) ->
+  {ok, Connection, Channel} = start_connection(Host),
+  librarink_mqs_amqp:produce(Channel, ExchangeName, ExchangeType,  RoutingKey, Payload),
+  librarink_mqs_amqp:close_connection(Connection, Channel).
