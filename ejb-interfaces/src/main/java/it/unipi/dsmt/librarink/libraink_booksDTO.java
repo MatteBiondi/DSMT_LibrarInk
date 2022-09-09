@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class libraink_booksDTO implements Serializable {
     String isbn;
     String book_title;
+    String book_author;
     String genre;
     int year_of_publication;
     String publisher;
@@ -15,6 +16,9 @@ public class libraink_booksDTO implements Serializable {
     String image_url_l;
     String description;
 
+    public String getBook_author() {
+        return book_author;
+    }
 
     public String getIsbn() {
         return isbn;
@@ -96,6 +100,10 @@ public class libraink_booksDTO implements Serializable {
 
     public void setImage_url_l(String image_url_l) {
         this.image_url_l = image_url_l;
+    }
+
+    public void setBook_author(String book_author) {
+        this.book_author = book_author;
     }
 
     public void setDescription(String description) {
