@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Test" type="RebarEunitRunConfigurationType" factoryName="Erlang Rebar Eunit">
     <module name="librarink-erlang" />
-    <option name="command" value="eunit" />
+    <option name="command" value="eunit --sname librarink --setcookie abcd" />
     <option name="skipDependencies" value="false" />
     <envs />
     <method v="2" />
