@@ -1,11 +1,12 @@
 {application, librarink_mnesiaDB,
- [{description, "An OTP library to handle mnesia operation on books database"},
+ [{description, "An OTP application to handle mnesia operation on books database"},
   {vsn, "0.1.0"},
   {registered, []},
+  {mod, {librarink_mnesiaDB_app, []}},
   {applications, [kernel, stdlib, mnesia]},
   {env,[]},
-  {modules, [librarink_mnesiaDB]},
-
+  {modules, [librarink_mnesiaDB, librarink_mnesiaDB_app, librarink_mnesiaDB_client, librarink_mnesiaDB_fun,
+     librarink_mnesiaDB_sup, librarinkn_mnesiaDB_worker_sup, librarink_mnesiaDB_bridge_sup, librarink_mnesiaDB_worker]},
   {licenses, ["Apache-2.0"]},
   {links, []}
  ]}.
