@@ -1,0 +1,9 @@
+{application, librarink_proxy,
+ [{description, "Proxy server to hide the core of Erlang server"},
+  {vsn, "0.1.0"},
+  {registered, [librarink_proxy_sup]},
+  {mod, {librarink_proxy_app, []}},
+  {applications, [kernel, stdlib, crypto]},
+  {modules, [librarink_proxy, librarink_proxy_app, librarink_proxy_sup, librarink_proxy_worker]},
+  {licenses, ["Apache-2.0"]}
+ ]}.

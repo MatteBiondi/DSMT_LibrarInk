@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Shell" type="RebarRunConfigurationType" factoryName="Erlang Rebar">
     <module name="librarink-erlang" />
-    <option name="command" value="shell" />
+    <option name="command" value="shell --setcookie abcd --sname librarink" />
     <option name="skipDependencies" value="false" />
     <envs />
     <method v="2" />
