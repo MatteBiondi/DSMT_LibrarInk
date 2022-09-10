@@ -44,7 +44,7 @@ start_link() ->
 init(_Args) ->
   MaxRestarts = 1,
   MaxSecondsBetweenRestarts = 60,
-  SupFlags = #{strategy => simple_one_for_one,
+  SupFlags = #{strategy => one_for_one,
     intensity => MaxRestarts,
     period => MaxSecondsBetweenRestarts},
 
@@ -59,12 +59,12 @@ init(_Args) ->
 -spec(start_worker(Function::atom(), Args::map(), BridgeSupId::string(), From::tuple()) -> {ok, Pid :: pid()}).
 start_worker(Function, Args, BridgeSupId, From) ->
   ChildSpec = #{id => BridgeSupId,
-    start => {librarink_mnesiaDB_bridge_sup, start_link, [BridgeSupId, Function, Args, From]},
+    start => {librarink_mnesiaDB_bridge_sup, start_link, [Function, Args, From]},
     restart => transient,
     shutdown => infinity,
     type => supervisor,
     modules => ['librarink_mnesiaDB_bridge_sup']},
-  supervisor:start_child(self(), ChildSpec).
+  supervisor:start_child(?SERVER, ChildSpec).
 
 
 %% @doc

@@ -10,7 +10,7 @@
 -behaviour(supervisor_bridge).
 
 %% API
--export([start_link/4]).
+-export([start_link/3]).
 
 %% Supervisor callbacks
 -export([init/1, terminate/2]).
@@ -22,10 +22,10 @@
 %%%===================================================================
 
 %% @doc Starts the supervisor bridge
--spec(start_link( BridgeSupId::string(), Function::atom(), Args::map(), From::tuple()) ->
+-spec(start_link( Function::atom(), Args::map(), From::tuple()) ->
   {ok, Pid :: pid()} | ignore | {error, Reason :: term()}).
-start_link(BridgeSupId, Function, Args, From) ->
-  supervisor:start_link({local, list_to_atom("Bridge-"++BridgeSupId)}, ?MODULE, [Function, Args, From]).
+start_link(Function, Args, From) ->
+  supervisor:start_link(?MODULE, [Function, Args, From]).
 
 %%%===================================================================
 %%% Supervisor callbacks
