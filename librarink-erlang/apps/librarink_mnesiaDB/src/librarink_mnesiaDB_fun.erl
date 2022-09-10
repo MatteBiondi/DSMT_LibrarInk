@@ -45,35 +45,40 @@
 install(ActiveNodes, BackupNodes) ->
   %Create schema for all nodes received as parameter
   Nodes = ActiveNodes ++ BackupNodes,
-  mnesia:create_schema(Nodes),
-  %Activate Mnesia in all nodes
-  rpc:multicall(Nodes, application, start, [mnesia]),
-  %Create tables if not exist
-  case mnesia:wait_for_tables([ librarink_lent_book,
-                                librarink_reserved_book,
-                                librarink_physical_book_copy], 5000) =:= ok of
-    true ->
-      {succeed, install_succeeded};
-    false ->
-      mnesia:create_table(librarink_lent_book,
-        [{attributes, record_info(fields, librarink_lent_book)},
-          {index, [#librarink_lent_book.isbn, #librarink_lent_book.physical_copy_id]},
-          {disc_copies, ActiveNodes},
-          {disc_only_copies, BackupNodes},
-          {type, bag}]),
-      mnesia:create_table(librarink_reserved_book,
-        [{attributes, record_info(fields, librarink_reserved_book)},
-          {index, [#librarink_reserved_book.isbn]},
-          {disc_copies, ActiveNodes},
-          {disc_only_copies, BackupNodes},
-          {type, bag}]),
-      mnesia:create_table(librarink_physical_book_copy,
-        [{attributes, record_info(fields, librarink_physical_book_copy)},
-          {index, [#librarink_physical_book_copy.physical_copy_id]},
-          {disc_copies, ActiveNodes},
-          {disc_only_copies, BackupNodes},
-          {type, bag}]),
-      {succeed, install_succeeded}
+  io:format("Active, Backup: ~p~n",[{ActiveNodes, BackupNodes}]),
+  Active = lists:member(node(), ActiveNodes),
+  case Active of
+    true ->   %Activate Mnesia in all nodes
+      io:format("I'm active !~n"),
+      mnesia:create_schema(Nodes),
+      rpc:multicall(Nodes, application, start, [mnesia]),
+      case mnesia:wait_for_tables([ librarink_lent_book,
+        librarink_reserved_book,
+        librarink_physical_book_copy], 5000) =:= ok of
+        true ->
+          {succeed, install_succeeded};
+        false ->  %Create tables if not exist
+          mnesia:create_table(librarink_lent_book,
+            [{attributes, record_info(fields, librarink_lent_book)},
+              {index, [#librarink_lent_book.isbn, #librarink_lent_book.physical_copy_id]},
+              {disc_copies, ActiveNodes},
+              {disc_only_copies, BackupNodes},
+              {type, bag}]),
+          mnesia:create_table(librarink_reserved_book,
+            [{attributes, record_info(fields, librarink_reserved_book)},
+              {index, [#librarink_reserved_book.isbn]},
+              {disc_copies, ActiveNodes},
+              {disc_only_copies, BackupNodes},
+              {type, bag}]),
+          mnesia:create_table(librarink_physical_book_copy,
+            [{attributes, record_info(fields, librarink_physical_book_copy)},
+              {index, [#librarink_physical_book_copy.physical_copy_id]},
+              {disc_copies, ActiveNodes},
+              {disc_only_copies, BackupNodes},
+              {type, bag}]),
+          {succeed, install_succeeded}
+      end;
+      _false -> io:format("I'm backup !~n"), {succeed, install_succeeded}
   end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
