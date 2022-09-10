@@ -25,7 +25,7 @@
 -spec(start_link( Function::atom(), Args::map(), From::tuple()) ->
   {ok, Pid :: pid()} | ignore | {error, Reason :: term()}).
 start_link(Function, Args, From) ->
-  supervisor:start_link(?MODULE, [Function, Args, From]).
+  supervisor_bridge:start_link(?MODULE, [Function, Args, From]).
 
 %%%===================================================================
 %%% Supervisor callbacks
