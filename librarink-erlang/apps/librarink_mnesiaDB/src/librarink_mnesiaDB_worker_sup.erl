@@ -56,7 +56,7 @@ init(_Args) ->
 %% @private
 %% @doc Start new supervised child, i.e. the librarink supervisor bridge associated
 %% to a master process. The supervisor bridge will be used to supervise a worker.
--spec(start_worker(Function::atom(), Args::list(term()), BridgeSupId::string(), From::tuple()) -> {ok, Pid :: pid()}).
+-spec(start_worker(Function::atom(), Args::map(), BridgeSupId::string(), From::tuple()) -> {ok, Pid :: pid()}).
 start_worker(Function, Args, BridgeSupId, From) ->
   ChildSpec = #{id => BridgeSupId,
     start => {librarink_mnesiaDB_bridge_sup, start_link, [BridgeSupId, Function, Args, From]},

@@ -44,7 +44,7 @@ init(_Args) ->
 
 %% @private
 %% @doc Handling call messages
--spec(handle_call(Request :: term(), From :: {pid(), Tag :: term()},
+-spec(handle_call(Request :: term() | {Function::atom(), Args::map()}, From :: {pid(), Tag :: term()},
     State :: #librarink_mnesiaDB_state{}) ->
   {reply, Reply :: term(), NewState :: #librarink_mnesiaDB_state{}} |
   {reply, Reply :: term(), NewState :: #librarink_mnesiaDB_state{}, timeout() | hibernate} |

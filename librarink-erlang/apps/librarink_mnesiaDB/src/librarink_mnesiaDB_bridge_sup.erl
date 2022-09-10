@@ -22,7 +22,7 @@
 %%%===================================================================
 
 %% @doc Starts the supervisor bridge
--spec(start_link( BridgeSupId::string(), Function::atom(), Args::list(term()), From::tuple()) ->
+-spec(start_link( BridgeSupId::string(), Function::atom(), Args::map(), From::tuple()) ->
   {ok, Pid :: pid()} | ignore | {error, Reason :: term()}).
 start_link(BridgeSupId, Function, Args, From) ->
   supervisor:start_link({local, list_to_atom("Bridge-"++BridgeSupId)}, ?MODULE, [Function, Args, From]).
@@ -34,7 +34,7 @@ start_link(BridgeSupId, Function, Args, From) ->
 %% @private
 %% @doc Whenever a supervisor is started using supervisor:start_link/[2,3],
 %% this function is called by the new process to start the subsystem and initialize.
--spec(init(list(Function::atom(), Args::list(term()), From::tuple())) -> {ok, Pid::pid(), []}).
+-spec(init(list(Function::atom(), Args::map(), From::tuple())) -> {ok, Pid::pid(), []}).
 init([Function, Args, From]) ->
   Pid = spawn(librarink_mnesiaDB_worker, handle_request, [Function, Args,From]),
   {ok, Pid, []}.

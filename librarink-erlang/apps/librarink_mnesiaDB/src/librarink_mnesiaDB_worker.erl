@@ -15,7 +15,7 @@
 %% interact with permanent data stored in Mnesia DB. If there is no error in the request,
 %% the worker execute the appropriate function wrote in librarink_mnesiaDB_fun. At the end,
 %% worker reply to the client sending the obtained result.
--spec(handle_request(Function :: atom(), Args::maps(), From::tuple()) -> ok).
+-spec(handle_request(Function :: atom(), Args::map(), From::tuple()) -> ok).
 
 handle_request(write_copy, #{isbn := Isbn, id := Id}, From)->
   Result = performe_operation(add_book_copy,[Isbn, Id]),
@@ -153,7 +153,7 @@ handle_request(_, _, From)->
 %% @doc This functions is used to call the mnesiaDB function implemented in
 %% librarink_mnesiaDB_fun module. This function allows to reduce redundant
 %% try...catch code. It takes function and arguments as parameters.
--spec(performe_operation(Fun :: atom(), Args::maps()) ->
+-spec(performe_operation(Fun :: atom(), Args::map()) ->
   {succeed, ok} |
   {succeed,{Records_counter :: pos_integer(), Records_list :: list(tuple())}} |
   {succeed, Copies_counter::pos_integer()} |
