@@ -34,7 +34,8 @@ start_link(BridgeSupId, Function, Args, From) ->
 %% @private
 %% @doc Whenever a supervisor is started using supervisor:start_link/[2,3],
 %% this function is called by the new process to start the subsystem and initialize.
--spec(init(list(Function::atom(), Args::map(), From::tuple())) -> {ok, Pid::pid(), []}).
+-type user_request_type() :: {struct, [{Function::atom(), Args::map(), From::tuple()}]}.
+-spec(init(ComposedArg :: user_request_type()) -> {ok, Pid::pid(), []}).
 init([Function, Args, From]) ->
   Pid = spawn(librarink_mnesiaDB_worker, handle_request, [Function, Args,From]),
   {ok, Pid, []}.
