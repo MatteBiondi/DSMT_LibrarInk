@@ -21,6 +21,10 @@ public class librarinkRemoteEJB implements LibrainkRemote{
         Map<String, Object> parameters = new HashMap<String, Object>();
         StringBuilder jpql = new StringBuilder();
         jpql.append("select u, coalesce(size(c.languages),0) from users u where 1 = 1 ");
+        if (usersFilter.getEmail() != null && !usersFilter.getEmail().isEmpty()){
+            jpql.append(" and lower(u.email) like concat('%', lower(:email), '%') ");
+            parameters.put("email", usersFilter.getEmail());
+        }
         if (usersFilter.getName() != null && !usersFilter.getName().isEmpty()){
             jpql.append(" and lower(u.name) like concat('%', lower(:name), '%') ");
             parameters.put("name", usersFilter.getName());
