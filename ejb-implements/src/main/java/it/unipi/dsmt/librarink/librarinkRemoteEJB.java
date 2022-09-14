@@ -374,7 +374,13 @@ public class librarinkRemoteEJB implements LibrainkRemote{
         }
         else
         {
-            entityManager.merge(user);
+            try {
+                entityManager.merge(user);
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
         }
         return userDTO;
     }

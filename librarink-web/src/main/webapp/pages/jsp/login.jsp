@@ -23,6 +23,14 @@
         <button type="submit">Login</button>
         <input type="checkbox" checked="checked"> Remember me
         <button type="button" class="cancelbtn"> Cancel</button>
+        <%
+        if(request.getParameterMap().containsKey("message"))
+        {
+        %>
+        <h2 style="color:red;"><%=request.getAttribute("message")%></h2>
+        <%
+            }
+        %>
         New member? <a href="<%= request.getContextPath()%>/SignUpServlet"> click here to signUp </a>
     </div>
 </form>

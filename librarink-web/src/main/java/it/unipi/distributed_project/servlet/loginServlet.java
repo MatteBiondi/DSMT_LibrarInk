@@ -38,7 +38,9 @@ public class loginServlet extends HttpServlet {
                 usersDTO = (libraink_usersDTO) librainkRemoteEJB.listUsers(usersFilter);//potrebbe non funzionare
                 if (usersDTO !=null)
                 {
+                    //a user session is composed by email and password
                     session.setAttribute("email",email);
+                    session.setAttribute("password",password);
                     String targetJPS ="librarink-web/src/main/webapp/index.jsp";
                     request.setAttribute("user",usersDTO);
                     RequestDispatcher requestDispatcher=request.getRequestDispatcher(targetJPS);
@@ -49,7 +51,7 @@ public class loginServlet extends HttpServlet {
                 {
 
                     String targetJPS ="librarink-web/src/main/webapp/pages/jsp/login.jsp";
-                    request.setAttribute("failed",true);
+                    request.setAttribute("message","password or  email not valid");
                     RequestDispatcher requestDispatcher=request.getRequestDispatcher(targetJPS);
                     requestDispatcher.forward(request,response);
                 }

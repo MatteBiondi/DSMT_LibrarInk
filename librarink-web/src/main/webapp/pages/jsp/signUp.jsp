@@ -31,6 +31,14 @@
 
         <button type="submit">Login</button>
         <button type="button" class="cancelbtn"> Cancel</button>
+        <%
+          if(request.getParameterMap().containsKey("message"))
+          {
+        %>
+        <h2 style="color:red;"><%=request.getAttribute("message")%></h2>
+        <%
+            }
+        %>
         Already a member? <a href="<%= request.getContextPath()%>/loginServlet"> click here to login </a>
     </div>
 </form>
