@@ -1,4 +1,4 @@
-package it.unipi.distributed_project.servlet;
+package it.unipi.dsmt.servlet;
 
 import it.unipi.dsmt.librarink.libraink_usersDTO;
 import it.unipi.dsmt.librarink.librarinkRemoteEJB;
