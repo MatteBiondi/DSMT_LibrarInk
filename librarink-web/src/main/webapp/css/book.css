@@ -1,0 +1,147 @@
+.thumbnail{
+    width: 20%;
+    height: fit-content;
+    /*Card effect*/
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    display: inline-block;
+    margin: 2.5% 2.5% 2.5% 2.1%;
+}
+
+.thumbnail:hover{
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.info_container > p{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 1em;
+    margin: 0.5em 1em;
+}
+
+.info_container > h3{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 1.2em;
+    margin: 0.5em;
+}
+
+.thumbnail > img{
+    max-width: 50%;
+    max-height: 50%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.thumbnail > *{
+    margin: 2%;
+    display: block;
+}
+
+a, a:hover, a:visited, a:active {
+    color: inherit;
+    text-decoration: none;
+}
+
+.info_container{
+    padding: 2% 5%;
+}
+
+.detailed{
+
+}
+
+.right_column{
+    float: right;
+    width: 45%;
+    margin-right: 5%;
+}
+
+.right_column > h3{
+    font-size: 1.3em;
+}
+
+.book_info{
+    background-color: lightgrey;
+    border: 2pt solid darkslategrey;
+}
+
+.book_info > *{
+    display: inline-block;
+    margin: 5pt;
+}
+
+.book_info > p {
+    word-break: normal;
+    overflow-wrap: break-word;
+    white-space: normal;
+    font-size: 1em;
+}
+
+.book_info > h3 {
+    word-break: normal;
+    overflow-wrap: break-word;
+    white-space: normal;
+    font-size: 1.3em;
+}
+
+.left_column{
+    float: left;
+    width: 45%;
+    margin-left: 5%;
+    align-content: center;
+}
+
+.left_column > img {
+    max-width:75%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.left_column > button {
+    width: 30%;
+    display: block;
+    margin-left: 35%;
+    margin-top: 3%;
+    background-color: royalblue;
+    font-weight: bold;
+    color: white;
+    border: none;
+    padding: 2%;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.stars_div{
+    width: fit-content;
+    direction: rtl;
+}
+
+.stars_div a {
+    font-size: 2em;
+    color: grey;
+    text-decoration: none;
+    -webkit-transition: all 0.4s;
+    -moz-transition: all 0.4s;
+    -o-transition: all 0.4s;
+    transition: all 0.4s;
+}
+.stars_div a:hover {
+    color: gold;
+    transform: scale(1.3);
+}
+.s1:hover ~ a,
+.s2:hover ~ a,
+.s3:hover ~ a,
+.s4:hover ~ a,
+.s5:hover ~ a {
+    color: gold;
+}
+
+.page_title{
+    margin: 2%;
+}
