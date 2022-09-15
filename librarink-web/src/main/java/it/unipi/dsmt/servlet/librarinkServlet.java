@@ -1,4 +1,4 @@
-package it.unipi.distributed_project.servlet;
+package it.unipi.dsmt.servlet;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
