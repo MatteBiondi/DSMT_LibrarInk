@@ -8,20 +8,19 @@
   <artifactId>DSMT_LibrarInk</artifactId>
   <packaging>pom</packaging>
   <version>1.0.0-SNAPSHOT</version>
+
   <modules>
     <module>librarink-web</module>
-      <module>ejb-interfaces</module>
+    <module>ejb-interfaces</module>
     <module>ejb-implements</module>
   </modules>
 
   <name>DSMT_LibrarInk</name>
-  <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
   </properties>
 
   <dependencies>
@@ -62,9 +61,13 @@
           <artifactId>maven-install-plugin</artifactId>
           <version>2.5.2</version>
         </plugin>
+        <!-- Exclude default deploy plugin -->
         <plugin>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>2.8.2</version>
+          <configuration>
+            <skip>true</skip>
+          </configuration>
         </plugin>
         <!-- site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
         <plugin>

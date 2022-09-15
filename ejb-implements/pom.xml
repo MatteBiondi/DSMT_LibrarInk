@@ -1,20 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>DSMT_LibrarInk</artifactId>
-        <groupId>it.unipi.dsmt.librarink</groupId>
-        <version>1.0.0-SNAPSHOT</version>
-    </parent>
+
     <modelVersion>4.0.0</modelVersion>
-
+    <groupId>it.unipi.dsmt.librarink</groupId>
     <artifactId>ejb-implements</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-
-    <name>ejb-implements</name>
-    <url>http://maven.apache.org</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -23,12 +19,6 @@
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>it.unipi.dsmt.librarink</groupId>
-            <artifactId>librarink-interfaces</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>javax.ejb</groupId>
@@ -41,5 +31,89 @@
             <artifactId>hibernate-core</artifactId>
             <version>5.4.0.Final</version>
         </dependency>
+        <dependency>
+            <groupId>it.unipi.dsmt.librarink</groupId>
+            <artifactId>ejb-interfaces</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <!-- Exclude default package plugin-->
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Fat jar plugin-->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+            <!-- Exclude default deploy plugin -->
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <!-- Glassfish deploy plugin -->
+            <plugin>
+                <groupId>org.glassfish.maven.plugin</groupId>
+                <artifactId>maven-glassfish-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <glassfishDirectory>C:\glassfish5\glassfish</glassfishDirectory>
+                    <user>admin</user>
+                    <!--passwordFile>C:\glassfish5\glassfish\domains\domain1\config\domain-passwords</passwordFile-->
+                    <adminPassword>admin</adminPassword>
+                    <domain>
+                        <name>domain1</name>
+                        <httpPort>8080</httpPort>
+                        <adminPort>4848</adminPort>
+                    </domain>
+                    <components>
+                        <component>
+                            <name>${project.artifactId}</name>
+                            <artifact>target/${project.artifactId}-${project.version}-jar-with-dependencies.jar</artifact>
+                        </component>
+                    </components>
+                    <debug>true</debug>
+                    <terse>false</terse>
+                    <echo>true</echo>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>glassfish</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
+
