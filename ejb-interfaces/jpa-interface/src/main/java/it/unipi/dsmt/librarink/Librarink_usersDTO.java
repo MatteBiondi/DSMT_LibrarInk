@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.sql.Date;
 
 
-public class libraink_usersDTO implements Serializable {
+public class Librarink_usersDTO implements Serializable {
     private String name;
     private String surname;
     private String address;

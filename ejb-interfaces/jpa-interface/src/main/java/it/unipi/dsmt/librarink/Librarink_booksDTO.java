@@ -2,7 +2,7 @@ package it.unipi.dsmt.librarink;
 
 import java.io.Serializable;
 
-public class libraink_booksDTO implements Serializable {
+public class Librarink_booksDTO implements Serializable {
     String isbn;
     String book_title;
     String book_author;

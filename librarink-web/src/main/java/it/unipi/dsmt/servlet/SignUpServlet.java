@@ -1,8 +1,9 @@
 package it.unipi.dsmt.servlet;
 
-import it.unipi.dsmt.librarink.libraink_usersDTO;
-import it.unipi.dsmt.librarink.librarinkRemoteEJB;
+import it.unipi.dsmt.librarink.LibrarinkRemote;
+import it.unipi.dsmt.librarink.Librarink_usersDTO;
 
+import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,7 +15,9 @@ import java.sql.Date;
 
 @WebServlet(name = "SignUpServlet", value = "/SignUpServlet")
 public class SignUpServlet extends HttpServlet {
-    private librarinkRemoteEJB librainkRemoteEJB;
+    @EJB
+    private LibrarinkRemote librarinkRemote;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -28,7 +31,7 @@ public class SignUpServlet extends HttpServlet {
         String password = request.getParameter("password");
         Date birthday = Date.valueOf(request.getParameter("birthday"));
         String address = request.getParameter("address");
-        libraink_usersDTO new_user = new libraink_usersDTO();
+        Librarink_usersDTO new_user = new Librarink_usersDTO();
         new_user.setPassword(password);
         new_user.setBirthday(birthday);
         new_user.setEmail(email);
@@ -36,7 +39,7 @@ public class SignUpServlet extends HttpServlet {
         new_user.setName(name);
         new_user.setSurname(surname);
         new_user.setImage("https://cdn.onlinewebfonts.com/svg/img_335286.png");
-        libraink_usersDTO user=librainkRemoteEJB.saveOrUpdateUser(new_user,false);
+        Librarink_usersDTO user= librarinkRemote.saveOrUpdateUser(new_user,false);
         String resourceURL;
         if (user==null)
         {

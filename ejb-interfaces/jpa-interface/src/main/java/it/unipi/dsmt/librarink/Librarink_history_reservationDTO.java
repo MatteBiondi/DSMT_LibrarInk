@@ -3,7 +3,7 @@ package it.unipi.dsmt.librarink;
 import java.io.Serializable;
 import java.sql.Date;
 
-public class libraink_history_reservationDTO implements Serializable {
+public class Librarink_history_reservationDTO implements Serializable {
     String user_email;
     String id_copy;
     String isbn;

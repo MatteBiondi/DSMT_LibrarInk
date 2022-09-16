@@ -1,7 +1,7 @@
 package it.unipi.dsmt.servlet;
 
-import it.unipi.dsmt.librarink.libraink_usersDTO;
-import it.unipi.dsmt.librarink.librarinkRemoteEJB;
+import it.unipi.dsmt.librarink.LibrarinkRemote;
+import it.unipi.dsmt.librarink.Librarink_usersDTO;
 
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
@@ -14,9 +14,10 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebServlet(name = "loginServlet", value = "/loginServlet")
-public class loginServlet extends HttpServlet {
+public class LoginServlet extends HttpServlet {
     @EJB
-    private librarinkRemoteEJB librainkRemoteEJB;
+    private LibrarinkRemote librarinkRemote;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String resourceUrl = null;
@@ -28,14 +29,14 @@ public class loginServlet extends HttpServlet {
             users
         }*/
         if (action != null) {
-            libraink_usersDTO usersDTO = null;
+            Librarink_usersDTO usersDTO = null;
             if ("login".equalsIgnoreCase(action)) {
-                libraink_usersDTO usersFilter = new libraink_usersDTO();
+                Librarink_usersDTO usersFilter = new Librarink_usersDTO();
                 String email = request.getParameter("email");
                 String password = request.getParameter("password");
                 usersFilter.setEmail(email);
                 usersFilter.setPassword(password);
-                usersDTO = (libraink_usersDTO) librainkRemoteEJB.listUsers(usersFilter);//potrebbe non funzionare
+                usersDTO = (Librarink_usersDTO) librarinkRemote.listUsers(usersFilter);//potrebbe non funzionare
                 if (usersDTO !=null)
                 {
                     //a user session is composed by email and password

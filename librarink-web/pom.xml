@@ -1,33 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>it.unipi.dsmt.librarink</groupId>
+  <parent>
+    <groupId>it.unipi.dsmt.librarink</groupId>
+    <artifactId>DSMT_LibrarInk</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>it.unipi.dsmt.librarink.web</groupId>
   <artifactId>librarink-web</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  <packaging>war</packaging>
 
+  <packaging>war</packaging>
   <name>${project.artifactId}</name>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>8</maven.compiler.source>
-    <maven.compiler.target>8</maven.compiler.target>
-  </properties>
+  <!-- Properties inherited from parent -->
 
   <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
       <version>3.1</version>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.11</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -47,68 +48,63 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>it.unipi.dsmt.librarink</groupId>
-      <artifactId>ejb-interfaces</artifactId>
+      <groupId>it.unipi.dsmt.librarink.ejb.interfaces</groupId>
+      <artifactId>erlang-client-interface</artifactId>
       <version>1.0.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
-      <dependency>
-          <groupId>it.unipi.dsmt.librarink</groupId>
-          <artifactId>ejb-implements</artifactId>
-          <version>1.0.0-SNAPSHOT</version>
-          <scope>compile</scope>
-      </dependency>
+    <dependency>
+      <groupId>it.unipi.dsmt.librarink.ejb.interfaces</groupId>
+      <artifactId>jpa-interface</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 
   <build>
     <finalName>${project.artifactId}</finalName>
     <plugins>
       <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.1.0</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.0.2</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.0</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.22.1</version>
+      </plugin>
+      <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <version>3.2.2</version>
-      </plugin>      <!-- Exclude default deploy plugin -->
+      </plugin>
+      <plugin>
+        <artifactId>maven-install-plugin</artifactId>
+        <version>2.5.2</version>
+      </plugin>
       <plugin>
         <artifactId>maven-deploy-plugin</artifactId>
         <version>2.8.2</version>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
       </plugin>
-      <!-- Glassfish deploy plugin -->
       <plugin>
         <groupId>org.glassfish.maven.plugin</groupId>
         <artifactId>maven-glassfish-plugin</artifactId>
         <version>2.1</version>
-        <configuration>
-          <glassfishDirectory>C:\glassfish5\glassfish</glassfishDirectory>
-          <user>admin</user>
-          <!--passwordFile>C:\glassfish5\glassfish\domains\domain1\config\domain-passwords</passwordFile-->
-          <adminPassword>admin</adminPassword>
-          <domain>
-            <name>domain1</name>
-            <httpPort>8080</httpPort>
-            <adminPort>4848</adminPort>
-          </domain>
-          <components>
-            <component>
-              <name>${project.artifactId}</name>
-              <artifact>target/${project.artifactId}-${project.version}.war</artifact>
-            </component>
-          </components>
-          <debug>true</debug>
-          <terse>false</terse>
-          <echo>true</echo>
-        </configuration>
-        <executions>
-          <execution>
-            <id>glassfish</id>
-            <phase>deploy</phase>
-            <goals>
-              <goal>deploy</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
-      </plugins>
+      <plugin>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.7.1</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>3.0.0</version>
+      </plugin>
+    </plugins>
   </build>
 </project>

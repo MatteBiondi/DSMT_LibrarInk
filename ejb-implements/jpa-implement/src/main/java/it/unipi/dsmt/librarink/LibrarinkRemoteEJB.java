@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Map;
 
 @Stateless
-public class librarinkRemoteEJB implements LibrainkRemote{
+public class LibrarinkRemoteEJB implements LibrarinkRemote {
     @PersistenceContext
     private EntityManager entityManager;
     @Override
-    public List<libraink_usersDTO> listUsers(libraink_usersDTO usersFilter) {
+    public List<Librarink_usersDTO> listUsers(Librarink_usersDTO usersFilter) {
         Map<String, Object> parameters = new HashMap<String, Object>();
         StringBuilder jpql = new StringBuilder();
         jpql.append("select u, coalesce(size(c.languages),0) from users u where 1 = 1 ");
@@ -43,12 +43,12 @@ public class librarinkRemoteEJB implements LibrainkRemote{
             query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
         }
         List<Object[]> usersList = query.getResultList();
-        List<libraink_usersDTO> toReturnList = new ArrayList<libraink_usersDTO>();
+        List<Librarink_usersDTO> toReturnList = new ArrayList<Librarink_usersDTO>();
         if (usersList != null && !usersList.isEmpty()) {
             for(Object[] usersInfo: usersList){
                 Users user = (Users)usersInfo[0];
                 Integer numLanguages = ((Number)usersInfo[1]).intValue();
-                libraink_usersDTO usersdto = new libraink_usersDTO();
+                Librarink_usersDTO usersdto = new Librarink_usersDTO();
                 usersdto.setPassword(user.getPassword());
                 usersdto.setName(user.getName());
                 usersdto.setSurname(user.getSurname());
@@ -63,7 +63,7 @@ public class librarinkRemoteEJB implements LibrainkRemote{
     }
 
     @Override
-    public List<libraink_booksDTO> listBooks(libraink_booksDTO booksFilter) {
+    public List<Librarink_booksDTO> listBooks(Librarink_booksDTO booksFilter) {
         Map<String, Object> parameters = new HashMap<String, Object>();
         StringBuilder jpql = new StringBuilder();
         jpql.append("select b, coalesce(size(b.languages),0) from books b where 1 = 1 ");
@@ -85,12 +85,12 @@ public class librarinkRemoteEJB implements LibrainkRemote{
             query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
         }
         List<Object[]> booksList = query.getResultList();
-        List<libraink_booksDTO> toReturnList = new ArrayList<libraink_booksDTO>();
+        List<Librarink_booksDTO> toReturnList = new ArrayList<Librarink_booksDTO>();
         if (booksList != null && !booksList.isEmpty()) {
             for(Object[] booksInfo : booksList){
                 Books book = (Books) booksInfo[0];
                 Integer numLanguages = ((Number) booksInfo[1]).intValue();
-                libraink_booksDTO bookDTO = new libraink_booksDTO();
+                Librarink_booksDTO bookDTO = new Librarink_booksDTO();
                 bookDTO.setIsbn(book.getIsbn());
                 bookDTO.setBook_title(book.getBook_title());
                 bookDTO.setGenre(book.getGenre());
@@ -109,7 +109,7 @@ public class librarinkRemoteEJB implements LibrainkRemote{
     }
 
     @Override
-    public List<libraink_history_loanDTO> listHistoryLoan(libraink_history_loanDTO history_loanFilter) {
+    public List<Librarink_history_loanDTO> listHistoryLoan(Librarink_history_loanDTO history_loanFilter) {
 
 
         Map<String, Object> parameters = new HashMap<String, Object>();
@@ -133,12 +133,12 @@ public class librarinkRemoteEJB implements LibrainkRemote{
             query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
         }
         List<Object[]> history_loanList = query.getResultList();
-        List<libraink_history_loanDTO> toReturnList = new ArrayList<libraink_history_loanDTO>();
+        List<Librarink_history_loanDTO> toReturnList = new ArrayList<Librarink_history_loanDTO>();
         if (history_loanList != null && !history_loanList.isEmpty()) {
             for(Object[] history_loanInfo: history_loanList){
                 History_loan history_loan = (History_loan) history_loanInfo[0];
                 Integer numLanguages = ((Number)history_loanInfo[1]).intValue();
-                libraink_history_loanDTO history_loanDTO = new libraink_history_loanDTO();
+                Librarink_history_loanDTO history_loanDTO = new Librarink_history_loanDTO();
                 history_loanDTO.setIsbn(history_loan.getIsbn());
                 history_loanDTO.setEnd_date(history_loan.getEnd_date());
                 history_loanDTO.setId_copy(history_loan.getId_copy());
@@ -151,7 +151,7 @@ public class librarinkRemoteEJB implements LibrainkRemote{
     }
 
     @Override
-    public List<libraink_wishlistDTO> listWishlist(libraink_wishlistDTO wishlistFilter) {
+    public List<Librarink_wishlistDTO> listWishlist(Librarink_wishlistDTO wishlistFilter) {
         Map<String, Object> parameters = new HashMap<String, Object>();
         StringBuilder jpql = new StringBuilder();
         jpql.append("select w, coalesce(size(w.languages),0) from wishlist w where 1 = 1 ");
@@ -169,12 +169,12 @@ public class librarinkRemoteEJB implements LibrainkRemote{
             query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
         }
         List<Object[]> wishlistList = query.getResultList();
-        List<libraink_wishlistDTO> toReturnList = new ArrayList<libraink_wishlistDTO>();
+        List<Librarink_wishlistDTO> toReturnList = new ArrayList<Librarink_wishlistDTO>();
         if (wishlistList != null && !wishlistList.isEmpty()) {
             for(Object[] wishlistInfo: wishlistList){
                 Wishlist wishlist = (Wishlist) wishlistInfo[0];
                 Integer numLanguages = ((Number)wishlistInfo[1]).intValue();
-                libraink_wishlistDTO wishlistDTO = new libraink_wishlistDTO();
+                Librarink_wishlistDTO wishlistDTO = new Librarink_wishlistDTO();
                 wishlistDTO.setIsbn(wishlist.getIsbn());
                 wishlistDTO.setEmail_user(wishlist.getEmail_user());
                 toReturnList.add(wishlistDTO);
@@ -184,7 +184,7 @@ public class librarinkRemoteEJB implements LibrainkRemote{
     }
 
     @Override
-    public List<libraink_history_reservationDTO> listHistoryReservation(libraink_history_reservationDTO history_reservationFilter) {
+    public List<Librarink_history_reservationDTO> listHistoryReservation(Librarink_history_reservationDTO history_reservationFilter) {
         Map<String, Object> parameters = new HashMap<String, Object>();
         StringBuilder jpql = new StringBuilder();
         jpql.append("select r, coalesce(size(r.languages),0) from history_reservation r where 1 = 1 ");
@@ -206,12 +206,12 @@ public class librarinkRemoteEJB implements LibrainkRemote{
             query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
         }
         List<Object[]> history_reservationList = query.getResultList();
-        List<libraink_history_reservationDTO> toReturnList = new ArrayList<libraink_history_reservationDTO>();
+        List<Librarink_history_reservationDTO> toReturnList = new ArrayList<Librarink_history_reservationDTO>();
         if (history_reservationList != null && !history_reservationList.isEmpty()) {
             for(Object[] history_reservationInfo: history_reservationList){
                 History_reservation history_reservation = (History_reservation) history_reservationInfo[0];
                 Integer numLanguages = ((Number)history_reservationInfo[1]).intValue();
-                libraink_history_reservationDTO history_reservationDTO = new libraink_history_reservationDTO();
+                Librarink_history_reservationDTO history_reservationDTO = new Librarink_history_reservationDTO();
                 history_reservationDTO.setIsbn(history_reservation.getIsbn());
                 history_reservationDTO.setEnd_date(history_reservation.getEnd_date());
                 history_reservationDTO.setId_copy(history_reservation.getId_copy());
@@ -225,9 +225,9 @@ public class librarinkRemoteEJB implements LibrainkRemote{
     }
 
     @Override
-    public libraink_usersDTO findUsersByEmail(String email) {
+    public Librarink_usersDTO findUsersByEmail(String email) {
         Users user = entityManager.find(Users.class,email);
-        libraink_usersDTO userDTO = new libraink_usersDTO();
+        Librarink_usersDTO userDTO = new Librarink_usersDTO();
         userDTO.setEmail(user.getEmail());
         userDTO.setAddress(user.getAddress());
         userDTO.setBirthday(user.getBirthday());
@@ -239,9 +239,9 @@ public class librarinkRemoteEJB implements LibrainkRemote{
     }
 
     @Override
-    public libraink_booksDTO findBooksByIsbn(String isbn) {
+    public Librarink_booksDTO findBooksByIsbn(String isbn) {
         Books book = entityManager.find(Books.class,isbn);
-        libraink_booksDTO bookDTO = new libraink_booksDTO();
+        Librarink_booksDTO bookDTO = new Librarink_booksDTO();
         bookDTO.setIsbn(book.getIsbn());
         bookDTO.setBook_title(book.getBook_title());
         bookDTO.setGenre(book.getGenre());
@@ -257,20 +257,20 @@ public class librarinkRemoteEJB implements LibrainkRemote{
     }
 
     @Override
-    public libraink_wishlistDTO findWishlistByKey(String user_email, String isbn) {
+    public Librarink_wishlistDTO findWishlistByKey(String user_email, String isbn) {
         WishListKey wishListKey=new WishListKey(user_email,isbn);
         Wishlist wishlist = entityManager.find(Wishlist.class,wishListKey);
-        libraink_wishlistDTO wishlistDTO = new libraink_wishlistDTO();
+        Librarink_wishlistDTO wishlistDTO = new Librarink_wishlistDTO();
         wishlistDTO.setIsbn(wishlist.getIsbn());
         wishlistDTO.setEmail_user(wishlist.getEmail_user());
         return wishlistDTO;
     }
 
     @Override
-    public libraink_history_loanDTO findHistoryLoanByKeys(String user_email, String isbn, String id_copy, Date start_date) {
+    public Librarink_history_loanDTO findHistoryLoanByKeys(String user_email, String isbn, String id_copy, Date start_date) {
         History_loanKey history_loanKey=new History_loanKey(user_email,isbn,id_copy,start_date);
         History_loan history_loan = entityManager.find(History_loan.class,history_loanKey);
-        libraink_history_loanDTO history_loanDTO = new libraink_history_loanDTO();
+        Librarink_history_loanDTO history_loanDTO = new Librarink_history_loanDTO();
         history_loanDTO.setIsbn(history_loan.getIsbn());
         history_loanDTO.setEnd_date(history_loan.getEnd_date());
         history_loanDTO.setId_copy(history_loan.getId_copy());
@@ -280,10 +280,10 @@ public class librarinkRemoteEJB implements LibrainkRemote{
     }
 
     @Override
-    public libraink_history_reservationDTO findHistoryReservationByKeys(String user_email, String isbn, String id_copy, Date start_date) {
+    public Librarink_history_reservationDTO findHistoryReservationByKeys(String user_email, String isbn, String id_copy, Date start_date) {
         History_reservationKey history_reservationKey=new History_reservationKey(user_email,isbn,id_copy,start_date);
         History_reservation history_reservation = entityManager.find(History_reservation.class,history_reservationKey);
-        libraink_history_reservationDTO history_reservationDTO = new libraink_history_reservationDTO();
+        Librarink_history_reservationDTO history_reservationDTO = new Librarink_history_reservationDTO();
         history_reservationDTO.setIsbn(history_reservation.getIsbn());
         history_reservationDTO.setEnd_date(history_reservation.getEnd_date());
         history_reservationDTO.setId_copy(history_reservation.getId_copy());
@@ -353,7 +353,7 @@ public class librarinkRemoteEJB implements LibrainkRemote{
     }
 
     @Override
-    public libraink_usersDTO saveOrUpdateUser(libraink_usersDTO userDTO,boolean update) {
+    public Librarink_usersDTO saveOrUpdateUser(Librarink_usersDTO userDTO, boolean update) {
         Users user = null;
         if (!update) {
             user = new Users();
@@ -386,7 +386,7 @@ public class librarinkRemoteEJB implements LibrainkRemote{
     }
 
     @Override
-    public libraink_booksDTO saveOrUpdateBooks(libraink_booksDTO bookDTO, boolean update) {
+    public Librarink_booksDTO saveOrUpdateBooks(Librarink_booksDTO bookDTO, boolean update) {
         Books book = null;
         if(!update)
         {
@@ -419,7 +419,7 @@ public class librarinkRemoteEJB implements LibrainkRemote{
     }
 
     @Override
-    public libraink_wishlistDTO saveOrUpdateWishlist(libraink_wishlistDTO wishlistDTO, boolean update) {
+    public Librarink_wishlistDTO saveOrUpdateWishlist(Librarink_wishlistDTO wishlistDTO, boolean update) {
         Wishlist wishlist = null;
         if(!update)
         {
@@ -445,7 +445,7 @@ public class librarinkRemoteEJB implements LibrainkRemote{
     }
 
     @Override
-    public libraink_history_reservationDTO saveOrUpdateHistory_reservation(libraink_history_reservationDTO history_reservationDTO, boolean update) {
+    public Librarink_history_reservationDTO saveOrUpdateHistory_reservation(Librarink_history_reservationDTO history_reservationDTO, boolean update) {
         History_reservation history_reservation=null;
         if(!update)
         {
@@ -476,7 +476,7 @@ public class librarinkRemoteEJB implements LibrainkRemote{
     }
 
     @Override
-    public libraink_history_loanDTO saveOrUpdateHistory_loan(libraink_history_loanDTO history_loanDTO, boolean update) {
+    public Librarink_history_loanDTO saveOrUpdateHistory_loan(Librarink_history_loanDTO history_loanDTO, boolean update) {
         History_loan history_loan=null;
         if(!update)
         {
