@@ -3,6 +3,9 @@
 %%% Created : 06. set 2022 18:17
 %%%-------------------------------------------------------------------
 -module(librarink_proxy_test).
+
+-ifdef(EUNIT).
+
 -export([gen_test/1, setup_env/0, stop_all/1]).
 -include_lib("eunit/include/eunit.hrl").
 
@@ -53,7 +56,7 @@ consume_mqs() ->
 
 setup_env() ->
     application:set_env(librarink_proxy, proxy_name, proxy),
-    application:set_env(librarink_proxy, mqs_host, "192.168.1.109"),
+    application:set_env(librarink_proxy, mqs_host, "localhost"),
     application:set_env(librarink_proxy, exchange_type, <<"fanout">>),
     application:set_env(librarink_proxy, routing_key, <<"">>),
     application:set_env(librarink_proxy, request_timeout, 10000),
@@ -99,3 +102,5 @@ stop_all(Pid) ->
     application:stop(librarink_proxy),
     gen_server:stop(database),
     meck:unload(database).
+
+-endif.

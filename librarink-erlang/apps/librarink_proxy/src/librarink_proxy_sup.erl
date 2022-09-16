@@ -1,5 +1,5 @@
 %%%-------------------------------------------------------------------
-%% @doc librarink_proxy top level supervisor.
+%% @doc Module defining librarink_proxy top level supervisor.
 %% @end
 %%%-------------------------------------------------------------------
 
@@ -13,12 +13,21 @@
 -define(SERVER, ?MODULE).
 
 %% @doc
+%% Spawn proxy supervisor that will supervise the server and will restart it in case of crash.
 %% @end
 -spec(start_link() -> {ok, Pid::pid()}).
 start_link() ->
     supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 
 %% @doc
+%% Initialization of supervisor process. The initial configuration include two children:
+%% <ul>
+%%  <li>{@link librarink_proxy. Proxy}: server that receive requests from client and schedule them to a dedicated
+%% worker</li>
+%%  <li>{@link librarink_proxy_worker_sup. Proxy worker supervisor}: supervisor process that is spawned to handle
+%% dynamically spawning of worker process</li>
+%% </ul>
+%% In case of crash of supervised process it will replaces with another process, following the one-for-one semantic.
 %% @end
 -spec(init(Args :: list()) -> {ok, {SupFlags :: term(), ChildSpecs :: list()}}).
 init([]) ->
