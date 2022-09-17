@@ -119,8 +119,9 @@ delete_test_() ->{"Delete", [
     ?_assertMatch({error,error_pending_loan},librarink_mnesiaDB_fun:delete_lent_by_book("CCC")),
     ?_assertMatch({error,error_pending_loan},librarink_mnesiaDB_fun:delete_lent_book_by_user("federico")),
     ?_assertMatch({succeed,{0, _}},librarink_mnesiaDB_fun:all_ended_loans()),
+    ?_assertMatch({succeed,ok},librarink_mnesiaDB_fun:renew_loan_by_book_copy("CCC", "ID-001")),
     ?_assertEqual({succeed,ok}, librarink_mnesiaDB_fun:terminate_loan_by_book("CCC", "ID-001")),
-    ?_assertMatch({succeed,{1, _}}, librarink_mnesiaDB_fun:get_and_delete_ended_loans())
+    ?_assertMatch({succeed,{2, _}}, librarink_mnesiaDB_fun:get_and_delete_ended_loans())
   ]}
 ]}.
 
