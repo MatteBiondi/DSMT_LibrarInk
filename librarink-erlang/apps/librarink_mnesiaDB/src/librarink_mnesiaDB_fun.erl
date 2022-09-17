@@ -12,7 +12,7 @@
   list_available_copies_by_book/1, lent_copies_by_book/1, loans_by_user/1, loan_by_book_copy/2, reservations_by_user/1,
   reservations_by_user_and_book/2, reservations_by_book/1, terminate_loan_by_book/2,
   cancel_reservation_by_book_and_user/2, get_and_delete_ended_reservations/0, get_and_delete_ended_loans/0,
-  all_copies_all_book/0, all_pending_reservations/0, all_ended_reservations/0, all_pending_loans/0, all_ended_loans/0]).
+  all_copies_all_book/0, all_pending_reservations/0, all_ended_reservations/0, all_pending_loans/0, all_ended_loans/0, renew_loan_by_book_copy/2]).
 
 -include_lib("stdlib/include/ms_transform.hrl").
 -import(calendar, [now_to_universal_time/1]).
@@ -916,6 +916,49 @@ terminate_loan_by_book( Isbn, Copy_id ) ->
           _ ->
             {error, unexpected_error}
         end
+      end,
+  mnesia:activity(transaction, F).
+
+
+%%--------------------------------------------------------------------
+%% @doc <pre>
+%%  This function is called to renew a book loan for a specified
+%%  book copy
+%%  Type: - Update operation
+%%  In:   - User: User's identifier
+%%        - Isbn: Selected book's ISBN
+%%        - Copy_Id: Book's copy id
+%%  Out:  - {succeed, ok} -> No error
+%%        - {error, undefined_book_copy} -> There are no copies with the specified id for the selected book
+%%        - {error, error_no_loan_found} -> The selected copy has no associated pending loan
+%%        - {error, unexpected_error} -> Unexpected error occurs
+%%        - Throws an exception in case of error
+%% </pre>
+%% @end
+%%--------------------------------------------------------------------
+-spec(renew_loan_by_book_copy ( Isbn::string(), Copy_id::string() ) ->
+  {succeed, ok} | {error, undefined_book_copy | error_no_loan_found | unexpected_error}).
+renew_loan_by_book_copy( Isbn, Copy_id ) ->
+  F = fun() ->
+    case loan_by_book_copy(Isbn, Copy_id) of
+      {error, undefined_book_copy}->
+        {error, undefined_book_copy};
+      {succeed,{0, []}}->
+        {error, error_no_loan_found};
+      {succeed,{1, [Row]}}->
+        Today = now_to_universal_time(timestamp()),
+        % Create a valid record putting name of the table as first element
+        Db_row = insert_element(1,Row,librarink_lent_book),
+        % Write a new version of the record with set stop_date to end old loan
+        mnesia:write(Db_row#librarink_lent_book{stop_date = Today}),
+        % Write a new version of the record with set start_date to renew the loan
+        mnesia:write(Db_row#librarink_lent_book{start_date = Today}),
+        % Delete the old version of the record
+        mnesia:delete_object(Db_row),
+        {succeed, ok};
+      _ ->
+        {error, unexpected_error}
+    end
       end,
   mnesia:activity(transaction, F).
 

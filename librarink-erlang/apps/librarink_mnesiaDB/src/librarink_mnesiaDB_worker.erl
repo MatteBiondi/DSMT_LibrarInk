@@ -141,6 +141,10 @@ handle_request(update_loan, #{type := terminate, isbn := Isbn, id := Id}, From)-
   Result = performe_operation(terminate_loan_by_book,[Isbn, Id]),
   gen_server:reply(From, Result);
 
+handle_request(update_loan, #{type := renew, isbn := Isbn, id := Id}, From)->
+  Result = performe_operation(renew_loan_by_book_copy,[Isbn, Id]),
+  gen_server:reply(From, Result);
+
 handle_request(update_reservation, #{type := cancel, user := User, isbn := Isbn}, From)->
   Result = performe_operation(cancel_reservation_by_book_and_user,[User, Isbn]),
   gen_server:reply(From, Result);
