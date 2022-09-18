@@ -6,6 +6,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.*;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -82,8 +83,8 @@ public class ErlangClientEJB implements ErlangClient {
 
         OtpErlangAtom request = new OtpErlangAtom("write_copy");
         OtpErlangMap args = new OtpErlangMap();
-        args.put(new OtpErlangAtom("isbn"), new OtpErlangString(isbn));
-        args.put(new OtpErlangAtom("id"), new OtpErlangString(id));
+        args.put(new OtpErlangAtom("isbn"), new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
+        args.put(new OtpErlangAtom("id"), new OtpErlangBinary(id.getBytes(StandardCharsets.UTF_8)));
 
         return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
     }
@@ -95,8 +96,8 @@ public class ErlangClientEJB implements ErlangClient {
 
         OtpErlangAtom request = new OtpErlangAtom("write_loan");
         OtpErlangMap args = new OtpErlangMap();
-        args.put(new OtpErlangAtom("user"), new OtpErlangString(user));
-        args.put(new OtpErlangAtom("isbn"), new OtpErlangString(isbn));
+        args.put(new OtpErlangAtom("user"),new OtpErlangBinary(user.getBytes(StandardCharsets.UTF_8)));
+        args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
 
         return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
     }
@@ -108,8 +109,8 @@ public class ErlangClientEJB implements ErlangClient {
 
         OtpErlangAtom request = new OtpErlangAtom("write_reservation");
         OtpErlangMap args = new OtpErlangMap();
-        args.put(new OtpErlangAtom("user"), new OtpErlangString(user));
-        args.put(new OtpErlangAtom("isbn"), new OtpErlangString(isbn));
+        args.put(new OtpErlangAtom("user"),new OtpErlangBinary(user.getBytes(StandardCharsets.UTF_8)));
+        args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
 
         return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
     }
@@ -119,11 +120,11 @@ public class ErlangClientEJB implements ErlangClient {
         OtpErlangAtom request = new OtpErlangAtom("delete_copy");
         OtpErlangMap args = new OtpErlangMap();
         if (isbn != null && id != null){
-            args.put(new OtpErlangAtom("isbn"), new OtpErlangString(isbn));
-            args.put(new OtpErlangAtom("id"), new OtpErlangString(id));
+            args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
+            args.put(new OtpErlangAtom("id"),new OtpErlangBinary(id.getBytes(StandardCharsets.UTF_8)));
         }
         else if (id != null){
-            args.put(new OtpErlangAtom("id"), new OtpErlangString(id));
+            args.put(new OtpErlangAtom("id"),new OtpErlangBinary(id.getBytes(StandardCharsets.UTF_8)));
         }
         else
             return "bad request";
@@ -138,15 +139,15 @@ public class ErlangClientEJB implements ErlangClient {
         OtpErlangMap args = new OtpErlangMap();
 
         if (user != null && isbn != null && id != null){
-            args.put(new OtpErlangAtom("user"), new OtpErlangString(user));
-            args.put(new OtpErlangAtom("isbn"), new OtpErlangString(isbn));
-            args.put(new OtpErlangAtom("id"), new OtpErlangString(id));
+            args.put(new OtpErlangAtom("user"),new OtpErlangBinary(user.getBytes(StandardCharsets.UTF_8)));
+            args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
+            args.put(new OtpErlangAtom("id"),new OtpErlangBinary(id.getBytes(StandardCharsets.UTF_8)));
         }
         else if(user != null && isbn == null && id == null){
-            args.put(new OtpErlangAtom("user"), new OtpErlangString(user));
+            args.put(new OtpErlangAtom("user"),new OtpErlangBinary(user.getBytes(StandardCharsets.UTF_8)));
         }
         else if(user == null && isbn != null && id == null){
-            args.put(new OtpErlangAtom("isbn"), new OtpErlangString(isbn));
+            args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
         }
         else
             return "bad request";
@@ -160,14 +161,14 @@ public class ErlangClientEJB implements ErlangClient {
         OtpErlangMap args = new OtpErlangMap();
 
         if (user != null && isbn != null){
-            args.put(new OtpErlangAtom("user"), new OtpErlangString(user));
-            args.put(new OtpErlangAtom("isbn"), new OtpErlangString(isbn));
+            args.put(new OtpErlangAtom("user"),new OtpErlangBinary(user.getBytes(StandardCharsets.UTF_8)));
+            args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
         }
         else if(user != null){
-            args.put(new OtpErlangAtom("user"), new OtpErlangString(user));
+            args.put(new OtpErlangAtom("user"),new OtpErlangBinary(user.getBytes(StandardCharsets.UTF_8)));
         }
         else if(isbn != null){
-            args.put(new OtpErlangAtom("isbn"), new OtpErlangString(isbn));
+            args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
         }
         else
             return "bad request";
@@ -193,22 +194,42 @@ public class ErlangClientEJB implements ErlangClient {
     public String read_all_copies(String isbn) {
         OtpErlangAtom request = new OtpErlangAtom("read_copies");
         OtpErlangMap args = new OtpErlangMap();
-        if (isbn != null){
-            args.put(new OtpErlangAtom("type"), new OtpErlangAtom("all"));
-            args.put(new OtpErlangAtom("isbn"), new OtpErlangString(isbn));
-        }
+
+        args.put(new OtpErlangAtom("type"), new OtpErlangAtom("all"));
+        if (isbn != null)
+            args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
 
         return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
     }
 
     @Override
     public String read_available_copies(String isbn) {
-        OtpErlangAtom request = new OtpErlangAtom("read_available_copies");
+        OtpErlangAtom request = new OtpErlangAtom("read_copies");
         OtpErlangMap args = new OtpErlangMap();
+
         if (isbn != null){
             args.put(new OtpErlangAtom("type"), new OtpErlangAtom("available"));
-            args.put(new OtpErlangAtom("isbn"), new OtpErlangString(isbn));
+            args.put(new OtpErlangAtom("operation"), new OtpErlangAtom("list"));
+            args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
         }
+        else
+            return "bad request";
+
+        return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+    }
+
+    @Override
+    public String count_available_copies(String isbn) {
+        OtpErlangAtom request = new OtpErlangAtom("read_copies");
+        OtpErlangMap args = new OtpErlangMap();
+
+        if (isbn != null){
+            args.put(new OtpErlangAtom("type"), new OtpErlangAtom("available"));
+            args.put(new OtpErlangAtom("operation"), new OtpErlangAtom("count"));
+            args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
+        }
+        else
+            return "bad request";
 
         return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
     }
@@ -219,14 +240,14 @@ public class ErlangClientEJB implements ErlangClient {
         OtpErlangMap args = new OtpErlangMap();
 
         if (user == null && isbn != null && id != null){
-            args.put(new OtpErlangAtom("isbn"), new OtpErlangString(isbn));
-            args.put(new OtpErlangAtom("id"), new OtpErlangString(id));
+            args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
+            args.put(new OtpErlangAtom("id"),new OtpErlangBinary(id.getBytes(StandardCharsets.UTF_8)));
         }
         else if(user == null && isbn != null){
-            args.put(new OtpErlangAtom("isbn"), new OtpErlangString(isbn));
+            args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
         }
         else if(user != null && isbn == null && id == null){
-            args.put(new OtpErlangAtom("user"), new OtpErlangString(user));
+            args.put(new OtpErlangAtom("user"),new OtpErlangBinary(user.getBytes(StandardCharsets.UTF_8)));
         }
         else if (user != null && isbn != null)
             return "bad request";
@@ -248,14 +269,14 @@ public class ErlangClientEJB implements ErlangClient {
         OtpErlangMap args = new OtpErlangMap();
 
         if (user != null && isbn != null){
-            args.put(new OtpErlangAtom("user"), new OtpErlangString(user));
-            args.put(new OtpErlangAtom("isbn"), new OtpErlangString(isbn));
+            args.put(new OtpErlangAtom("user"),new OtpErlangBinary(user.getBytes(StandardCharsets.UTF_8)));
+            args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
         }
         else if(user != null){
-            args.put(new OtpErlangAtom("user"), new OtpErlangString(user));
+            args.put(new OtpErlangAtom("user"),new OtpErlangBinary(user.getBytes(StandardCharsets.UTF_8)));
         }
         else if(isbn != null){
-            args.put(new OtpErlangAtom("isbn"), new OtpErlangString(isbn));
+            args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
         }
 
         return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
@@ -270,32 +291,48 @@ public class ErlangClientEJB implements ErlangClient {
     }
 
     @Override
-    public String update_loan(String type, String isbn, String id) {
+    public String terminate_loan(String isbn, String id) {
         OtpErlangAtom request = new OtpErlangAtom("update_loan");
         OtpErlangMap args = new OtpErlangMap();
 
-        if (type == null || isbn == null || id == null){
+        if (isbn == null || id == null){
             return "bad request";
         }
-        args.put(new OtpErlangAtom("type"), new OtpErlangString(type));
-        args.put(new OtpErlangAtom("isbn"), new OtpErlangString(isbn));
-        args.put(new OtpErlangAtom("id"), new OtpErlangString(id));
+        args.put(new OtpErlangAtom("type"), new OtpErlangAtom("terminate"));
+        args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
+        args.put(new OtpErlangAtom("id"),new OtpErlangBinary(id.getBytes(StandardCharsets.UTF_8)));
 
 
         return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
     }
 
     @Override
-    public String update_reservation(String type, String user, String isbn) {
+    public String renew_loan(String isbn, String id) {
+        OtpErlangAtom request = new OtpErlangAtom("update_loan");
+        OtpErlangMap args = new OtpErlangMap();
+
+        if (isbn == null || id == null){
+            return "bad request";
+        }
+        args.put(new OtpErlangAtom("type"), new OtpErlangAtom("renew"));
+        args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
+        args.put(new OtpErlangAtom("id"),new OtpErlangBinary(id.getBytes(StandardCharsets.UTF_8)));
+
+
+        return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+    }
+
+    @Override
+    public String cancel_reservation(String user, String isbn) {
         OtpErlangAtom request = new OtpErlangAtom("update_reservation");
         OtpErlangMap args = new OtpErlangMap();
 
-        if (type == null || user == null || isbn == null){
+        if (user == null || isbn == null){
             return "bad request";
         }
-        args.put(new OtpErlangAtom("type"), new OtpErlangString(type));
-        args.put(new OtpErlangAtom("user"), new OtpErlangString(user));
-        args.put(new OtpErlangAtom("isbn"), new OtpErlangString(isbn));
+        args.put(new OtpErlangAtom("type"), new OtpErlangAtom("cancel"));
+        args.put(new OtpErlangAtom("user"),new OtpErlangBinary(user.getBytes(StandardCharsets.UTF_8)));
+        args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
 
 
         return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
