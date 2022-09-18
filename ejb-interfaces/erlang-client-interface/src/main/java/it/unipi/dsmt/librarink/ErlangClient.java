@@ -14,10 +14,12 @@ public interface ErlangClient {
     String archive_reservations();
     String read_all_copies(String isbn);
     String read_available_copies(String isbn);
+    String count_available_copies(String isbn);
     String read_loans(String user, String isbn, String id);
     String read_ended_loans();
     String read_reservations(String user, String isbn);
     String read_ended_reservations();
-    String update_loan(String type, String isbn, String id);
-    String update_reservation(String type, String user, String isbn);
+    String terminate_loan(String isbn, String id);
+    String renew_loan(String isbn, String id);
+    String cancel_reservation(String user, String isbn);
 }

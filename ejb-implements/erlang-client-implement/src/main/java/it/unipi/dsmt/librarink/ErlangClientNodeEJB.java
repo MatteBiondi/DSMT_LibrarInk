@@ -21,13 +21,12 @@ public class ErlangClientNodeEJB implements ErlangClientNode {
     public void init(){
         try{
             Properties properties = new Properties();
-            properties.load(this.getClass().getClassLoader().getResourceAsStream("erlang-client.properties"));//InetAddress.getLocalHost().getHostAddress();
+            properties.load(this.getClass().getClassLoader().getResourceAsStream("erlang-client.properties"));
             node = new OtpNode(
-                    properties.getProperty("name", "client") + this.hashCode() + "@" +
-                            InetAddress.getLocalHost().getHostName(),
+                    properties.getProperty("name", "client") + "-" + this.hashCode(),
                     properties.getProperty("cookie", "no-cookie")
             );
-
+            LOGGER.info(InetAddress.getLocalHost().getHostName());
             LOGGER.info("Init ErlangClientNode");
         }
         catch (IOException ex){
