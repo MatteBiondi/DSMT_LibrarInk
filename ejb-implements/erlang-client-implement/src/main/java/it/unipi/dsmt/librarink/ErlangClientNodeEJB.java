@@ -26,7 +26,6 @@ public class ErlangClientNodeEJB implements ErlangClientNode {
                     properties.getProperty("name", "client") + "-" + this.hashCode(),
                     properties.getProperty("cookie", "no-cookie")
             );
-            LOGGER.info(InetAddress.getLocalHost().getHostName());
             LOGGER.info("Init ErlangClientNode");
         }
         catch (IOException ex){
