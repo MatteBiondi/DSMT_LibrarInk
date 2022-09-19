@@ -63,8 +63,12 @@
                 </div>
                 <h3>Brief Description: </h3>
                 <p><%= request.getAttribute("description")%></p>
-                <h3>Users rate the book: <%= request.getAttribute("rate")%>/<%= MAX_RATE %></h3>
-                <h3>Number of available copies: <%= request.getAttribute("available_copies")%></h3>
+                <h3>Users rate the book:
+                    <span id="avg_rate"><%= request.getAttribute("rate")%></span>/<%= MAX_RATE %>
+                </h3>
+                <h3>Number of available copies:
+                    <span id="copies_counter"><%= request.getAttribute("available_copies")%></span>
+                </h3>
                 <div class="stars_div">
                     <!--todo: vote if it is the first time or otherwise change the vote-->
                     <!--todo: Add js code-->
