@@ -12,16 +12,15 @@
 %%% Created : 05. set 2022 13:32
 %%%-------------------------------------------------------------------
 -module(librarink_proxy_worker).
-
 -export([work/4]).
 
 -record(librarink_proxy_env, {mnesia_name, mnesia_nodes, request_timeout, mqs_host, exchange_type, routing_key}).
 
 -define(CONNECTED_FILTER(Active, Backup), fun(Node) -> (Node =:= Active) or (Node =:= Backup) end).
 -define(CONNECTED_NODES, [node()] ++ nodes()).
--define(ADD_NOTIFICATION(Isbn),{Isbn, jsx:encode(#{<<"isbn">> => list_to_binary(Isbn), <<"add">> => 1})}).
--define(REMOVE_NOTIFICATION(Isbn),{Isbn, jsx:encode(#{<<"isbn">> => list_to_binary(Isbn), <<"sub">> => 1})}).
--define(SET_NOTIFICATION(Isbn),{Isbn, jsx:encode(#{<<"isbn">> => list_to_binary(Isbn), <<"set">> => 0})}).
+-define(ADD_NOTIFICATION(Isbn),{Isbn, jsx:encode(#{isbn => Isbn, operation => add})}).
+-define(REMOVE_NOTIFICATION(Isbn),{Isbn, jsx:encode(#{isbn => Isbn, operation => sub})}).
+-define(SET_NOTIFICATION(Isbn),{Isbn, jsx:encode(#{isbn => Isbn, operation => reset})}).
 
 %%%%%===================================================================
 %%%%% API
@@ -34,7 +33,7 @@
 work(Request, From, Tag, Env) ->
   {Result, Response} =
     case Request of
-      {Operation, #{isbn := _Isbn}} when is_atom(Operation) and is_list(_Isbn) -> forward_request(Request, Env);
+      {Operation, #{isbn := Isbn_}} when is_atom(Operation) and is_binary(Isbn_) -> forward_request(Request, Env);
       {Operation, Args} when is_atom(Operation) and is_map(Args) -> forward_multi_request(Request, Env);
       _Others -> {error, malformed_request}
     end,
@@ -42,10 +41,16 @@ work(Request, From, Tag, Env) ->
   EncodedResponse =
     case Response of
       {Counter, Values} when is_list(Values) ->#{counter=>Counter, values=>Values};
-      Value when is_atom(Value) -> Value
+      Value when is_atom(Value) -> Value;
+      Value when is_number(Value) -> Value
     end,
 
-  From ! {Tag, jsx:encode(#{result => Result, response => EncodedResponse})},
+  try
+    From ! {Tag, jsx:encode(#{result => Result, response => EncodedResponse})}
+  catch
+      error: _ ->  From ! {Tag, jsx:encode(#{result => error, response => unexpected_error})}
+  end,
+
 
   {Exchange, Notification} = build_notification(Request, Result),
   case Notification of
@@ -101,7 +106,7 @@ forward_multi_request(Request, Env) ->
 %% Select the correct server that is associated to a certain isbn. The operation of lookup use mapping between the
 %% result (GroupId) of a function that takes isbn as argument and node position in the config file
 %% @end
--spec(lookup_server(Isbn :: string(), Env :: #librarink_proxy_env{}) -> Node :: node()).
+-spec(lookup_server(Isbn :: binary(), Env :: #librarink_proxy_env{}) -> Node :: node()).
 lookup_server(Isbn,Env) ->
   GroupId = binary:decode_unsigned(crypto:hash(md5, Isbn)) rem erlang:length(Env#librarink_proxy_env.mnesia_nodes) + 1,
   {Active, Backup} = lists:nth(GroupId, Env#librarink_proxy_env.mnesia_nodes),
@@ -122,20 +127,6 @@ retrieve_active_node(Active, Backup) ->
         true -> false
       end
   end.
-
-%% @private
-%% @doc
-%% Publish on MQS queue the notification about a certain event on a specific book
-%% @end
--spec(publish_notification(Isbn :: binary(), Notification :: binary(), Env :: #librarink_proxy_env{}) -> none()).
-publish_notification(Isbn, Notification, Env) ->
-  librarink_mqs_amqp:produce_once(
-    Env#librarink_proxy_env.mqs_host,
-    list_to_binary(Isbn),
-    Env#librarink_proxy_env.exchange_type,
-    Env#librarink_proxy_env.routing_key,
-    Notification
-  ).
 
 %% @private
 %% @doc
@@ -167,6 +158,20 @@ join_responses(Responses) ->
          end;
     _Error -> {errors, lists:foldl(FoldErrors, [], ErrorList)}
   end.
+
+%% @private
+%% @doc
+%% Publish on MQS queue the notification about a certain event on a specific book
+%% @end
+-spec(publish_notification(Isbn :: binary(), Notification :: binary(), Env :: #librarink_proxy_env{}) -> none()).
+publish_notification(Isbn, Notification, Env) ->
+  librarink_common_amqp:produce_once(
+    Env#librarink_proxy_env.mqs_host,
+    Isbn,
+    Env#librarink_proxy_env.exchange_type,
+    Env#librarink_proxy_env.routing_key,
+    Notification
+  ).
 
 %% @private
 %% @doc

@@ -1,0 +1,7 @@
+{application, librarink_common,
+ [{description, "Common modules used by librarink applications"},
+  {vsn, "0.1.0"},
+  {applications, [kernel, stdlib, amqp_client]},
+  {modules, [librarink_common_amqp, librarink_common_mqs_client]},
+  {licenses, ["Apache-2.0"]}
+ ]}.

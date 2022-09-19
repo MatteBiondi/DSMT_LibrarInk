@@ -5,10 +5,11 @@
 %%% @end
 %%%-------------------------------------------------------------------
 -module(librarink_websocket_handler).
--include("include/librarink_websocket_state.hrl").
 
 %% API
 -export([init/2, websocket_init/1, websocket_handle/2, websocket_info/2, terminate/3]).
+
+-record(librarink_websocket_state, {mqs_pid = none, items=[]}).
 
 -define(QUEUE_NAME, list_to_binary(pid_to_list(self()))).
 -define(EXCHANGE_TYPE, <<"fanout">>).
@@ -39,7 +40,7 @@ init(Req, _State) ->
 websocket_init(State) ->
   io:format("[~p] Websocket init: ~p~n",[self(), State]),
   %% Register to MQS
-  case librarink_mqs_client:register(self()) of
+  case librarink_common_mqs_client:register(self()) of
     {ok, _} -> {[], #librarink_websocket_state{}, hibernate};
     _Error -> {stop, State}
   end.
@@ -96,16 +97,16 @@ websocket_handle(_, State) ->
   {NoMessage :: none(), State :: #librarink_websocket_state{}, hibernate}).
 websocket_info({update, Update}, State) ->
   io:format("[~p] Websocket info: update message~n", [self()]),
-  {[{text, jsx:encode(#{<<"update">> => Update})}], State, hibernate};
+  {[{text, jsx:encode(#{type => update, data => jsx:decode(Update)})}], State, hibernate};
 websocket_info({info, Info}, State) ->
   io:format("[~p] Websocket info: info message~n",[self()]),
-  {[{text, jsx:encode(#{<<"info">> => Info})}], State, hibernate};
+  {[{text, jsx:encode(#{type => info, data => Info})}], State, hibernate};
 websocket_info({mqs, MqsPid}, State=#librarink_websocket_state{items = Items}) when is_pid(MqsPid) ->
   io:format("[~p] New MQS process: ~p~n",[self(), MqsPid]),
-  librarink_mqs_client:declare_queue(MqsPid, ?QUEUE_NAME),
+  librarink_common_mqs_client:declare_queue(MqsPid, ?QUEUE_NAME),
   add_bindings(MqsPid, ?QUEUE_NAME, Items, ?EXCHANGE_TYPE, ?ROUTING_KEY),
   WebSocketHandlerPid = self(),
-  librarink_mqs_client:start_consumer(MqsPid, fun(Msg) -> WebSocketHandlerPid ! {update, Msg} end),
+  librarink_common_mqs_client:start_consumer(MqsPid, fun(Msg) -> WebSocketHandlerPid ! {update, Msg} end),
   NewState = State#librarink_websocket_state{mqs_pid = MqsPid},
   {[], NewState, hibernate};
 websocket_info(Msg, State) ->
@@ -119,7 +120,7 @@ websocket_info(Msg, State) ->
 -spec(terminate(Reason :: any(), Request :: any() ,State::#librarink_websocket_state{}) -> ok).
 terminate(Reason, _Request, #librarink_websocket_state{mqs_pid = MqsPid}) ->
   io:format("[~p] Websocket terminate: ~p~n",[self(), Reason]),
-  librarink_mqs_client:unregister(MqsPid),
+  librarink_common_mqs_client:unregister(MqsPid),
   ok.
 
 %%===================================================================
@@ -132,7 +133,7 @@ terminate(Reason, _Request, #librarink_websocket_state{mqs_pid = MqsPid}) ->
 %% @end
 add_bindings(_MqsPid, _Queue, [], _ExchangeType, _RoutingKey) -> ok;
 add_bindings(MqsPid, QueueName, [ExchangeName | T], ExchangeType, RoutingKey) ->
-  librarink_mqs_client:bind_queue(MqsPid, QueueName, ExchangeName, ExchangeType, RoutingKey),
+  librarink_common_mqs_client:bind_queue(MqsPid, QueueName, ExchangeName, ExchangeType, RoutingKey),
   add_bindings(MqsPid, QueueName, T, ExchangeType, RoutingKey).
 
 %% @doc
@@ -141,5 +142,5 @@ add_bindings(MqsPid, QueueName, [ExchangeName | T], ExchangeType, RoutingKey) ->
 %% @end
 remove_bindings(_MqsPid, _Queue, [], _RoutingKey) -> ok;
 remove_bindings(MqsPid, QueueName, [ExchangeName | T], RoutingKey) ->
-  librarink_mqs_client:unbind_queue(MqsPid, QueueName, ExchangeName, RoutingKey),
+  librarink_common_mqs_client:unbind_queue(MqsPid, QueueName, ExchangeName, RoutingKey),
   remove_bindings(MqsPid, QueueName, T, RoutingKey).

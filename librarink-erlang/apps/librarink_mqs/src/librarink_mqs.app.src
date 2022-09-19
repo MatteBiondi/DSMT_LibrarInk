@@ -3,9 +3,7 @@
   {vsn, "0.1.0"},
   {registered, [librarink_mqs_sup]},
   {mod, {librarink_mqs_app, []}},
-  {applications, [kernel, stdlib, amqp_client]},
-  {env,[]},
-  {modules, [librarink_mqs_app, librarink_mqs_sup, librarink_mqs, librarink_mqs_amqp, librarink_mqs_client]},
-  {licenses, ["Apache-2.0"]},
-  {links, []}
+  {applications, [kernel, stdlib]},
+  {modules, [librarink_mqs_app, librarink_mqs_sup, librarink_mqs]},
+  {licenses, ["Apache-2.0"]}
  ]}.

@@ -7,7 +7,7 @@
 %%% @end
 %%% Created : 01. set 2022 17:49
 %%%-------------------------------------------------------------------
--module(librarink_mqs_amqp).
+-module(librarink_common_amqp).
 
 %% API
 -export([start_connection/1, declare_queue/2, bind_queue/5, unbind_queue/4, start_consumer/3, consumer/3,
@@ -135,6 +135,11 @@ consumer(Connection, Channel, Callback) ->
       close_connection(Connection, Channel)
   end.
 
+%% @doc
+%% Produce message on specified queue.
+%% @end
+-spec(produce(Channel ::pid(), ExchangeName :: binary(), ExchangeType :: binary(), RoutingKey :: binary(),
+    Payload :: binary()) -> none()).
 produce(Channel, ExchangeName, ExchangeType, RoutingKey, Payload)->
 
   %% Declare exchange
@@ -151,7 +156,12 @@ produce(Channel, ExchangeName, ExchangeType, RoutingKey, Payload)->
   %% Send message
   amqp_channel:cast(Channel, Publish, Msg).
 
+%% @doc
+%% Open a new connection, produce message on selected queue and close the connection.
+%% @end
+-spec(produce_once(Host :: atom(), ExchangeName :: binary(), ExchangeType :: binary(), RoutingKey :: binary(),
+    Payload :: binary()) -> none()).
 produce_once(Host, ExchangeName, ExchangeType, RoutingKey, Payload) ->
   {ok, Connection, Channel} = start_connection(Host),
-  librarink_mqs_amqp:produce(Channel, ExchangeName, ExchangeType,  RoutingKey, Payload),
-  librarink_mqs_amqp:close_connection(Connection, Channel).
+  librarink_common_amqp:produce(Channel, ExchangeName, ExchangeType,  RoutingKey, Payload),
+  librarink_common_amqp:close_connection(Connection, Channel).

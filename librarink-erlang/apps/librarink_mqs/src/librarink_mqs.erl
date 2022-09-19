@@ -5,17 +5,22 @@
 %%% supervised by {@link librarink_mqs_sup. dedicated supervisor}, so can be restored in case of problems.
 %%% <img src="images/mqs-schema.svg" style="display: block;width: 100%;margin: 15px;"/>
 %%% @end
-%%% Created : 31. ago 2022 00:27
 %%%-------------------------------------------------------------------
 -module(librarink_mqs).
 
 -behaviour(gen_server).
--include("librarink_mqs_state.hrl").
 
 %% API
 -export([start_link/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2]).  %% gen_server callbacks
 
+-record(librarink_mqs_state, {master_pid, connection = none, channel= none, queues = [],
+  consumer = none, consumer_tags = [], callback = none}).
+
+-define(
+MQS_STATE(MasterPid, Connection, Channel),
+  #librarink_mqs_state{master_pid = MasterPid, connection = Connection, channel = Channel}
+).
 -define(SERVER, ?MODULE).
 -define(GET_ENV(Param),element(2,application:get_env(librarink_mqs, Param))).
 
@@ -46,7 +51,7 @@ start_link(MasterPid) ->
 init(MasterPid) ->
   process_flag(trap_exit, true),  % Process must trap exits to call terminate/2 on supervisor:terminate_child/2 and to
                                   %   receive message in case of consumer process crash
-  {ok, Connection, Channel} = librarink_mqs_amqp:start_connection(?GET_ENV(host)),
+  {ok, Connection, Channel} = librarink_common_amqp:start_connection(?GET_ENV(host)),
   monitor(process, MasterPid), % Start monitor of master process, if it crash MQS process can shutdown
   MasterPid ! {mqs,self()}, % Inform the master process that the MQS process it's ready to receive configuration, in
                             %  case of crash the state will be lost, so the master process has to configure the MQS
@@ -70,7 +75,7 @@ init(MasterPid) ->
   {noreply, NewState :: #librarink_mqs_state{}}).
 handle_call(Request, {From,_}, State = #librarink_mqs_state{master_pid = MasterPid}) ->
   io:format("[~p] Handle call: ~p~n", [self(), Request]),
-  io:format("[~p] State: ~p~n", [self(), State]),
+  %io:format("[~p] State: ~p~n", [self(), State]),
   case From == MasterPid of % The request is executed only if sent by master process
     true ->
       handle(Request, State); % Utility function to handler request
@@ -122,7 +127,7 @@ handle_info(Info, State = #librarink_mqs_state{}) -> % Catch all clause
     State :: #librarink_mqs_state{}) -> term()).
 terminate(Reason,State = #librarink_mqs_state{connection = Connection, channel = Channel}) ->
   io:format("[~p] MQS terminating: ~p~n[~p] State: ~p~n", [self(), Reason, self(), State]),
-  librarink_mqs_amqp:close_connection(Connection, Channel).
+  librarink_common_amqp:close_connection(Connection, Channel).
 
 %% @private
 %% @doc
@@ -133,26 +138,26 @@ terminate(Reason,State = #librarink_mqs_state{connection = Connection, channel =
   {reply, ok, NewState :: #librarink_mqs_state{}} |
   {reply, undefined_command, NewState :: #librarink_mqs_state{}}).
 handle({declare_queue, QueueName}, State = #librarink_mqs_state{channel = Channel, queues = Queues}) ->
-  {ok, NewQueue} = librarink_mqs_amqp:declare_queue(Channel, QueueName),
+  {ok, NewQueue} = librarink_common_amqp:declare_queue(Channel, QueueName),
   NewState = State#librarink_mqs_state{queues = Queues ++ [NewQueue]},
-  io:format("[~p] NewState: ~p~n", [self(), NewState]),
+  %io:format("[~p] NewState: ~p~n", [self(), NewState]),
   {reply, ok, NewState};
 handle({bind_queue, Queue, ExchangeName, ExchangeType, RoutingKey}, State = #librarink_mqs_state{channel = Channel}) ->
-  ok = librarink_mqs_amqp:bind_queue(Channel, Queue, ExchangeName, ExchangeType, RoutingKey),
-  io:format("[~p] NewState: ~p~n", [self(), State]),
+  ok = librarink_common_amqp:bind_queue(Channel, Queue, ExchangeName, ExchangeType, RoutingKey),
+  %io:format("[~p] NewState: ~p~n", [self(), State]),
   {reply, ok, State};
 handle({unbind_queue, Queue, ExchangeName, RoutingKey}, State = #librarink_mqs_state{channel = Channel}) ->
-  librarink_mqs_amqp:unbind_queue(Channel, Queue, ExchangeName, RoutingKey),
-  io:format("[~p] NewState: ~p~n", [self(), State]),
+  librarink_common_amqp:unbind_queue(Channel, Queue, ExchangeName, RoutingKey),
+  %io:format("[~p] NewState: ~p~n", [self(), State]),
   {reply, ok, State};
 handle({start_consumer, Callback}, State = #librarink_mqs_state{connection = Connection, channel = Channel, queues=
   Queues, consumer = Consumer}) ->
   case is_pid(Consumer) of
     true -> {reply, already_started, State};
     _else ->
-      {ok, NewConsumer, ConsumerTags} = librarink_mqs_amqp:start_consumer({Connection, Channel}, Queues, Callback),
+      {ok, NewConsumer, ConsumerTags} = librarink_common_amqp:start_consumer({Connection, Channel}, Queues, Callback),
       NewState = State#librarink_mqs_state{consumer = NewConsumer, consumer_tags = ConsumerTags, callback = Callback},
-      io:format("[~p] NewState: ~p~n", [self(), NewState]),
+      %io:format("[~p] NewState: ~p~n", [self(), NewState]),
       {reply, ok, NewState}
   end;
 handle(Request, State) ->

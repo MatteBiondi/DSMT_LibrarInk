@@ -5,7 +5,7 @@
 %%% @end
 %%% Created : 31. ago 2022 12:56
 %%%-------------------------------------------------------------------
--module(librarink_mqs_client).
+-module(librarink_common_mqs_client).
 
 %% API
 -export([register/1, declare_queue/2, bind_queue/5, unbind_queue/4, start_consumer/2, unregister/1]).

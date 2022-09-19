@@ -82,7 +82,9 @@ handle_info({From, Tag, Request}, Env) when is_pid(From) ->
     {error, {already_started, _Pid}}-> {noreply, Env}; %% The worker process is already handling such request,
                                           %% something strange happened, but the request will not be processed twice
     _ -> {noreply, Env}
-  end.
+  end;
+handle_info(_Info, Env) ->
+  {noreply, Env}.
 
 %% @private
 %% @doc This function is called by a gen_server when it is about to
