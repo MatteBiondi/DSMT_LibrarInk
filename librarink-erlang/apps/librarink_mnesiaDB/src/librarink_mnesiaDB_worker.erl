@@ -159,9 +159,9 @@ handle_request(_, _, From)->
 %% try...catch code. It takes function and arguments as parameters.
 -spec(performe_operation(Fun :: atom(), Args::map()) ->
   {succeed, ok} |
-  {succeed,{Records_counter :: pos_integer(), Records_list :: list(tuple())}} |
+  {succeed,{Records_counter :: pos_integer(), Records_list :: list(map())}} |
   {succeed, Copies_counter::pos_integer()} |
-  {succeed, Records_list::list(tuple())} |
+  {succeed, Records_list::list(map())} |
   {error, error_not_available_copy | undefined_book_copy | error_no_loan_found | error_no_reservation_found |
     error_cancellation_failed | reservation_not_found | unexpected_error | unavailable_copies_to_reserve |
     error_insert_failed | book_already_reserved | error_pending_loan | error_all_copies_reserved_or_lent |

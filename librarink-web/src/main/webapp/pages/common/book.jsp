@@ -37,7 +37,7 @@
     Reserve button + Whishlist button
     -->
         <h1 class="page_title"><%= request.getAttribute("title")%></h1>
-        <div class="detailed">
+        <div class="detailed" id="<%= request.getAttribute("isbn")%>">
             <div class="right_column">
                 <div class="book_info">
                     <h3>Title:</h3>
@@ -64,6 +64,7 @@
                 <h3>Brief Description: </h3>
                 <p><%= request.getAttribute("description")%></p>
                 <h3>Users rate the book: <%= request.getAttribute("rate")%>/<%= MAX_RATE %></h3>
+                <h3>Number of available copies: <%= request.getAttribute("available_copies")%></h3>
                 <div class="stars_div">
                     <!--todo: vote if it is the first time or otherwise change the vote-->
                     <!--todo: Add js code-->

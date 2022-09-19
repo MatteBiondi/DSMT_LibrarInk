@@ -20,7 +20,7 @@
 
 %% Definition of DB record
 -record(librarink_lent_book, {user, isbn, physical_copy_id, start_date, stop_date}).
--record(librarink_reserved_book, {user, isbn, start_date, stop_date, canceled}).
+-record(librarink_reserved_book, {user, isbn, start_date, stop_date, cancelled}).
 -record(librarink_physical_book_copy, {isbn, physical_copy_id}).
 
 
@@ -53,8 +53,8 @@ install(ActiveNodes, BackupNodes) ->
       mnesia:create_schema(Nodes),
       rpc:multicall(Nodes, application, start, [mnesia]),
       case mnesia:wait_for_tables([ librarink_lent_book,
-        librarink_reserved_book,
-        librarink_physical_book_copy], 5000) =:= ok of
+                                    librarink_reserved_book,
+                                    librarink_physical_book_copy], 5000) =:= ok of
         true ->
           {succeed, install_succeeded};
         false ->  %Create tables if not exist
@@ -129,7 +129,7 @@ stop_librarink_mnesia(Nodes) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(add_book_copy ( Isbn::string(), Physical_copy_id::string()) -> {succeed, ok}).
+-spec(add_book_copy ( Isbn::binary(), Physical_copy_id::binary()) -> {succeed, ok}).
 add_book_copy(Isbn, Physical_copy_id) ->
   F = fun() ->
         mnesia:write(#librarink_physical_book_copy{ isbn = Isbn,
@@ -155,7 +155,7 @@ add_book_copy(Isbn, Physical_copy_id) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(from_reservation_to_loan ( User::string() , Isbn::string() )
+-spec(from_reservation_to_loan ( User::binary() , Isbn::string() )
       -> {succeed, ok} | {error, error_not_available_copy | undefined_book | reservation_not_found | unexpected_error}).
 from_reservation_to_loan(User, Isbn) ->
   F = fun() ->
@@ -168,14 +168,19 @@ from_reservation_to_loan(User, Isbn) ->
             %Find an available copy
             case list_available_copies_by_book(Isbn) of
               {succeed, [H | _]} ->
-                {_, Selected_id} = H,
+                Selected_id = maps:get(id, H),
                 %Transforms the reservation into a loan
                 %Put a stop_date to reservation
-                Old_res = insert_element(1,Res,librarink_reserved_book),
-                mnesia:write(Old_res#librarink_reserved_book{stop_date = Timestamp, canceled = false}),
+                Old_res = from_map_to_record(librarink_reserved_book, Res),
+                mnesia:write(Old_res#librarink_reserved_book{stop_date = Timestamp, cancelled = false}),
                 mnesia:delete_object(Old_res),
                 %Insert a loan row
-                New_loan = {librarink_lent_book, User, Isbn, Selected_id, Timestamp, null},
+                New_loan = #librarink_lent_book{
+                  user = User,
+                  isbn = Isbn,
+                  physical_copy_id = Selected_id,
+                  start_date = Timestamp,
+                  stop_date = null},
                 mnesia:write(New_loan),
                 {succeed, ok};
               {succeed, []} ->
@@ -224,8 +229,8 @@ add_book_reservation(User, Isbn) ->
                   isbn = Isbn,
                   start_date = now_to_universal_time(timestamp()),
                   stop_date = null,
-                  canceled = false}),
-                  {succeed, ok};
+                  cancelled = false}),
+                {succeed, ok};
               {succeed, Counter} when Counter == 0 ->
                 {error, unavailable_copies_to_reserve};
               _ ->
@@ -261,7 +266,7 @@ add_book_reservation(User, Isbn) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(delete_book_copy ( Isbn::string(), Physical_copy_id::string()) ->
+-spec(delete_book_copy ( Isbn::string(), Physical_copy_id::binary()) ->
   {succeed, ok} | {error, undefined_book_copy | error_pending_loan | error_all_copies_reserved_or_lent | undefined_book | unexpected_error}).
 delete_book_copy(Isbn, Physical_copy_id) ->
   F = fun() ->
@@ -309,7 +314,7 @@ delete_book_copy(Isbn, Physical_copy_id) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(delete_all_book_copies ( Isbn::string() ) ->
+-spec(delete_all_book_copies ( Isbn::binary() ) ->
   {succeed, ok} | {error, error_pending_loan_or_reservation | undefined_book | unexpected_error}).
 delete_all_book_copies(Isbn) ->
   F = fun() ->
@@ -346,7 +351,7 @@ delete_all_book_copies(Isbn) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(delete_lent_book (User::string(), Isbn::string(), Id::string()) ->
+-spec(delete_lent_book (User::binary(), Isbn::binary(), Id::binary()) ->
   {succeed, ok} | {error, error_pending_loan}).
 delete_lent_book(User, Isbn, Id) ->
   F = fun() ->
@@ -383,7 +388,7 @@ delete_lent_book(User, Isbn, Id) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(get_and_delete_ended_loans () -> {succeed,{Records_counter :: pos_integer(), Records_list :: list(tuple())}}).
+-spec(get_and_delete_ended_loans () -> {succeed,{Records_counter :: pos_integer(), Records_list :: list(map())}}).
 get_and_delete_ended_loans() ->
   F = fun() ->
         Res = all_ended_loans(),
@@ -404,7 +409,7 @@ get_and_delete_ended_loans() ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(delete_lent_by_book (Isbn::string()) -> {succeed, ok} | {error, error_pending_loan}).
+-spec(delete_lent_by_book (Isbn::binary()) -> {succeed, ok} | {error, error_pending_loan}).
 delete_lent_by_book(Isbn) ->
   delete_lent_book('_', Isbn, '_').
 
@@ -421,7 +426,7 @@ delete_lent_by_book(Isbn) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(delete_lent_book_by_user (User::string()) -> {succeed, ok} | {error, error_pending_loan}).
+-spec(delete_lent_book_by_user (User::binary()) -> {succeed, ok} | {error, error_pending_loan}).
 delete_lent_book_by_user(User) ->
   delete_lent_book(User, '_', '_').
 
@@ -438,7 +443,7 @@ delete_lent_book_by_user(User) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(delete_book_reservation (User::string(), Isbn::string()) -> {succeed, ok} | {error, error_pending_reservation}).
+-spec(delete_book_reservation (User::binary(), Isbn::binary()) -> {succeed, ok} | {error, error_pending_reservation}).
 delete_book_reservation(User, Isbn) ->
   F = fun() ->
         To_delete = #librarink_reserved_book{user = User, isbn = Isbn, _ = '_'},
@@ -475,7 +480,8 @@ delete_book_reservation(User, Isbn) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(get_and_delete_ended_reservations () -> {succeed,{Records_counter :: pos_integer(), Records_list :: list(tuple())}}).
+-spec(get_and_delete_ended_reservations () ->
+  {succeed,{Records_counter :: pos_integer(), Records_list :: list(map())}}).
 get_and_delete_ended_reservations() ->
   F = fun() ->
         Res = all_ended_reservations(),
@@ -497,7 +503,7 @@ get_and_delete_ended_reservations() ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(delete_books_reservation_by_user (User::string()) -> {succeed, ok} | {error, error_pending_reservation}).
+-spec(delete_books_reservation_by_user (User::binary()) -> {succeed, ok} | {error, error_pending_reservation}).
 delete_books_reservation_by_user(User) ->
   delete_book_reservation(User, '_').
 
@@ -514,7 +520,7 @@ delete_books_reservation_by_user(User) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(delete_book_reservations_by_book (Isbn::string()) -> {succeed, ok} | {error, error_pending_reservation}).
+-spec(delete_book_reservations_by_book (Isbn::binary()) -> {succeed, ok} | {error, error_pending_reservation}).
 delete_book_reservations_by_book(Isbn) ->
   delete_book_reservation('_', Isbn).
 
@@ -534,11 +540,11 @@ delete_book_reservations_by_book(Isbn) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(copies_by_book (Isbn::string()) -> {succeed,{Records_counter :: pos_integer(), Records_list :: list(tuple())}}).
+-spec(copies_by_book (Isbn::binary()) -> {succeed,{Records_counter :: pos_integer(), Records_list :: list(map())}}).
 copies_by_book(Isbn) ->
   F = fun() ->
-        Record=#librarink_physical_book_copy{isbn = Isbn,_='_'},
-        [ {Row_isbn, Row_id} ||
+        Record=#librarink_physical_book_copy{isbn = Isbn, _='_'},
+        [ #{isbn => Row_isbn, id => Row_id} ||
           #librarink_physical_book_copy{isbn = Row_isbn, physical_copy_id = Row_id} <- mnesia:match_object(Record)]
       end,
   Result_list = mnesia:activity(transaction, F),
@@ -556,7 +562,7 @@ copies_by_book(Isbn) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(all_copies_all_book () -> {succeed,{Records_counter :: pos_integer(), Records_list :: list(tuple())}}).
+-spec(all_copies_all_book () -> {succeed,{Records_counter :: pos_integer(), Records_list :: list(map())}}).
 all_copies_all_book() ->
   copies_by_book('_').
 
@@ -574,7 +580,7 @@ all_copies_all_book() ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(count_available_copies_by_book (Isbn::string()) ->
+-spec(count_available_copies_by_book (Isbn::binary()) ->
   {succeed, Copies_counter::pos_integer()} | {error, unexpected_error | undefined_book}).
 count_available_copies_by_book(Isbn) ->
   F = fun() ->
@@ -608,8 +614,8 @@ count_available_copies_by_book(Isbn) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(list_available_copies_by_book (Isbn::string()) ->
-  {succeed, Records_list::list(tuple())} | {error, unexpected_error | undefined_book}).
+-spec(list_available_copies_by_book (Isbn::binary()) ->
+  {succeed, Records_list::list(map())} | {error, unexpected_error | undefined_book}).
 list_available_copies_by_book(Isbn) ->
   F = fun() ->
         All_copies = copies_by_book(Isbn),
@@ -619,8 +625,9 @@ list_available_copies_by_book(Isbn) ->
           {succeed,{Counter, List_of_copies}} when Counter > 0->
             {succeed,{_, Lent_copies}} = lent_copies_by_book(Isbn),
             %Available copies-> Not lent
-            Extracted_lent_copies = [{Row_isbn, Row_id} ||
-              #librarink_lent_book{isbn = Row_isbn, physical_copy_id = Row_id} <- Lent_copies],
+            Extracted_lent_copies = [
+              #{isbn => Row_isbn, id => Row_id} ||
+              #{isbn := Row_isbn, id := Row_id} <- Lent_copies],
             Not_lent_copies = List_of_copies -- Extracted_lent_copies,
             {succeed, Not_lent_copies};
           _ ->
@@ -642,8 +649,8 @@ list_available_copies_by_book(Isbn) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(lent_copies_by_book (Isbn::string()) ->
-  {succeed,{Records_counter :: pos_integer(), Records_list :: list(tuple())}} | {error, undefined_book}).
+-spec(lent_copies_by_book (Isbn::binary()) ->
+  {succeed,{Records_counter :: pos_integer(), Records_list :: list(map())}} | {error, undefined_book}).
 lent_copies_by_book(Isbn) ->
   F = fun() ->
         {succeed,{Copies_counter, _}} = copies_by_book(Isbn),
@@ -669,7 +676,7 @@ lent_copies_by_book(Isbn) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(loans_by_user (User::string()) -> {succeed,{Records_counter :: pos_integer(), Records_list :: list(tuple())}}).
+-spec(loans_by_user (User::binary()) -> {succeed,{Records_counter :: pos_integer(), Records_list :: list(map())}}).
 loans_by_user(User) ->
   F = fun() ->
         get_pending_loans(User, '_', '_')
@@ -691,12 +698,12 @@ loans_by_user(User) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(loan_by_book_copy ( Isbn::string(), Copy_Id::string() ) ->
-  {succeed,{Records_counter :: pos_integer(), Records_list :: list(tuple())}} | {error, undefined_book_copy}).
+-spec(loan_by_book_copy ( Isbn::binary(), Copy_Id::binary() ) ->
+  {succeed,{Records_counter :: pos_integer(), Records_list :: list(map())}} | {error, undefined_book_copy}).
 loan_by_book_copy(Isbn, Copy_Id) ->
   F = fun() ->
         {succeed,{_, List_of_copies}} = copies_by_book(Isbn),
-        case lists:member({Isbn, Copy_Id}, List_of_copies) of
+        case lists:member(#{isbn => Isbn, id => Copy_Id}, List_of_copies) of
           true ->
             Result_list = get_pending_loans('_', Isbn, Copy_Id),
             {succeed,{length(Result_list), Result_list}};
@@ -717,7 +724,7 @@ loan_by_book_copy(Isbn, Copy_Id) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(all_pending_loans() -> {succeed,{Records_counter :: pos_integer(), Records_list :: list(tuple())}}).
+-spec(all_pending_loans() -> {succeed,{Records_counter :: pos_integer(), Records_list :: list(map())}}).
 all_pending_loans() ->
   F = fun() ->
         get_pending_loans('_', '_', '_')
@@ -736,9 +743,10 @@ all_pending_loans() ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(all_ended_loans () -> {succeed,{Records_counter :: pos_integer(), Records_list :: list(tuple())}}).
+-spec(all_ended_loans () -> {succeed,{Records_counter :: pos_integer(), Records_list :: list(map())}}).
 all_ended_loans() ->
   F = fun() ->
+        % Get DB records
         Match = ets:fun2ms(
           fun(#librarink_lent_book{ user = Record_user,
                                     isbn = Record_isbn,
@@ -749,7 +757,11 @@ all_ended_loans() ->
             {Record_user, Record_isbn, Record_id, Record_start, Record_stop}
           end
         ),
-        mnesia:select(librarink_lent_book, Match)
+        Res = mnesia:select(librarink_lent_book, Match),
+
+        % Create maps from records
+        [#{user => Record_user, isbn => Record_isbn, id => Record_id, start_date => Record_start, stop_date => Record_stop}
+          || {Record_user, Record_isbn, Record_id, Record_start, Record_stop} <- Res]
       end,
   Result_list = mnesia:activity(transaction, F),
   {succeed,{length(Result_list), Result_list}}.
@@ -768,8 +780,8 @@ all_ended_loans() ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(reservations_by_user_and_book ( User::string(), Isbn::string() ) ->
-  {succeed, {Records_counter :: pos_integer(), Records_list :: list(tuple())}} | {error, undefined_book}).
+-spec(reservations_by_user_and_book ( User::binary(), Isbn::binary() ) ->
+  {succeed, {Records_counter :: pos_integer(), Records_list :: list(map())}} | {error, undefined_book}).
 reservations_by_user_and_book(User,Isbn) ->
   F = fun() ->
         {succeed,{Copies_counter, _}} = copies_by_book(Isbn),
@@ -778,12 +790,13 @@ reservations_by_user_and_book(User,Isbn) ->
             {error, undefined_book};
           false ->
             Record=#librarink_reserved_book{user = User, isbn = Isbn, stop_date = null,  _='_'},
-            Result_list = [{Record_user, Record_isbn, Record_start, Record_stop, Record_cancelled} ||
+            Result_list = [
+              #{user => Record_user, isbn => Record_isbn, start_date => Record_start, stop_date => Record_stop, cancelled => Record_cancelled} ||
               #librarink_reserved_book{ user = Record_user,
                                         isbn = Record_isbn,
                                         start_date = Record_start,
                                         stop_date = Record_stop,
-                                        canceled = Record_cancelled}
+                                        cancelled = Record_cancelled}
                 <- mnesia:match_object(Record)],
             {succeed,{length(Result_list), Result_list}}
         end
@@ -804,8 +817,8 @@ reservations_by_user_and_book(User,Isbn) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(reservations_by_user (User::string()) ->
-  {succeed,{Records_counter :: pos_integer(), Records_list :: list(tuple())}} | {error, undefined_book}).
+-spec(reservations_by_user (User::binary()) ->
+  {succeed,{Records_counter :: pos_integer(), Records_list :: list(map())}} | {error, undefined_book}).
 reservations_by_user(User) ->
   reservations_by_user_and_book(User, '_').
 
@@ -822,8 +835,8 @@ reservations_by_user(User) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(reservations_by_book ( Isbn::string() ) ->
-  {succeed,{Records_counter :: pos_integer(), Records_list :: list(tuple())}} | {error, undefined_book}).
+-spec(reservations_by_book ( Isbn::binary() ) ->
+  {succeed,{Records_counter :: pos_integer(), Records_list :: list(map())}} | {error, undefined_book}).
 reservations_by_book(Isbn) ->
   reservations_by_user_and_book('_', Isbn).
 
@@ -841,7 +854,7 @@ reservations_by_book(Isbn) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(all_pending_reservations() ->
-  {succeed,{Records_counter :: pos_integer(), Records_list :: list(tuple())}} | {error, undefined_book}).
+  {succeed,{Records_counter :: pos_integer(), Records_list :: list(map())}} | {error, undefined_book}).
 all_pending_reservations() ->
   reservations_by_user_and_book('_', '_').
 
@@ -857,20 +870,25 @@ all_pending_reservations() ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(all_ended_reservations() -> {succeed,{Records_counter :: pos_integer(), Records_list :: list(tuple())}}).
+-spec(all_ended_reservations() -> {succeed,{Records_counter :: pos_integer(), Records_list :: list(map())}}).
 all_ended_reservations() ->
   F = fun() ->
+        % Get DB records
         Match = ets:fun2ms(
           fun(#librarink_reserved_book{ user = Record_user,
                                         isbn=Record_isbn,
                                         start_date = Record_start,
                                         stop_date = Record_stop,
-                                        canceled = Record_cancelled})
+                                        cancelled = Record_cancelled})
             when Record_stop =/= null ->
             {Record_user, Record_isbn, Record_start, Record_stop, Record_cancelled}
           end
         ),
-        mnesia:select(librarink_reserved_book, Match)
+        Res = mnesia:select(librarink_reserved_book, Match),
+
+        % Create maps from records
+        [#{user => Record_user, isbn => Record_isbn, start_date => Record_start, stop_date => Record_stop, cancelled => Record_cancelled}
+          || {Record_user, Record_isbn, Record_start, Record_stop, Record_cancelled} <- Res]
       end,
   Result_list = mnesia:activity(transaction, F),
   {succeed,{length(Result_list), Result_list}}.
@@ -895,7 +913,7 @@ all_ended_reservations() ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(terminate_loan_by_book ( Isbn::string(), Copy_id::string() ) ->
+-spec(terminate_loan_by_book ( Isbn::binary(), Copy_id::binary() ) ->
   {succeed, ok} | {error, undefined_book_copy | error_no_loan_found | unexpected_error}).
 terminate_loan_by_book( Isbn, Copy_id ) ->
   F = fun() ->
@@ -907,7 +925,7 @@ terminate_loan_by_book( Isbn, Copy_id ) ->
           {succeed,{1, [Row]}}->
             Stop_date = now_to_universal_time(timestamp()),
             % Create a valid record putting name of the table as first element
-            Db_row = insert_element(1,Row,librarink_lent_book),
+            Db_row = from_map_to_record(librarink_lent_book, Row),
             % Write a new version of the record with set stop_date
             mnesia:write(Db_row#librarink_lent_book{stop_date = Stop_date}),
             % Delete the old version of the record
@@ -936,7 +954,7 @@ terminate_loan_by_book( Isbn, Copy_id ) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(renew_loan_by_book_copy ( Isbn::string(), Copy_id::string() ) ->
+-spec(renew_loan_by_book_copy ( Isbn::binary(), Copy_id::binary() ) ->
   {succeed, ok} | {error, undefined_book_copy | error_no_loan_found | unexpected_error}).
 renew_loan_by_book_copy( Isbn, Copy_id ) ->
   F = fun() ->
@@ -948,7 +966,7 @@ renew_loan_by_book_copy( Isbn, Copy_id ) ->
       {succeed,{1, [Row]}}->
         Today = now_to_universal_time(timestamp()),
         % Create a valid record putting name of the table as first element
-        Db_row = insert_element(1,Row,librarink_lent_book),
+        Db_row = from_map_to_record(librarink_lent_book,Row),
         % Write a new version of the record with set stop_date to end old loan
         mnesia:write(Db_row#librarink_lent_book{stop_date = Today}),
         % Write a new version of the record with set start_date to renew the loan
@@ -978,7 +996,7 @@ renew_loan_by_book_copy( Isbn, Copy_id ) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(cancel_reservation_by_book_and_user ( User::string(), Isbn::string() ) ->
+-spec(cancel_reservation_by_book_and_user ( User::binary(), Isbn::binary() ) ->
   {succeed, ok} | {error, undefined_book | error_no_reservation_found | error_cancellation_failed}).
 cancel_reservation_by_book_and_user(User, Isbn) ->
   F = fun() ->
@@ -990,9 +1008,9 @@ cancel_reservation_by_book_and_user(User, Isbn) ->
           {succeed, {_, [Row]}}->
             Stop_date = now_to_universal_time(timestamp()),
             % Create a valid record putting name of the table as first element
-            Db_row = insert_element(1,Row,librarink_reserved_book),
+            Db_row = from_map_to_record(librarink_reserved_book,Row),
             % Write a new version of the record with set stop_date and cancelled
-            mnesia:write(Db_row#librarink_reserved_book{stop_date = Stop_date, canceled = true}),
+            mnesia:write(Db_row#librarink_reserved_book{stop_date = Stop_date, cancelled = true}),
             % Delete the old version of the record
             mnesia:delete_object(Db_row),
             {succeed, ok};
@@ -1020,14 +1038,54 @@ cancel_reservation_by_book_and_user(User, Isbn) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(get_pending_loans (User::string(), Isbn::string(), Copy_Id::string() ) ->
-  {Records_counter::pos_integer(), Records_list::list(tuple())}).
+-spec(get_pending_loans (User::binary(), Isbn::binary(), Copy_Id::binary() ) ->
+  {Records_counter::pos_integer(), Records_list::list(map())}).
 get_pending_loans(User, Isbn, Copy_Id) ->
   Record=#librarink_lent_book{user = User, isbn = Isbn, physical_copy_id = Copy_Id, stop_date = null,  _='_'},
-  [{Record_user, Record_isbn, Record_id, Record_start, Record_stop} ||
+  [#{user => Record_user, isbn => Record_isbn, id => Record_id, start_date => Record_start, stop_date => Record_stop} ||
     #librarink_lent_book{ user = Record_user,
                           isbn = Record_isbn,
                           physical_copy_id = Record_id,
                           start_date = Record_start,
                           stop_date = Record_stop}
       <- mnesia:match_object(Record)].
+
+
+%%--------------------------------------------------------------------
+%% @private
+%% @doc <pre>
+%%  This function is called to build a valid DB tuple from a map. This
+%%  function should be used with caution to avoid drops in performance.
+%%  Type: - Transformation operation
+%%  In:   - Record_type: The tpe of record to be created
+%%        - Map: Map data to be transformed in record
+%%  Out:  - Requested record with values from map argument
+%% </pre>
+%% @end
+%%--------------------------------------------------------------------
+-spec(from_map_to_record (librarink_physical_book_copy|librarink_reserved_book|librarink_lent_book, Map::map()) ->
+  {Record::tuple()}).
+
+from_map_to_record(librarink_physical_book_copy, Map)->
+  #librarink_physical_book_copy{
+    isbn = maps:get(isbn, Map),
+    physical_copy_id = maps:get(id,Map)
+  };
+
+from_map_to_record(librarink_reserved_book, Map)->
+  #librarink_reserved_book{
+    user = maps:get(user,Map),
+    isbn = maps:get(isbn, Map),
+    start_date = maps:get(start_date,Map),
+    stop_date = maps:get(stop_date,Map),
+    cancelled = maps:get(cancelled,Map)
+  };
+
+from_map_to_record(librarink_lent_book, Map)->
+  #librarink_lent_book{
+    user = maps:get(user,Map),
+    isbn = maps:get(isbn, Map),
+    physical_copy_id = maps:get(id,Map),
+    start_date = maps:get(start_date,Map),
+    stop_date = maps:get(stop_date,Map)
+  }.
