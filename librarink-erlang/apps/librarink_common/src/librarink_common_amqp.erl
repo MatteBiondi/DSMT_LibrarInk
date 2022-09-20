@@ -14,6 +14,7 @@
   close_connection/2, produce/5, produce_once/5]).
 
 -include_lib("amqp_client/include/amqp_client.hrl").
+-include_lib("kernel/include/logger.hrl").
 
 %% @doc
 %% Connect to the MQS broker at the specified address and open a channel to start communication.
@@ -114,24 +115,23 @@ consumer(Connection, Channel, Callback) ->
     true ->
       receive
         #'basic.consume_ok'{} -> %% Message received after consumer subscription
-          io:format("[~p] Basic.consume_ok~n", [self()]),
           consumer(Connection, Channel, Callback);
         {#'basic.deliver'{delivery_tag = Tag}, #amqp_msg{payload = Msg}} -> %% Message received on queues
-          io:format("~p Consumer: ~p~n",[self(), Msg]),
+          ?LOG_DEBUG("Consumer message on queue: ~p",[Msg]),
           amqp_channel:cast(Channel, #'basic.ack'{delivery_tag = Tag}), %% Send ack to broker
           Callback(Msg),
           consumer(Connection, Channel, Callback);
         #'basic.cancel_ok'{} -> %% Message received after consumer cancellation
-          io:format("[~p] Cancel~n",[self()]),
+          ?LOG_DEBUG("Consumer canceled"),
           cancel;
         {'EXIT',_Pid, Reason}  -> %% Message received if the MQS process that has spawned the consumer crashed
-          io:format("[~p] MQS process crashed: ~p~n",[self(), Reason]),
+          ?LOG_DEBUG("MQS process crashed: ~p",[Reason]),
           close_connection(Connection, Channel);
         Any -> %% Catch all clause
-          io:format("[~p] Unexpected message: ~p~n",[self(), Any])
+          ?LOG_NOTICE("Unexpected message: ~p",[Any])
       end;
     _False ->
-      io:format("Inactive channel~n"),
+      ?LOG_NOTICE("Inactive channel"),
       close_connection(Connection, Channel)
   end.
 

@@ -30,9 +30,9 @@
     {ok, pid(), State :: term()} |
     {error, Reason :: term()}).
 start(_StartType, _StartArgs) ->
-
     {ok, WSPort} = application:get_env(librarink_websocket, port),
-
+    {ok, Domain} = application:get_env(librarink_websocket, logger_domain),
+    logger:set_primary_config(metadata, #{domain => Domain}),
     %% Start cowboy server
     UpdateDispatch = cowboy_router:compile([
         {'_', [{"/update", librarink_websocket_handler, []}]} %% {HostMatch, list({PathMatch, Handler, InitialState})}

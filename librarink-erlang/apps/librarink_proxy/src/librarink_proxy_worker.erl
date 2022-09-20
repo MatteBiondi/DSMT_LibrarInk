@@ -14,6 +14,8 @@
 -module(librarink_proxy_worker).
 -export([work/4]).
 
+-include_lib("kernel/include/logger.hrl").
+
 -record(librarink_proxy_env, {mnesia_name, mnesia_nodes, request_timeout, mqs_host, exchange_type, routing_key}).
 
 -define(CONNECTED_FILTER(Active, Backup), fun(Node) -> (Node =:= Active) or (Node =:= Backup) end).
@@ -48,15 +50,18 @@ work(Request, From, Tag, Env) ->
   try
     From ! {Tag, jsx:encode(#{result => Result, response => EncodedResponse})}
   catch
-      error: _ ->  From ! {Tag, jsx:encode(#{result => error, response => unexpected_error})}
+    error: _ ->  From ! {Tag, jsx:encode(#{result => error, response => unexpected_error})}
   end,
 
-
   {Exchange, Notification} = build_notification(Request, Result),
-  case Notification of
-    no_notification -> ok;
-    _ -> publish_notification(Exchange, Notification, Env)
-  end.
+  try
+    case Notification of
+      no_notification -> ok;
+      _ -> publish_notification(Exchange, Notification, Env)
+    end
+catch
+  error: Error -> ?LOG_WARNING("Notification publishment failed: ~p",[Error])
+end.
 
 %%%%%===================================================================
 %%%%% INTERNAL FUNCTIONS

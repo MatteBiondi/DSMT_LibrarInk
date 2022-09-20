@@ -19,6 +19,8 @@
     {ok, pid(), State :: term()} |
     {error, Reason :: term()}).
 start(_StartType, _StartArgs) ->
+    {ok, Domain} = application:get_env(librarink_mqs, logger_domain),
+    logger:set_primary_config(metadata, #{domain => Domain}),
     librarink_mqs_sup:start_link().
 
 %% @doc

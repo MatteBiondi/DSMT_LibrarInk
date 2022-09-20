@@ -81,3 +81,4 @@ _checkouts/
 
 librarink-erlang/doc/*
 librarink_db_files/
+logs/

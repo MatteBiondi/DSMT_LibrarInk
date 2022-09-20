@@ -15,6 +15,8 @@
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2]).
 
+-include_lib("kernel/include/logger.hrl").
+
 -define(GET_ENV(Param),element(2,application:get_env(librarink_proxy, Param))).
 
 -record(librarink_proxy_env, {mnesia_name, mnesia_nodes, request_timeout, mqs_host, exchange_type, routing_key}).
@@ -55,7 +57,7 @@ init([]) ->
   {reply, Reply :: term(), NewState :: #librarink_proxy_env{}} |
   {stop, Reason :: term(), NewState :: #librarink_proxy_env{}}).
 handle_call(Request, {From, Tag}, Env) ->
-  io:format("[~p] Incoming request: ~p~n",[self(), {From, Tag, Request}]),
+  ?LOG_INFO("Request: ~p",[{From, Tag, Request}]),
   case librarink_proxy_worker_sup:start_worker(From, Tag, Request, Env) of
     {ok, _Pid} -> {noreply, Env}; %% The response will be sent by the worker process
     {error, {already_started, _Pid}}-> {noreply, Env}; %% The worker process is already handling such request,
@@ -76,7 +78,7 @@ handle_cast(_Request, Env) ->
 -spec(handle_info({From :: pid(), Tag :: reference(), Request :: term()}, Env :: #librarink_proxy_env{}) ->
   {noreply, NewState :: #librarink_proxy_env{}}).
 handle_info({From, Tag, Request}, Env) when is_pid(From) ->
-  io:format("[~p] Incoming request: ~p~n",[self(), {From, Tag, Request}]),
+  ?LOG_INFO("Request: ~p",[{From, Tag, Request}]),
   case librarink_proxy_worker_sup:start_worker(From, Tag, Request, Env) of
     {ok, _Pid} -> {noreply, Env}; %% The response will be sent by the worker process
     {error, {already_started, _Pid}}-> {noreply, Env}; %% The worker process is already handling such request,

@@ -21,6 +21,8 @@
 -spec(start(StartType :: normal | {takeover, node()}, StartArgs :: term()) ->
     {ok, pid()} | {error, Reason :: term()}).
 start(_StartType, _StartArgs) ->
+    {ok, Domain} = application:get_env(librarink_proxy, logger_domain),
+    logger:set_primary_config(metadata, #{domain => Domain}),
     librarink_proxy_sup:start_link().
 
 %% @doc

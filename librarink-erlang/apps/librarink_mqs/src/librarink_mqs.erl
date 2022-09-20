@@ -14,6 +14,8 @@
 -export([start_link/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2]).  %% gen_server callbacks
 
+-include_lib("kernel/include/logger.hrl").
+
 -record(librarink_mqs_state, {master_pid, connection = none, channel= none, queues = [],
   consumer = none, consumer_tags = [], callback = none}).
 
@@ -74,8 +76,7 @@ init(MasterPid) ->
   {reply, Reply :: term(), NewState :: #librarink_mqs_state{}} |
   {noreply, NewState :: #librarink_mqs_state{}}).
 handle_call(Request, {From,_}, State = #librarink_mqs_state{master_pid = MasterPid}) ->
-  io:format("[~p] Handle call: ~p~n", [self(), Request]),
-  %io:format("[~p] State: ~p~n", [self(), State]),
+  ?LOG_INFO("Request: ~p", [Request]),
   case From == MasterPid of % The request is executed only if sent by master process
     true ->
       handle(Request, State); % Utility function to handler request
@@ -106,15 +107,15 @@ handle_cast(_Request, State) ->
 -spec(handle_info(Info :: timeout() | term(), State :: #librarink_mqs_state{}) -> % Link message, consumer process crash
   {noreply, NewState :: #librarink_mqs_state{}} | {stop, Reason :: term(), NewState :: #librarink_mqs_state{}}).
 handle_info({'EXIT', Consumer, Reason}, State = #librarink_mqs_state{consumer = Consumer}) ->
-  io:format("[~p] Consumer crashed: ~p~n", [self(), Reason]),
+  ?LOG_DEBUG("Consumer crashed: ~p", [Reason]),
   {stop, shutdown, State}; % Stop gracefully
 handle_info({'DOWN', _Ref, process, MasterPid, Reason},
     State = #librarink_mqs_state{master_pid = MasterPid}) -> % Monitor message, master process crash
-  io:format("[~p] Handle monitor: ~p~n", [self(), Reason]),
+  ?LOG_DEBUG("Monitor down: ~p", [Reason]),
   spawn(fun() -> librarink_mqs_sup:stop_child(MasterPid ) end), % Request to supervisor to stop the MQS process
   {noreply, State};
 handle_info(Info, State = #librarink_mqs_state{}) -> % Catch all clause
-  io:format("[~p] Handle info: ~p~n", [self(), Info]),
+  ?LOG_DEBUG("Info: ~p", [Info]),
   {noreply, State}.
 
 %% @private
@@ -126,7 +127,7 @@ handle_info(Info, State = #librarink_mqs_state{}) -> % Catch all clause
 -spec(terminate(Reason :: (normal | shutdown | {shutdown, term()} | term()),
     State :: #librarink_mqs_state{}) -> term()).
 terminate(Reason,State = #librarink_mqs_state{connection = Connection, channel = Channel}) ->
-  io:format("[~p] MQS terminating: ~p~n[~p] State: ~p~n", [self(), Reason, self(), State]),
+  ?LOG_INFO("MQS terminating: ~p~nState: ~p~n", [Reason, State]),
   librarink_common_amqp:close_connection(Connection, Channel).
 
 %% @private
@@ -140,15 +141,15 @@ terminate(Reason,State = #librarink_mqs_state{connection = Connection, channel =
 handle({declare_queue, QueueName}, State = #librarink_mqs_state{channel = Channel, queues = Queues}) ->
   {ok, NewQueue} = librarink_common_amqp:declare_queue(Channel, QueueName),
   NewState = State#librarink_mqs_state{queues = Queues ++ [NewQueue]},
-  %io:format("[~p] NewState: ~p~n", [self(), NewState]),
+  ?LOG_DEBUG("New state: ~p", [NewState]),
   {reply, ok, NewState};
 handle({bind_queue, Queue, ExchangeName, ExchangeType, RoutingKey}, State = #librarink_mqs_state{channel = Channel}) ->
   ok = librarink_common_amqp:bind_queue(Channel, Queue, ExchangeName, ExchangeType, RoutingKey),
-  %io:format("[~p] NewState: ~p~n", [self(), State]),
+  ?LOG_DEBUG("New state: ~p", [State]),
   {reply, ok, State};
 handle({unbind_queue, Queue, ExchangeName, RoutingKey}, State = #librarink_mqs_state{channel = Channel}) ->
   librarink_common_amqp:unbind_queue(Channel, Queue, ExchangeName, RoutingKey),
-  %io:format("[~p] NewState: ~p~n", [self(), State]),
+  ?LOG_DEBUG("New state: ~p", [State]),
   {reply, ok, State};
 handle({start_consumer, Callback}, State = #librarink_mqs_state{connection = Connection, channel = Channel, queues=
   Queues, consumer = Consumer}) ->
@@ -157,9 +158,9 @@ handle({start_consumer, Callback}, State = #librarink_mqs_state{connection = Con
     _else ->
       {ok, NewConsumer, ConsumerTags} = librarink_common_amqp:start_consumer({Connection, Channel}, Queues, Callback),
       NewState = State#librarink_mqs_state{consumer = NewConsumer, consumer_tags = ConsumerTags, callback = Callback},
-      %io:format("[~p] NewState: ~p~n", [self(), NewState]),
+      ?LOG_DEBUG("New state: ~p", [NewState]),
       {reply, ok, NewState}
   end;
 handle(Request, State) ->
-  io:format("[~p] Undefined command: ~p~n", [self(), Request]),
+  ?LOG_NOTICE("Undefined command: ~p", [Request]),
   {reply, undefined_command, State}.

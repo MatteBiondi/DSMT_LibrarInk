@@ -9,6 +9,8 @@
 %% API
 -export([init/2, websocket_init/1, websocket_handle/2, websocket_info/2, terminate/3]).
 
+-include_lib("kernel/include/logger.hrl").
+
 -record(librarink_websocket_state, {mqs_pid = none, items=[]}).
 
 -define(QUEUE_NAME, list_to_binary(pid_to_list(self()))).
@@ -38,7 +40,7 @@ init(Req, _State) ->
   {[], #librarink_websocket_state{}, hibernate} |
   {stop, State::#librarink_websocket_state{}}).
 websocket_init(State) ->
-  io:format("[~p] Websocket init: ~p~n",[self(), State]),
+  ?LOG_INFO("Websocket connection established"),
   %% Register to MQS
   case librarink_common_mqs_client:register(self()) of
     {ok, _} -> {[], #librarink_websocket_state{}, hibernate};
@@ -56,17 +58,17 @@ websocket_init(State) ->
 -spec(websocket_handle(IncomingMessage:: term(), State::#librarink_websocket_state{})->
   {ok,  State::#librarink_websocket_state{}, hibernate}).
 websocket_handle({text, ?KEEP_ALIVE}, State) ->
-  io:format("[~p] Websocket keep-alive~n",[self()]),
+ ?LOG_DEBUG("Message on websocket: keep-alive"),
   {ok, State, hibernate};
 websocket_handle({text, Msg}, State=#librarink_websocket_state{mqs_pid = MqsPid, items = OldItem}) ->
-  io:format("[~p] Websocket handle: ~p~n",[self(), Msg]),
+  ?LOG_DEBUG("Message on websocket: ~p",[Msg]),
   case jsx:is_json(Msg) of
     true ->
       case is_list(NewItem = jsx:decode(Msg, [])) of
         true ->
           add_bindings(MqsPid, ?QUEUE_NAME, lists:subtract(NewItem, OldItem), ?EXCHANGE_TYPE, ?ROUTING_KEY),
           remove_bindings(MqsPid, ?QUEUE_NAME, lists:subtract(OldItem, NewItem), ?ROUTING_KEY),
-          io:format("[~p] New items: ~p~n", [self(), NewItem]),
+          ?LOG_DEBUG("New tracked items: ~p", [NewItem]),
           {ok, State#librarink_websocket_state{items = NewItem}, hibernate};
         _false ->
           self() ! {info, <<"Malformed items">>},
@@ -76,8 +78,8 @@ websocket_handle({text, Msg}, State=#librarink_websocket_state{mqs_pid = MqsPid,
       self() ! {info, <<"Malformed items">>},
       {ok, State, hibernate}
   end;
-websocket_handle(_, State) ->
-  io:format("[~p] Websocket handle: unexpected message~n",[self()]),
+websocket_handle(_Msg, State) ->
+  ?LOG_NOTICE("Unexpected message: ~p",[_Msg]),
   {ok, State, hibernate}.
 
 %% @doc
@@ -96,21 +98,21 @@ websocket_handle(_, State) ->
   {ClientMessage :: list(term()), State :: #librarink_websocket_state{}, hibernate} |
   {NoMessage :: none(), State :: #librarink_websocket_state{}, hibernate}).
 websocket_info({update, Update}, State) ->
-  io:format("[~p] Websocket info: update message~n", [self()]),
+  ?LOG_DEBUG("Websocket info: update message"),
   {[{text, jsx:encode(#{type => update, data => jsx:decode(Update)})}], State, hibernate};
 websocket_info({info, Info}, State) ->
-  io:format("[~p] Websocket info: info message~n",[self()]),
+  ?LOG_DEBUG("Websocket info: info message~n"),
   {[{text, jsx:encode(#{type => info, data => Info})}], State, hibernate};
 websocket_info({mqs, MqsPid}, State=#librarink_websocket_state{items = Items}) when is_pid(MqsPid) ->
-  io:format("[~p] New MQS process: ~p~n",[self(), MqsPid]),
+  ?LOG_DEBUG("New MQS process: ~p", [MqsPid]),
   librarink_common_mqs_client:declare_queue(MqsPid, ?QUEUE_NAME),
   add_bindings(MqsPid, ?QUEUE_NAME, Items, ?EXCHANGE_TYPE, ?ROUTING_KEY),
   WebSocketHandlerPid = self(),
   librarink_common_mqs_client:start_consumer(MqsPid, fun(Msg) -> WebSocketHandlerPid ! {update, Msg} end),
   NewState = State#librarink_websocket_state{mqs_pid = MqsPid},
   {[], NewState, hibernate};
-websocket_info(Msg, State) ->
-  io:format("[~p] Websocket info: unexpected message~p~n",[self(),Msg]),
+websocket_info(_Msg, State) ->
+  ?LOG_NOTICE("Unexpected message: ~p", [_Msg]),
   {[], State, hibernate}.
 
 %% @doc
@@ -119,7 +121,7 @@ websocket_info(Msg, State) ->
 %% @end
 -spec(terminate(Reason :: any(), Request :: any() ,State::#librarink_websocket_state{}) -> ok).
 terminate(Reason, _Request, #librarink_websocket_state{mqs_pid = MqsPid}) ->
-  io:format("[~p] Websocket terminate: ~p~n",[self(), Reason]),
+  ?LOG_INFO("Websocket connection closed: ~p",[Reason]),
   librarink_common_mqs_client:unregister(MqsPid),
   ok.
 
