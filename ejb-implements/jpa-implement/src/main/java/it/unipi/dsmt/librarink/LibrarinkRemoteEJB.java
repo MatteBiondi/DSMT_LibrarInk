@@ -184,6 +184,11 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
     }
 
     @Override
+    public List<Librarink_gradesDTO> listGrades(Librarink_gradesDTO wishlistFilter) {
+        return null;
+    }
+
+    @Override
     public List<Librarink_history_reservationDTO> listHistoryReservation(Librarink_history_reservationDTO history_reservationFilter) {
         Map<String, Object> parameters = new HashMap<String, Object>();
         StringBuilder jpql = new StringBuilder();
@@ -257,6 +262,11 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
     }
 
     @Override
+    public Librarink_gradesDTO findGradesByKey(String user_email, String isbn) {
+        return null;
+    }
+
+    @Override
     public Librarink_wishlistDTO findWishlistByKey(String user_email, String isbn) {
         WishListKey wishListKey=new WishListKey(user_email,isbn);
         Wishlist wishlist = entityManager.find(Wishlist.class,wishListKey);
@@ -325,6 +335,11 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
             entityManager.remove(wishlist);
             return true;
         }
+        return false;
+    }
+
+    @Override
+    public boolean deleteGradeByKey(String user_email, String isbn) {
         return false;
     }
 
@@ -442,6 +457,11 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
             entityManager.merge(wishlist);
         }
         return wishlistDTO;
+    }
+
+    @Override
+    public Librarink_gradesDTO saveOrUpdateGrade(Librarink_gradesDTO gradesDTO, boolean update) {
+        return null;
     }
 
     @Override
