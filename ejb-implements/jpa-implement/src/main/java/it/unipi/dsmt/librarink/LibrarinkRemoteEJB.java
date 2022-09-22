@@ -184,8 +184,37 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
     }
 
     @Override
-    public List<Librarink_gradesDTO> listGrades(Librarink_gradesDTO wishlistFilter) {
-        return null;
+    public List<Librarink_gradesDTO> listGrades(Librarink_gradesDTO gradesFilter) {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        StringBuilder jpql = new StringBuilder();
+        jpql.append("select l, coalesce(size(l.languages),0) from grade l where 1 = 1 ");
+        if (gradesFilter.getUser_email() != null && !gradesFilter.getUser_email().isEmpty()){
+            jpql.append(" and lower(l.user_email) like concat('%', lower(:user_email), '%') ");
+            parameters.put("user_email", gradesFilter.getUser_email());
+        }
+        if (gradesFilter.getIsbn() != null && !gradesFilter.getIsbn().isEmpty()){
+            jpql.append(" and lower(l.isbn) like concat('%', lower(:isbn), '%') ");
+            parameters.put("isbn", gradesFilter.getIsbn());
+        }
+        jpql.append(" group by l ");
+        Query query = entityManager.createQuery(jpql.toString());
+        for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
+            query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
+        }
+        List<Object[]> gradeList = query.getResultList();
+        List<Librarink_gradesDTO> toReturnList = new ArrayList<Librarink_gradesDTO>();
+        if (gradeList != null && !gradeList.isEmpty()) {
+            for(Object[] gradeInfo: gradeList){
+                Grade grade = (Grade) gradeInfo[0];
+                Integer numLanguages = ((Number)gradeInfo[1]).intValue();
+                Librarink_gradesDTO gradesDTO = new Librarink_gradesDTO();
+                gradesDTO.setIsbn(grade.getIsbn());
+                gradesDTO.setUser_email(grade.getUser_email());
+                gradesDTO.setStars(grade.getStars());
+                toReturnList.add(gradesDTO);
+            }
+        }
+        return toReturnList;
     }
 
     @Override
@@ -263,7 +292,13 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
 
     @Override
     public Librarink_gradesDTO findGradesByKey(String user_email, String isbn) {
-        return null;
+        GradeKey gradeKey=new GradeKey(user_email,isbn);
+        Grade grade = entityManager.find(Grade.class,gradeKey);
+        Librarink_gradesDTO gradeDTO = new Librarink_gradesDTO();
+        gradeDTO.setIsbn(grade.getIsbn());
+        gradeDTO.setUser_email(grade.getUser_email());
+        gradeDTO.setStars(grade.getStars());
+        return gradeDTO;
     }
 
     @Override
@@ -340,6 +375,13 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
 
     @Override
     public boolean deleteGradeByKey(String user_email, String isbn) {
+        GradeKey gradeKey = new GradeKey(user_email,isbn);
+        Grade grade = entityManager.find(Grade.class,gradeKey);
+        if(grade!=null)
+        {
+            entityManager.remove(grade);
+            return true;
+        }
         return false;
     }
 
@@ -461,7 +503,29 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
 
     @Override
     public Librarink_gradesDTO saveOrUpdateGrade(Librarink_gradesDTO gradesDTO, boolean update) {
-        return null;
+        Grade grade = null;
+        if(!update)
+        {
+            grade=new Grade();
+        }
+        else
+        {
+            grade=entityManager.find(Grade.class,new GradeKey(gradesDTO.getUser_email(),gradesDTO.getIsbn()));
+
+
+        }
+        grade.setIsbn(gradesDTO.getIsbn());
+        grade.setUser_email(gradesDTO.getUser_email());
+        grade.setStars(gradesDTO.getStars());
+        if(!update)
+        {
+            entityManager.persist(grade);
+        }
+        else
+        {
+            entityManager.merge(grade);
+        }
+        return gradesDTO;
     }
 
     @Override

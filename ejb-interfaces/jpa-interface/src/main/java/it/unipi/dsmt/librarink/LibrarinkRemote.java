@@ -9,7 +9,7 @@ public interface LibrarinkRemote {
     public List<Librarink_booksDTO> listBooks(Librarink_booksDTO booksFilter);
     public List<Librarink_history_loanDTO> listHistoryLoan(Librarink_history_loanDTO history_loanFilter);
     public List<Librarink_wishlistDTO> listWishlist(Librarink_wishlistDTO wishlistFilter);
-    public List<Librarink_gradesDTO> listGrades(Librarink_gradesDTO wishlistFilter);
+    public List<Librarink_gradesDTO> listGrades(Librarink_gradesDTO gradesFilter);
     public List<Librarink_history_reservationDTO> listHistoryReservation(Librarink_history_reservationDTO history_reservationFilter);
     public Librarink_usersDTO findUsersByEmail(String email);
     public Librarink_booksDTO findBooksByIsbn(String isbn);
