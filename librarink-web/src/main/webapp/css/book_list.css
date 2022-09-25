@@ -1,0 +1,14 @@
+#pagination-menu {
+    display: flex;
+    justify-content: center;
+}
+
+#pagination-menu span{
+    cursor: pointer;
+}
+
+#book-items a,
+#book-items a:focus {
+    color: black;
+    text-decoration: none;
+}

@@ -1,19 +1,35 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <html>
-<head>
-    <title>Librarink</title>
-    <link rel="stylesheet" href="./css/book.css" type="text/css" media="screen">
-</head>
-<body>
-<h2>Catalog:</h2>
-<!--Todo: fields for the search, the book filter and the 'for' loop with include (see below)-->
-<!--Todo: if the results are> x then use paging-->
-<jsp:include page="pages/common/book.jsp" >
-    <jsp:param name="type" value="thumbnail" />
-    <jsp:param name="image" value="https://images-na.ssl-images-amazon.com/images/I/71gjt76M3xL.jpg" />
-    <jsp:param name="title" value="Il Signore degli anelli. Trilogia" />
-    <jsp:param name="author" value="John R. R. Tolkien" />
-    <jsp:param name="isbn" value="978-8845210273" />
-    <jsp:param name="rate" value="5" />
-</jsp:include>
-</body>
+    <head>
+        <title>Librarink</title>
+        <link rel="icon" type="image/x-icon" href="/librarink-web/images/favicon.ico">
+        <link rel="stylesheet" href="/librarink-web/css/index.css" type="text/css" media="screen">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+              rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+              crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css"
+              integrity="sha384-xeJqLiuOvjUBq3iGOjvSQSIlwrpqjSHXpduPd6rQpuiM3f5/ijby8pCsnbu5S81n"
+              crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.6.1.js"
+                integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI="
+                crossorigin="anonymous">
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/librarink-web/scripts/book_search.js"></script>
+    </head>
+
+    <body>
+        <div class="wrapper">
+            <jsp:include page="pages/common/navbar_top.jsp">
+                <jsp:param name="search_bar" value="true" />
+            </jsp:include>
+            <section id="content">
+                <div id="book-list"><!-- FILL BY AJAX REQUEST --></div>
+            </section>
+        </div>
+    <!--script src="/librarink-web/scripts/websocket.js"></script-->
+    </body>
 </html>
