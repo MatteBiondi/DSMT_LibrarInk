@@ -4,6 +4,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name="wishlist")
+@IdClass(WishListKey.class)
 public class Wishlist {
     @Id
     @Column(name="email_user")

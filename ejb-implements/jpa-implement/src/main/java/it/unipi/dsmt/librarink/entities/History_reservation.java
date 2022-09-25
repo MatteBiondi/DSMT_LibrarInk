@@ -1,13 +1,11 @@
 package it.unipi.dsmt.librarink.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.sql.Date;
 
 @Entity
 @Table(name = "history_reservation")
+@IdClass(History_loanKey.class)
 public class History_reservation {
     @Id
     @Column(name="user_email")

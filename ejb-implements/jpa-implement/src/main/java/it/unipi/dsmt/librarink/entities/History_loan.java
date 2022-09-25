@@ -1,12 +1,11 @@
 package it.unipi.dsmt.librarink.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.sql.Date;
+
 @Entity
 @Table(name = "history_loan")
+@IdClass(History_loanKey.class)
 public class History_loan {
     @Id
     @Column(name="user_email")
@@ -62,6 +61,7 @@ public class History_loan {
     public void setEnd_date(Date end_date) {
         this.end_date = end_date;
     }
+
     public History_loanKey getHistory_loanKey()
     {
         return new History_loanKey(user_email,isbn,id_copy,start_date);
