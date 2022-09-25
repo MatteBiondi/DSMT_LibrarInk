@@ -589,4 +589,87 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
         }
         return history_loanDTO;
     }
+
+    @Override
+    public List<Librarink_booksDTO> list_pagination_book(int offset, int page, Librarink_booksDTO filter) {
+        Map<String, Object> parameters = new HashMap<>();
+        StringBuilder jpql = new StringBuilder("select b from Books b where 1=1");
+
+        if (filter.getBook_title() != null && !filter.getBook_title().isEmpty()){
+            jpql.append(" and lower(b.book_title) like concat('%', lower(:book_title), '%')");
+            parameters.put("book_title", filter.getBook_title());
+        }
+        if (filter.getBook_author() != null && !filter.getBook_author().isEmpty()){
+            jpql.append(" and lower(b.book_author) like concat('%', lower(:book_author), '%') ");
+            parameters.put("book_author", filter.getBook_author());
+        }
+        if (filter.getGenre() != null && !filter.getGenre().isEmpty()){
+            jpql.append(" and lower(b.genre) like concat('%', lower(:genre), '%') ");
+            parameters.put("genre", filter.getGenre());
+        }
+        if (filter.getIsbn() != null && !filter.getIsbn().isEmpty()){
+            jpql.append(" and lower(b.isbn) like concat('%', lower(:isbn), '%') ");
+            parameters.put("isbn", filter.getIsbn());
+        }
+
+        Query query = entityManager.createQuery(jpql.toString());
+        for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
+            query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
+        }
+        query.setMaxResults(page);
+        query.setFirstResult(page * offset);
+        List<Books> booksList = query.getResultList();
+        List<Librarink_booksDTO> toReturnList = new ArrayList<>();
+
+        if (booksList != null && !booksList.isEmpty()) {
+            for(Books book : booksList){
+                Librarink_booksDTO bookDTO = new Librarink_booksDTO();
+                bookDTO.setIsbn(book.getIsbn());
+                bookDTO.setBook_title(book.getBook_title());
+                bookDTO.setBook_author(book.getBook_author());
+                bookDTO.setGenre(book.getGenre());
+                bookDTO.setPublisher(book.getPublisher());
+                bookDTO.setImage_url_s(book.getImage_url_s());
+                bookDTO.setImage_url_m(book.getImage_url_m());
+                bookDTO.setImage_url_l(book.getImage_url_l());
+                bookDTO.setDescription(book.getDescription());
+                bookDTO.setYear_of_publication(book.getYear_of_publication());
+                bookDTO.setSum_of_stars(book.getSum_of_stars());
+                bookDTO.setNumber_of_review(book.getNumber_of_review());
+                toReturnList.add(bookDTO);
+            }
+        }
+
+        return toReturnList;
+    }
+
+    @Override
+    public long count_book(Librarink_booksDTO filter) {
+        Map<String, Object> parameters = new HashMap<>();
+        StringBuilder jpql = new StringBuilder("select count(b.isbn) from Books b where 1=1");
+
+        if (filter.getBook_title() != null && !filter.getBook_title().isEmpty()){
+            jpql.append(" and lower(b.book_title) like concat('%', lower(:book_title), '%')");
+            parameters.put("book_title", filter.getBook_title());
+        }
+        if (filter.getBook_author() != null && !filter.getBook_author().isEmpty()){
+            jpql.append(" and lower(b.book_author) like concat('%', lower(:book_author), '%') ");
+            parameters.put("book_author", filter.getBook_author());
+        }
+        if (filter.getGenre() != null && !filter.getGenre().isEmpty()){
+            jpql.append(" and lower(b.genre) like concat('%', lower(:genre), '%') ");
+            parameters.put("genre", filter.getGenre());
+        }
+        if (filter.getIsbn() != null && !filter.getIsbn().isEmpty()){
+            jpql.append(" and lower(b.isbn) like concat('%', lower(:isbn), '%') ");
+            parameters.put("isbn", filter.getIsbn());
+        }
+
+        Query query = entityManager.createQuery(jpql.toString());
+        for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
+            query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
+        }
+
+        return (Long) query.getSingleResult();
+    }
 }

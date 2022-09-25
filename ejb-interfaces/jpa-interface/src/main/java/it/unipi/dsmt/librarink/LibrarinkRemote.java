@@ -30,4 +30,6 @@ public interface LibrarinkRemote {
     public Librarink_history_reservationDTO saveOrUpdateHistory_reservation(Librarink_history_reservationDTO history_reservationDTO, boolean update);
     public Librarink_history_loanDTO saveOrUpdateHistory_loan(Librarink_history_loanDTO history_loanDTO, boolean update);
 
+    public List<Librarink_booksDTO> list_pagination_book(int offset, int page, Librarink_booksDTO filter);
+    public long count_book(Librarink_booksDTO filter);
 }
