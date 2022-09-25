@@ -25,11 +25,12 @@
     <div class="d-flex align-items-center" id="icons">
         <div id="notification" class="dropdown">
             <a class="d-flex align-items-center text-reset hidden-arrow" href="#" data-bs-toggle="dropdown">
-                <span class="badge rounded-pill badge-notification bg-danger"><!-- Filled by websocket --></span>
+                <span id="notification-counter" data-counter="0" class="badge rounded-pill badge-notification
+                      bg-danger"><!-- Filled by websocket --></span>
                 <i class="bi bi-bell-fill"></i>
             </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <!-- TODO: Filled by websocket -->
+            <ul id="notification-items" class="dropdown-menu dropdown-menu-end">
+                <!-- Filled by websocket -->
             </ul>
         </div>
         <div id="user" class="dropdown">
@@ -41,7 +42,7 @@
                     <a class="dropdown-item" href="#">My profile</a>
                 </li>
                 <li>
-                    <a class="dropdown-item" href="#">Logout</a>
+                    <a class="dropdown-item" href="logout">Logout</a>
                 </li>
             </ul>
         </div>
