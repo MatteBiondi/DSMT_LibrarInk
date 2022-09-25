@@ -1,0 +1,44 @@
+.navbar-top {
+    position: sticky !important;
+    top: 0;
+}
+.navbar-brand {
+    margin: 15px;
+    padding: 0;
+}
+
+#search {
+    margin: 15px;
+    padding: 0;
+}
+
+#search-chooser{
+    border-radius: 0 5px 5px 0;
+}
+
+#icons {
+    margin: 15px;
+    padding: 0;
+}
+
+#search-clear{
+    display: none;
+    align-self: center;
+    margin: 5px;
+    color: red;
+}
+
+.bi{
+    font-size: 25px;
+}
+
+.navbar-top a,
+.navbar-top a:focus {
+    color: inherit;
+    text-decoration: none;
+}
+
+#notification, #user{
+    margin-left: 5px;
+    margin-right: 5px;
+}
