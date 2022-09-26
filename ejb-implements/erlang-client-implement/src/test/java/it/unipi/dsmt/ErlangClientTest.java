@@ -1,37 +1,32 @@
 package it.unipi.dsmt;
 
-import it.unipi.dsmt.librarink.ErlangClient;
-import it.unipi.dsmt.librarink.ErlangClientEJB;
-import it.unipi.dsmt.librarink.ErlangClientNodeEJB;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+import it.unipi.dsmt.librarink.ReservationDTO;
 import org.junit.Test;
-
-import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Map;
 
 public class ErlangClientTest {
-    public final int N_WORKER = 1;
-    public final ErlangClientNodeEJB client;
-    public final Thread[] workers;
-
-    public ErlangClientTest(){
-        client = new ErlangClientNodeEJB();
-        client.init();
-        workers = new Thread[N_WORKER];
-    }
 
     public void test() {
-       client.destroy();
-        //for (int i = 0; i < N_WORKER; ++i) {
-        //    workers[i] = new Thread(() -> System.out.println(client.read_all_copies("AAA")));
-        //    workers[i].start();
-        //}
-//
-        //for(Thread worker: workers) {
-        //    try {
-        //        worker.join();
-        //    } catch (InterruptedException e) {
-        //        e.printStackTrace();
-        //    }
-        //}
-        //((ErlangClientEJB) client).destroy();
+        String json = "{\"response\":{\"counter\":1,\"values\":[{\"cancelled\":false,\"isbn\":\"AAA\"," +
+                "\"start_date\":\"2022-09-26T13:42:35Z\",\"stop_date\":null,\"user\":\"federico\"}]}," +
+                "\"result\":\"succeed\"}";
+
+        JsonObject result = new Gson().fromJson(json, JsonObject.class);
+
+        if (result.get("result").getAsString().equals("succeed")){
+            System.out.println(result.get("response").toString());
+            JsonObject response = new Gson().fromJson(result.get("response").toString(), JsonObject.class);
+            Type collectionType = new TypeToken<List<ReservationDTO>>(){}.getType();
+            List list = new Gson().fromJson(response.get("values").toString(), collectionType);
+            System.out.println(list);
+        }
+        else {
+            System.out.println("null");
+        }
     }
 }

@@ -1,6 +1,7 @@
 package it.unipi.dsmt.librarink;
 
 import javax.ejb.Remote;
+import java.util.List;
 
 @Remote
 public interface ErlangClient {
@@ -12,13 +13,13 @@ public interface ErlangClient {
     String delete_reservation(String user, String isbn);
     String archive_loans();
     String archive_reservations();
-    String read_all_copies(String isbn);
-    String read_available_copies(String isbn);
+    List<BookCopyDTO> read_all_copies(String isbn);
+    List<BookCopyDTO> read_available_copies(String isbn);
     String count_available_copies(String isbn);
-    String read_loans(String user, String isbn, String id);
-    String read_ended_loans();
-    String read_reservations(String user, String isbn);
-    String read_ended_reservations();
+    List<LoanDTO> read_loans(String user, String isbn, String id);
+    List<LoanDTO> read_ended_loans();
+    List<ReservationDTO> read_reservations(String user, String isbn);
+    List<ReservationDTO> read_ended_reservations();
     String terminate_loan(String isbn, String id);
     String renew_loan(String isbn, String id);
     String cancel_reservation(String user, String isbn);

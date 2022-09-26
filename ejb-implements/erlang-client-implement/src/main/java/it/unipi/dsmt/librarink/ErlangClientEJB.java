@@ -1,12 +1,18 @@
 package it.unipi.dsmt.librarink;
 
 import com.ericsson.otp.erlang.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.*;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -191,7 +197,7 @@ public class ErlangClientEJB implements ErlangClient {
     }
 
     @Override
-    public String read_all_copies(String isbn) {
+    public List<BookCopyDTO> read_all_copies(String isbn) {
         OtpErlangAtom request = new OtpErlangAtom("read_copies");
         OtpErlangMap args = new OtpErlangMap();
 
@@ -199,11 +205,12 @@ public class ErlangClientEJB implements ErlangClient {
         if (isbn != null)
             args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
 
-        return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+        String json_result = send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+        return parseBookCopy(json_result);
     }
 
     @Override
-    public String read_available_copies(String isbn) {
+    public List<BookCopyDTO> read_available_copies(String isbn) {
         OtpErlangAtom request = new OtpErlangAtom("read_copies");
         OtpErlangMap args = new OtpErlangMap();
 
@@ -213,9 +220,10 @@ public class ErlangClientEJB implements ErlangClient {
             args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
         }
         else
-            return properties.getProperty("bad_request");
+            return null;//properties.getProperty("bad_request");
 
-        return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+        String json_result = send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+        return parseBookCopy(json_result);
     }
 
     @Override
@@ -235,7 +243,7 @@ public class ErlangClientEJB implements ErlangClient {
     }
 
     @Override
-    public String read_loans(String user, String isbn, String id) {
+    public List<LoanDTO> read_loans(String user, String isbn, String id) {
         OtpErlangAtom request = new OtpErlangAtom("read_loans");
         OtpErlangMap args = new OtpErlangMap();
 
@@ -250,21 +258,23 @@ public class ErlangClientEJB implements ErlangClient {
             args.put(new OtpErlangAtom("user"),new OtpErlangBinary(user.getBytes(StandardCharsets.UTF_8)));
         }
         else if (user != null && isbn != null)
-            return properties.getProperty("bad_request");
+            return null;//properties.getProperty("bad_request");
 
-        return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+        String json_result = send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+        return parseLoan(json_result);
     }
 
     @Override
-    public String read_ended_loans() {
+    public List<LoanDTO> read_ended_loans() {
         OtpErlangAtom request = new OtpErlangAtom("read_ended_loans");
         OtpErlangMap args = new OtpErlangMap();
 
-        return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+        String json_result = send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+        return parseLoan(json_result);
     }
 
     @Override
-    public String read_reservations(String user, String isbn) {
+    public List<ReservationDTO> read_reservations(String user, String isbn) {
         OtpErlangAtom request = new OtpErlangAtom("read_reservations");
         OtpErlangMap args = new OtpErlangMap();
 
@@ -279,15 +289,17 @@ public class ErlangClientEJB implements ErlangClient {
             args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
         }
 
-        return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+        String json_result = send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+        return parseReservation(json_result);
     }
 
     @Override
-    public String read_ended_reservations() {
+    public List<ReservationDTO> read_ended_reservations() {
         OtpErlangAtom request = new OtpErlangAtom("read_ended_reservations");
         OtpErlangMap args = new OtpErlangMap();
 
-        return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+        String json_result = send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+        return parseReservation(json_result);
     }
 
     @Override
@@ -336,5 +348,29 @@ public class ErlangClientEJB implements ErlangClient {
 
 
         return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+    }
+
+    private List<BookCopyDTO> parseBookCopy(String json){
+        return parseJSON(json, new TypeToken<List<BookCopyDTO>>(){}.getType());
+    }
+
+    private List<ReservationDTO> parseReservation(String json){
+        return parseJSON(json, new TypeToken<List<ReservationDTO>>(){}.getType());
+    }
+
+    private List<LoanDTO> parseLoan(String json){
+        return parseJSON(json, new TypeToken<List<LoanDTO>>(){}.getType());
+    }
+
+    private List parseJSON(String json, Type collectionType){
+        System.out.println(json);
+        JsonObject result = new Gson().fromJson(json, JsonObject.class);
+        if (result.get("result").getAsString().equals("succeed")){
+            JsonObject response = new Gson().fromJson(result.get("response").toString(), JsonObject.class);
+            return new Gson().fromJson(response.get("values").toString(), collectionType);
+        }
+        else {
+            return null;
+        }
     }
 }
