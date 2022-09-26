@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.*;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -26,18 +27,28 @@ public class ErlangClientEJB implements ErlangClient {
 
     @PostConstruct
     public void init() {
+        InputStream input = null;
         properties = new Properties();
         try {
-            properties.load(this.getClass().getClassLoader().getResourceAsStream("erlang-client.properties"));
+            input = this.getClass().getClassLoader().getResourceAsStream("erlang-client.properties");
+            properties.load(input);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        finally {
+            try {
+                if (input != null)
+                    input.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         LOGGER.info("Init ErlangClient");
     }
 
     @PreDestroy
     public void destroy() {
-        LOGGER.info("Destroy ErlangClientNode");
+        LOGGER.info("Destroy ErlangClient");
     }
 
     private String send_request(OtpErlangTuple request) {

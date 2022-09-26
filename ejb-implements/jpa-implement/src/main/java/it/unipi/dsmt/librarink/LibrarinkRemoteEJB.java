@@ -278,6 +278,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
         Librarink_booksDTO bookDTO = new Librarink_booksDTO();
         bookDTO.setIsbn(book.getIsbn());
         bookDTO.setBook_title(book.getBook_title());
+        bookDTO.setBook_author(book.getBook_author());
         bookDTO.setGenre(book.getGenre());
         bookDTO.setPublisher(book.getPublisher());
         bookDTO.setImage_url_s(book.getImage_url_s());

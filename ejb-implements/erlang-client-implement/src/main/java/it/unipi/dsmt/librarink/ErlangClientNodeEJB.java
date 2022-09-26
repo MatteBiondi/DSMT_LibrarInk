@@ -3,12 +3,15 @@ package it.unipi.dsmt.librarink;
 import com.ericsson.otp.erlang.OtpErlangRef;
 import com.ericsson.otp.erlang.OtpMbox;
 import com.ericsson.otp.erlang.OtpNode;
+import com.sun.java.swing.plaf.windows.WindowsDesktopPaneUI;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.Stateless;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -19,9 +22,11 @@ public class ErlangClientNodeEJB implements ErlangClientNode {
 
     @PostConstruct
     public void init(){
+        InputStream input = null;
         try{
             Properties properties = new Properties();
-            properties.load(this.getClass().getClassLoader().getResourceAsStream("erlang-client.properties"));
+            input = this.getClass().getClassLoader().getResourceAsStream("erlang-client.properties");
+            properties.load(input);
             node = new OtpNode(
                     properties.getProperty("name", "client") + "-" + this.hashCode(),
                     properties.getProperty("cookie", "no-cookie")
@@ -30,6 +35,14 @@ public class ErlangClientNodeEJB implements ErlangClientNode {
         }
         catch (IOException ex){
             ex.printStackTrace();
+        }
+        finally {
+            try {
+                if (input != null)
+                    input.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

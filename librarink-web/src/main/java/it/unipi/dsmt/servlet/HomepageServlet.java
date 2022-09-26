@@ -10,12 +10,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Logger;
 
 @WebServlet(name = "HomepageServlet", value = "/homepage", loadOnStartup = 0)
 public class HomepageServlet extends HttpServlet {
-    private static final Logger LOGGER = Logger.getLogger(AsyncRequestServlet.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(HomepageServlet.class.getName());
     private int page_length;
     private int nav_items_length;
     @EJB
@@ -23,11 +24,21 @@ public class HomepageServlet extends HttpServlet {
 
     @Override
     public void init(){
+        InputStream input = null;
         Properties properties = new Properties();
         try {
-            properties.load(this.getClass().getClassLoader().getResourceAsStream("servlet.properties"));
+            input = this.getClass().getClassLoader().getResourceAsStream("servlet.properties");
+            properties.load(input);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        finally {
+            try {
+                if (input != null)
+                    input.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         page_length = Integer.parseInt(properties.getProperty("page_length", "50"));
         nav_items_length = Integer.parseInt(properties.getProperty("nav_items_length", "11"));
