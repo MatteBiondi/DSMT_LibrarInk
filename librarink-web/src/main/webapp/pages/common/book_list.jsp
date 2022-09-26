@@ -15,6 +15,7 @@
             <jsp:param name="author" value="${book.getBook_author()}" />
             <jsp:param name="isbn" value="${book.getIsbn()}" />
             <jsp:param name="rate" value="${book.getSum_of_stars()}" />
+            <jsp:param name="link" value="book_detail?isbn=${book.getIsbn()}" />
         </jsp:include>
     </c:forEach>
 </div>

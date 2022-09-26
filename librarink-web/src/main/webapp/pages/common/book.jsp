@@ -13,7 +13,8 @@
 <!--In case of list of books: not detailed representation -->
 <!-- Image + Rate + Title + Author -->
 <% if (type != null && type.equals("thumbnail")) { %>
-    <a href = "" id = "<%= request.getParameter("isbn")%>"> <!--todo add anchor link-->
+    <a href = "<%= request.getParameter("link")%>" id = "<%= request.getParameter("isbn")%>"> <!--todo add anchor
+    link-->
         <div class="thumbnail">
             <img src="<%= request.getParameter("image")%>" alt="Book cover image">
             <div class="info_container">
@@ -27,7 +28,7 @@
     <html>
     <head>
         <link rel="stylesheet" href="./css/book.css" type="text/css" media="screen">
-        <title><%= request.getAttribute("title")%></title>
+        <title><%= request.getParameter("title")%></title>
     </head>
     <body>
     <!--In case of a certain book: detailed representation -->
@@ -36,38 +37,38 @@
     Title + Author + Category + Publisher + Published Date + Language + Description + Rate +
     Reserve button + Whishlist button
     -->
-        <h1 class="page_title"><%= request.getAttribute("title")%></h1>
-        <div class="detailed" id="<%= request.getAttribute("isbn")%>">
+        <h1 class="page_title"><%= request.getParameter("title")%></h1>
+        <div class="detailed" id="<%= request.getParameter("isbn")%>">
             <div class="right_column">
                 <div class="book_info">
                     <h3>Title:</h3>
-                    <p id="title"><%= request.getAttribute("title")%> </p>
+                    <p id="title"><%= request.getParameter("title")%> </p>
                     <br>
                     <h3>Author:</h3>
-                    <p id="author"><%= request.getAttribute("author")%></p>
+                    <p id="author"><%= request.getParameter("author")%></p>
                     <br>
                     <h3>ISBN:</h3>
-                    <p id="isbn"><%= request.getAttribute("isbn")%></p>
+                    <p id="isbn"><%= request.getParameter("isbn")%></p>
                     <br>
                     <h3>Category:</h3>
-                    <p id="category"><%= request.getAttribute("category")%></p>
+                    <p id="category"><%= request.getParameter("category")%></p>
                     <br>
                     <h3>Publisher:</h3>
-                    <p id="publisher"><%= request.getAttribute("publisher")%></p>
+                    <p id="publisher"><%= request.getParameter("publisher")%></p>
                     <br>
                     <h3>Published date:</h3>
-                    <p id="published_date"><%= request.getAttribute("published_date")%></p>
+                    <p id="published_date"><%= request.getParameter("published_date")%></p>
                     <br>
                     <h3>Language:</h3>
-                    <p id="language"><%= request.getAttribute("language")%></p>
+                    <p id="language"><%= request.getParameter("language")%></p>
                 </div>
                 <h3>Brief Description: </h3>
-                <p><%= request.getAttribute("description")%></p>
+                <p><%= request.getParameter("description")%></p>
                 <h3>Users rate the book:
-                    <span id="avg_rate"><%= request.getAttribute("rate")%></span>/<%= MAX_RATE %>
+                    <span id="avg_rate"><%= request.getParameter("rate")%></span>/<%= MAX_RATE %>
                 </h3>
                 <h3>Number of available copies:
-                    <span id="copies_counter"><%= request.getAttribute("available_copies")%></span>
+                    <span id="copies_counter"><%= request.getParameter("available_copies")%></span>
                 </h3>
                 <div class="stars_div">
                     <!--todo: vote if it is the first time or otherwise change the vote-->
@@ -80,7 +81,7 @@
                 </div>
             </div>
             <div class="left_column">
-                <img src="<%= request.getAttribute("image")%>" alt="Book cover image">
+                <img src="<%= request.getParameter("image")%>" alt="Book cover image">
                 <button>Reserve</button>
                 <button>Add to wishlist</button>
             </div>
