@@ -27,24 +27,12 @@ public class admin_page_servlet extends HttpServlet {
         LibrarinkRemoteEJB librarinkRemoteEJB=new LibrarinkRemoteEJB();
         List<LoanDTO> loans;
         List<ReservationDTO> reservationDTOS;
-        List<LoanDTO> loansResponse = null;
-        List<ReservationDTO> reservationResponse = null;
         List<ReservationDTO> reservations;
         List<Librarink_usersDTO> usersDTOList=librarinkRemoteEJB.listUsers(new Librarink_usersDTO());
-        for(Librarink_usersDTO user:usersDTOList)
-        {
-            loans = erlang_client.read_loans(user.getName(),null,null);
-            loansResponse.addAll(loans);
-
-        }
-        request.setAttribute("loanList",loansResponse);
-        for(Librarink_usersDTO user:usersDTOList)
-        {
-            reservationDTOS= erlang_client.read_reservations(user.getName(),null);
-            reservationResponse.addAll(reservationDTOS);
-
-        }
-        request.setAttribute("reservationList",reservationResponse);
+        loans = erlang_client.read_loans(null,null,null);
+        request.setAttribute("loanList",loans);
+        reservationDTOS= erlang_client.read_reservations(null,null);
+        request.setAttribute("reservationList",reservationDTOS);
         String targetJPS ="librarink-web/src/main/webapp/pages/jsp/admin_page.jsp";
 
         RequestDispatcher requestDispatcher=request.getRequestDispatcher(targetJPS);
@@ -54,6 +42,9 @@ public class admin_page_servlet extends HttpServlet {
             throw new RuntimeException(e);
         }
     }
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+    }
 }
 
