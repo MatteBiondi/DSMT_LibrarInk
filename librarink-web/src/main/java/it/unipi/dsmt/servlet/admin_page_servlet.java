@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 @WebServlet(name = "admin_page_servlet", value = "", loadOnStartup = 0)
@@ -44,6 +45,17 @@ public class admin_page_servlet extends HttpServlet {
     }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String type_request= (String) request.getAttribute("type_request");
+        switch (type_request) {
+            case "loan_end":
+                //do loan
+                break;
+            case "reservation_deleted":
+                //do reservation
+                break;
+            default:
+                break;
+        }
 
     }
 }

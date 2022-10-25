@@ -28,65 +28,88 @@
 %>
 <body>
 
-<h2>Cell that spans two columns</h2>
-<p>To make a cell span more than one column, use the colspan attribute.</p>
 
-<table style="width:100%">
-    <tr>
-        <th colspan="5">Pending Reservation</th>
-        <th colspan="5">Active Loan</th>
-    </tr>
-    <tr>
-        <td>ck</td>
-        <td>ISBN</td>
-        <td>User ID</td>
-        <td>Start Time</td>
-        <td>End Time</td>
-        <td>ck</td>
-        <td>Loan ID</td>
-        <td>ISBN</td>
-        <td>User ID</td>
-        <td>Start Time</td>
-        <td>End Time</td>
-    </tr>
-    <%  while(loanDTOIterator.hasNext() ||reservationDTOIterator.hasNext()){%>
-    <tr>
-        <%if(reservationDTOIterator.hasNext()){
+<%--@declare id="reservation"--%><%--@declare id="loan"--%><form ACTION="",id="reservation">
+    <table style="width:100%">
+        <tr>
+            <th colspan="5">Pending Reservation</th>
+            <th colspan="5">Active Loan</th>
+        </tr>
+        <tr>
+            <td>ck</td>
+            <td>ISBN</td>
+            <td>User ID</td>
+            <td>Start Time</td>
+            <td>End Time</td>
+            <td>ck</td>
+        </tr>
+        <%  while(loanDTOIterator.hasNext() ||reservationDTOIterator.hasNext()){%>
+        <tr>
+            <%if(reservationDTOIterator.hasNext()){
 
-        ReservationDTO reservationDTO=reservationDTOIterator.next();%>
-        <td><input type="checkbox" name = "reservation" value=<%=reservationDTO%> /></td>
-            <td><%=reservationDTO.getIsbn()%></td>
-            <td><%=reservationDTO.getUser()%></td>
-            <td><%=reservationDTO.getStartDate()%></td>
-            <td><%=reservationDTO.getStopDate()%></td>
-        <%}
-        else{%>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            ReservationDTO reservationDTO=reservationDTOIterator.next();%>
+            <td><input type="checkbox" name = "reservation" value=<%=
+            reservationDTO.getUser()+reservationDTO.getIsbn()+reservationDTO.getStartDate()%> /></td>
+                <td><%=reservationDTO.getIsbn()%></td>
+                <td><%=reservationDTO.getUser()%></td>
+                <td><%=reservationDTO.getStartDate()%></td>
+                <td><%=reservationDTO.getStopDate()%></td>
+            <%}
+            else{%>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            <%}%>
+            <%if(loanDTOIterator.hasNext()){
+            loanDTOIterator.next();}%>
+        </tr>
         <%}%>
-        <%if(loanDTOIterator.hasNext()){
-        LoanDTO loanDTO=loanDTOIterator.next();%>
-        <td><input type="checkbox" name = "loan" value=<%=loanDTO%> /></td>
-        <td><%=loanDTO.getIsbn()%></td>
-        <td><%=loanDTO.getUser()%></td>
-        <td><%=loanDTO.getStartDate()%></td>
-        <td><%=loanDTO.getStartDate()%></td>
-        <%}
-        else{%>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+    </table>
+</form>
+<form ACTION="",id="loan">
+    <table style="width:100%">
+        <tr>
+            <th colspan="5">Pending Reservation</th>
+            <th colspan="5">Active Loan</th>
+        </tr>
+        <tr>
+
+            <td>Loan ID</td>
+            <td>ISBN</td>
+            <td>User ID</td>
+            <td>Start Time</td>
+            <td>End Time</td>
+        </tr>
+        <%  while(loanDTOIterator.hasNext() ||reservationDTOIterator.hasNext()){%>
+        <tr>
+            <%if(reservationDTOIterator.hasNext()){
+
+                reservationDTOIterator.next();}%>
+            <%if(loanDTOIterator.hasNext()){
+                LoanDTO loanDTO=loanDTOIterator.next();%>
+            <td><input type="checkbox" name = "loan" value=<%=loanDTO.getId()%> /></td>
+            <td><%=loanDTO.getIsbn()%></td>
+            <td><%=loanDTO.getUser()%></td>
+            <td><%=loanDTO.getStartDate()%></td>
+            <td><%=loanDTO.getStartDate()%></td>
+            <%}
+            else{%>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <%}%>
+        </tr>
         <%}%>
-    </tr>
-    <%}%>
-</table>
-<button type="submit">Submit</button>
-<button type="submit">Delete</button>
-<button type="submit">Submit</button>
+    </table>
+</form>
+<button type="submit" form="reservation" value="ConfirmReservation">Confirm Reservation</button>
+<button type="submit" form="reservation" value="DeleteReservation">Delete Reservation</button>
+<button type="submit" form="loan" value="EndLoan">End Loan</button>
+<button type="">History</button>
+<button type="">NewLoan</button>
 </body>
 </html>
