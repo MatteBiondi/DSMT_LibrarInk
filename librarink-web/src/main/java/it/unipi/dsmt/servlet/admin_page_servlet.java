@@ -1,7 +1,6 @@
 package it.unipi.dsmt.servlet;
 
 import it.unipi.dsmt.librarink.*;
-
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -12,8 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Locale;
-import java.util.logging.Logger;
+
 
 @WebServlet(name = "admin_page_servlet", value = "", loadOnStartup = 0)
 public class admin_page_servlet extends HttpServlet {
@@ -45,20 +43,20 @@ public class admin_page_servlet extends HttpServlet {
     }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String reservation_parameter[];
-        String reservations_checkbox[];
-        String loan_parameter[];
-        String loan_checkbox[];
+        String[] reservation_parameter;
+        String[] reservations_checkbox;
+        String[] loan_parameter;
+        String[] loan_checkbox;
         String type_request= (String) request.getAttribute("button");
         switch (type_request) {
             case "ConfirmReservation":
                 reservations_checkbox = request.getParameterValues("reservation");
                 if (reservations_checkbox != null && reservations_checkbox.length != 0) {
 
-                    for (int i = 0; i < reservations_checkbox.length; i++) {
-                        reservation_parameter=reservations_checkbox[i].split(";");
+                    for (String reservationsCheckbox : reservations_checkbox) {
+                        reservation_parameter = reservationsCheckbox.split(";");
                         //ToDo archive a reservation
-                        erlang_client.write_loan(reservation_parameter[0],reservation_parameter[1]);
+                        erlang_client.write_loan(reservation_parameter[0], reservation_parameter[1]);
                         erlang_client.archive_reservations();
                     }
                 }
@@ -67,9 +65,9 @@ public class admin_page_servlet extends HttpServlet {
                 reservations_checkbox = request.getParameterValues("reservation");
                 if (reservations_checkbox != null && reservations_checkbox.length != 0) {
 
-                    for (int i = 0; i < reservations_checkbox.length; i++) {
-                        reservation_parameter=reservations_checkbox[i].split(";");
-                        erlang_client.cancel_reservation(reservation_parameter[0],reservation_parameter[1]);
+                    for (String reservationsCheckbox : reservations_checkbox) {
+                        reservation_parameter = reservationsCheckbox.split(";");
+                        erlang_client.cancel_reservation(reservation_parameter[0], reservation_parameter[1]);
                     }
                 }
                 break;
@@ -77,10 +75,10 @@ public class admin_page_servlet extends HttpServlet {
                 loan_checkbox = request.getParameterValues("loan");
                 if (loan_checkbox != null && loan_checkbox.length != 0) {
 
-                    for (int i = 0; i < loan_checkbox.length; i++) {
-                        loan_parameter=loan_checkbox[i].split(";");
+                    for (String loanCheckbox : loan_checkbox) {
+                        loan_parameter = loanCheckbox.split(";");
                         //ToDo archive a reservation
-                        erlang_client.terminate_loan(loan_parameter[0],loan_parameter[1]);
+                        String s = erlang_client.terminate_loan(loan_parameter[0], loan_parameter[1]);
                     }
                 }
                 //end loan
