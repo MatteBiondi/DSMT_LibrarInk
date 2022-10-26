@@ -45,13 +45,45 @@ public class admin_page_servlet extends HttpServlet {
     }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String type_request= (String) request.getAttribute("type_request");
+        String reservation_parameter[];
+        String reservations_checkbox[];
+        String loan_parameter[];
+        String loan_checkbox[];
+        String type_request= (String) request.getAttribute("button");
         switch (type_request) {
-            case "loan_end":
-                //do loan
+            case "ConfirmReservation":
+                reservations_checkbox = request.getParameterValues("reservation");
+                if (reservations_checkbox != null && reservations_checkbox.length != 0) {
+
+                    for (int i = 0; i < reservations_checkbox.length; i++) {
+                        reservation_parameter=reservations_checkbox[i].split(";");
+                        //ToDo archive a reservation
+                        erlang_client.write_loan(reservation_parameter[0],reservation_parameter[1]);
+                        erlang_client.archive_reservations();
+                    }
+                }
                 break;
-            case "reservation_deleted":
-                //do reservation
+            case "DeleteReservation":
+                reservations_checkbox = request.getParameterValues("reservation");
+                if (reservations_checkbox != null && reservations_checkbox.length != 0) {
+
+                    for (int i = 0; i < reservations_checkbox.length; i++) {
+                        reservation_parameter=reservations_checkbox[i].split(";");
+                        erlang_client.cancel_reservation(reservation_parameter[0],reservation_parameter[1]);
+                    }
+                }
+                break;
+            case "EndLoan":
+                loan_checkbox = request.getParameterValues("loan");
+                if (loan_checkbox != null && loan_checkbox.length != 0) {
+
+                    for (int i = 0; i < loan_checkbox.length; i++) {
+                        loan_parameter=loan_checkbox[i].split(";");
+                        //ToDo archive a reservation
+                        erlang_client.terminate_loan(loan_parameter[0],loan_parameter[1]);
+                    }
+                }
+                //end loan
                 break;
             default:
                 break;
