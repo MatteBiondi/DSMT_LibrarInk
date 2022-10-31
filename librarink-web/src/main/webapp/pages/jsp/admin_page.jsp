@@ -90,7 +90,7 @@
                 reservationDTOIterator.next();}%>
             <%if(loanDTOIterator.hasNext()){
                 LoanDTO loanDTO=loanDTOIterator.next();%>
-            <td><input type="checkbox" name = "loan" value=<%=loanDTO.getIsbn()+";"+loanDTO.getId()%> /></td>
+            <td><input type="checkbox" name = "loan" value=<%=loanDTO.getIsbn()+";"+loanDTO.getId()+";"+loanDTO.getUser()%> /></td>
             <td><%=loanDTO.getIsbn()%></td>
             <td><%=loanDTO.getUser()%></td>
             <td><%=loanDTO.getStartDate()%></td>

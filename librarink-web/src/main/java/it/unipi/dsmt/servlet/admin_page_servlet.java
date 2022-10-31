@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Date;
 import java.util.List;
 
 
@@ -59,9 +60,16 @@ public class admin_page_servlet extends HttpServlet {
 
                     for (String reservationsCheckbox : reservations_checkbox) {
                         reservation_parameter = reservationsCheckbox.split(";");
-
-                        //ToDo archive a reservation
                         erlang_client.write_loan(reservation_parameter[0], reservation_parameter[1]);
+                        List<ReservationDTO> reservationDTO=
+                                erlang_client.read_reservations(reservation_parameter[0],reservation_parameter[1]);
+                        Librarink_history_reservationDTO history_reservationDTO = new Librarink_history_reservationDTO();
+                        history_reservationDTO.setUser_email(reservationDTO.get(0).getUser());
+                        history_reservationDTO.setIsbn(reservationDTO.get(0).getIsbn());
+                        history_reservationDTO.setStart_date((Date) reservationDTO.get(0).getStartDate());
+                        history_reservationDTO.setEnd_date((Date) reservationDTO.get(0).getStopDate());
+                        history_reservationDTO.setDeleted(false);
+                        remoteEJB.saveOrUpdateHistory_reservation(history_reservationDTO,false);
                         erlang_client.archive_reservations();
                     }
                 }
@@ -73,6 +81,15 @@ public class admin_page_servlet extends HttpServlet {
                     for (String reservationsCheckbox : reservations_checkbox) {
                         reservation_parameter = reservationsCheckbox.split(";");
                         erlang_client.cancel_reservation(reservation_parameter[0], reservation_parameter[1]);
+                        List<ReservationDTO> reservationDTO=
+                                erlang_client.read_reservations(reservation_parameter[0],reservation_parameter[1]);
+                        Librarink_history_reservationDTO history_reservationDTO = new Librarink_history_reservationDTO();
+                        history_reservationDTO.setUser_email(reservationDTO.get(0).getUser());
+                        history_reservationDTO.setIsbn(reservationDTO.get(0).getIsbn());
+                        history_reservationDTO.setStart_date((Date) reservationDTO.get(0).getStartDate());
+                        history_reservationDTO.setEnd_date((Date) reservationDTO.get(0).getStopDate());
+                        history_reservationDTO.setDeleted(reservationDTO.get(0).getCancelled());
+                        erlang_client.delete_reservation(reservation_parameter[0],reservation_parameter[1]);
                     }
                 }
                 break;
@@ -82,8 +99,20 @@ public class admin_page_servlet extends HttpServlet {
 
                     for (String loanCheckbox : loan_checkbox) {
                         loan_parameter = loanCheckbox.split(";");
-                        //ToDo archive a reservation
+                        //ToDo archive a loan
+
                         String s = erlang_client.terminate_loan(loan_parameter[0], loan_parameter[1]);
+                        List<LoanDTO> loanDTOList = erlang_client.read_loans(loan_parameter[2],loan_parameter[0],loan_parameter[1]);
+                        LoanDTO loanDTO = loanDTOList.get(0);
+                        Librarink_history_loanDTO librarink_history_loanDTO=new Librarink_history_loanDTO();
+                        librarink_history_loanDTO.setIsbn(loanDTO.getIsbn());
+                        librarink_history_loanDTO.setStart_date((Date) loanDTO.getStartDate());
+                        librarink_history_loanDTO.setUser_email(loanDTO.getUser());
+                        librarink_history_loanDTO.setId_copy(loanDTO.getId());
+                        librarink_history_loanDTO.setEnd_date((Date) loanDTO.getStopDate());
+                        remoteEJB.saveOrUpdateHistory_loan(librarink_history_loanDTO,false);
+                        erlang_client.delete_loan(loan_parameter[2],loan_parameter[0],loan_parameter[1]);
+
                     }
                 }
                 //end loan
