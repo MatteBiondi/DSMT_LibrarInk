@@ -13,9 +13,7 @@ public class History_reservation {
     @Id
     @Column(name="isbn")
     String isbn;
-    @Id
-    @Column(name="id_copy")
-    String id_copy;
+
     @Id
     @Column(name="start_date")
     Date start_date;
@@ -38,14 +36,6 @@ public class History_reservation {
 
     public void setIsbn(String isbn) {
         this.isbn = isbn;
-    }
-
-    public String getId_copy() {
-        return id_copy;
-    }
-
-    public void setId_copy(String id_copy) {
-        this.id_copy = id_copy;
     }
 
     public Date getStart_date() {
@@ -72,6 +62,6 @@ public class History_reservation {
         this.deleted = deleted;
     }
     public History_reservationKey getHistory_reservationKey(){
-        return new History_reservationKey(user_email,isbn,id_copy,start_date);
+        return new History_reservationKey(user_email,isbn, start_date);
     }
 }

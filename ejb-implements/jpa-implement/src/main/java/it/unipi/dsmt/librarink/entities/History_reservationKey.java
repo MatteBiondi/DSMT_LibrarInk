@@ -1,7 +1,5 @@
 package it.unipi.dsmt.librarink.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
 import java.io.Serializable;
 import java.sql.Date;
 
@@ -9,13 +7,11 @@ public class History_reservationKey implements Serializable {
 
     private String user_email;
     private String isbn;
-    private String id_copy;
     private Date start_date;
 
-    public History_reservationKey(String user_email, String isbn, String id_copy, Date start_date) {
+    public History_reservationKey(String user_email, String isbn, Date start_date) {
         this.user_email = user_email;
         this.isbn = isbn;
-        this.id_copy = id_copy;
         this.start_date = start_date;
     }
 
@@ -33,14 +29,6 @@ public class History_reservationKey implements Serializable {
 
     public void setIsbn(String isbn) {
         this.isbn = isbn;
-    }
-
-    public String getId_copy() {
-        return id_copy;
-    }
-
-    public void setId_copy(String id_copy) {
-        this.id_copy = id_copy;
     }
 
     public Date getStart_date() {

@@ -1,6 +1,8 @@
 package it.unipi.dsmt.servlet;
 
 import it.unipi.dsmt.librarink.*;
+import it.unipi.dsmt.librarink.entities.History_reservation;
+
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -19,6 +21,7 @@ public class admin_page_servlet extends HttpServlet {
 
     @EJB
     private ErlangClient erlang_client;
+    private LibrarinkRemoteEJB remoteEJB;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -43,6 +46,7 @@ public class admin_page_servlet extends HttpServlet {
     }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        History_reservation history_reservation_filter;
         String[] reservation_parameter;
         String[] reservations_checkbox;
         String[] loan_parameter;
@@ -55,6 +59,7 @@ public class admin_page_servlet extends HttpServlet {
 
                     for (String reservationsCheckbox : reservations_checkbox) {
                         reservation_parameter = reservationsCheckbox.split(";");
+
                         //ToDo archive a reservation
                         erlang_client.write_loan(reservation_parameter[0], reservation_parameter[1]);
                         erlang_client.archive_reservations();
