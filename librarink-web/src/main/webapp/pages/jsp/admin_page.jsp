@@ -30,7 +30,7 @@
 
 
 <%--@declare id="reservation"--%><%--@declare id="loan"--%>
-<form ACTION="src/main/java/it/unipi/dsmt/servlet/admin_page_servlet.java",id="reservation">
+<form ACTION="src/main/java/it/unipi/dsmt/servlet/AdminPageServlet.java",id="reservation">
     <table style="width:100%">
         <tr>
             <th colspan="5">Pending Reservation</th>
@@ -69,7 +69,7 @@
         <%}%>
     </table>
 </form>
-<form ACTION="src/main/java/it/unipi/dsmt/servlet/admin_page_servlet.java",id="loan">
+<form ACTION="src/main/java/it/unipi/dsmt/servlet/AdminPageServlet.java",id="loan">
     <table style="width:100%">
         <tr>
             <th colspan="5">Pending Reservation</th>

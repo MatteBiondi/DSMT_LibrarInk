@@ -5,7 +5,7 @@ import java.sql.Date;
 
 @Entity
 @Table(name = "history_reservation")
-@IdClass(History_loanKey.class)
+@IdClass(History_reservationKey.class)
 public class History_reservation {
     @Id
     @Column(name="user_email")

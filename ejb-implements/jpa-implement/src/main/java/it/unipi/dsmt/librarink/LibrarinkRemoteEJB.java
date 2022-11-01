@@ -21,7 +21,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
         Map<String, Object> parameters = new HashMap<String, Object>();
         StringBuilder jpql = new StringBuilder();
         //jpql.append("select u, coalesce(size(c.languages),0) from users u where 1 = 1 ");
-        jpql.append("select u from users u where 1 = 1 ");
+        jpql.append("select u from Users u where 1 = 1 ");
         if (usersFilter.getEmail() != null && !usersFilter.getEmail().isEmpty()){
             jpql.append(" and lower(u.email) like concat('%', lower(:email), '%') ");
             parameters.put("email", usersFilter.getEmail());
@@ -68,7 +68,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
         Map<String, Object> parameters = new HashMap<String, Object>();
         StringBuilder jpql = new StringBuilder();
         //jpql.append("select b, coalesce(size(b.languages),0) from books b where 1 = 1 ");
-        jpql.append("select b from books b where 1 = 1 ");
+        jpql.append("select b from Books b where 1 = 1 ");
         if (booksFilter.getBook_title() != null && !booksFilter.getBook_title().isEmpty()){
             jpql.append(" and lower(b.book_title) like concat('%', lower(:book_title), '%') ");
             parameters.put("book", booksFilter.getBook_title());
@@ -117,7 +117,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
         Map<String, Object> parameters = new HashMap<String, Object>();
         StringBuilder jpql = new StringBuilder();
         //jpql.append("select l, coalesce(size(l.languages),0) from history_loan l where 1 = 1 ");
-        jpql.append("select l from history_loan l where 1 = 1 ");
+        jpql.append("select l from History_loan l where 1 = 1 ");
         if (history_loanFilter.getUser_email() != null && !history_loanFilter.getUser_email().isEmpty()){
             jpql.append(" and lower(l.user_email) like concat('%', lower(:user_email), '%') ");
             parameters.put("user_email", history_loanFilter.getUser_email());
@@ -158,7 +158,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
         Map<String, Object> parameters = new HashMap<String, Object>();
         StringBuilder jpql = new StringBuilder();
         //jpql.append("select w, coalesce(size(w.languages),0) from wishlist w where 1 = 1 ");
-        jpql.append("select w from wishlist w where 1 = 1 ");
+        jpql.append("select w from Wishlist w where 1 = 1 ");
         if (wishlistFilter.getEmail_user() != null && !wishlistFilter.getEmail_user().isEmpty()){
             jpql.append(" and lower(w.email_user) like concat('%', lower(:email_user), '%') ");
             parameters.put("email_user", wishlistFilter.getEmail_user());
@@ -192,7 +192,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
         Map<String, Object> parameters = new HashMap<String, Object>();
         StringBuilder jpql = new StringBuilder();
         //jpql.append("select l, coalesce(size(l.languages),0) from grade l where 1 = 1 ");
-        jpql.append("select l from grade l where 1 = 1 ");
+        jpql.append("select l from Grade l where 1 = 1 ");
         if (gradesFilter.getUser_email() != null && !gradesFilter.getUser_email().isEmpty()){
             jpql.append(" and lower(l.user_email) like concat('%', lower(:user_email), '%') ");
             parameters.put("user_email", gradesFilter.getUser_email());
@@ -227,7 +227,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
         Map<String, Object> parameters = new HashMap<String, Object>();
         StringBuilder jpql = new StringBuilder();
         //jpql.append("select r, coalesce(size(r.languages),0) from history_reservation r where 1 = 1 ");
-        jpql.append("select r from history_reservation r where 1 = 1 ");
+        jpql.append("select r from History_reservation r where 1 = 1 ");
         if (history_reservationFilter.getUser_email() != null && !history_reservationFilter.getUser_email().isEmpty()){
             jpql.append(" and lower(r.user_email) like concat('%', lower(:user_email), '%') ");
             parameters.put("user_email", history_reservationFilter.getUser_email());
