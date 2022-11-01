@@ -16,7 +16,7 @@ import java.sql.Date;
 import java.util.List;
 
 
-@WebServlet(name = "AdminPageServlet", value = "", loadOnStartup = 0)
+@WebServlet(name = "AdminPageServlet", value = "/admin", loadOnStartup = 0)
 public class AdminPageServlet extends HttpServlet {
     //private static final Logger LOGGER = Logger.getLogger(AsyncRequestServlet.class.getName());
 
