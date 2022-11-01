@@ -29,7 +29,8 @@
 <body>
 
 
-<%--@declare id="reservation"--%><%--@declare id="loan"--%><form ACTION="",id="reservation">
+<%--@declare id="reservation"--%><%--@declare id="loan"--%>
+<form ACTION="src/main/java/it/unipi/dsmt/servlet/admin_page_servlet.java",id="reservation">
     <table style="width:100%">
         <tr>
             <th colspan="5">Pending Reservation</th>
@@ -49,7 +50,7 @@
 
             ReservationDTO reservationDTO=reservationDTOIterator.next();%>
             <td><input type="checkbox" name = "reservation" value=<%=
-            reservationDTO.getUser()+reservationDTO.getIsbn()+reservationDTO.getStartDate()%> /></td>
+            reservationDTO.getUser()+";"+reservationDTO.getIsbn()+";"+reservationDTO.getStartDate()%> /></td>
                 <td><%=reservationDTO.getIsbn()%></td>
                 <td><%=reservationDTO.getUser()%></td>
                 <td><%=reservationDTO.getStartDate()%></td>
@@ -68,7 +69,7 @@
         <%}%>
     </table>
 </form>
-<form ACTION="",id="loan">
+<form ACTION="src/main/java/it/unipi/dsmt/servlet/admin_page_servlet.java",id="loan">
     <table style="width:100%">
         <tr>
             <th colspan="5">Pending Reservation</th>
@@ -89,7 +90,7 @@
                 reservationDTOIterator.next();}%>
             <%if(loanDTOIterator.hasNext()){
                 LoanDTO loanDTO=loanDTOIterator.next();%>
-            <td><input type="checkbox" name = "loan" value=<%=loanDTO.getId()%> /></td>
+            <td><input type="checkbox" name = "loan" value=<%=loanDTO.getIsbn()+";"+loanDTO.getId()+";"+loanDTO.getUser()%> /></td>
             <td><%=loanDTO.getIsbn()%></td>
             <td><%=loanDTO.getUser()%></td>
             <td><%=loanDTO.getStartDate()%></td>
@@ -106,9 +107,9 @@
         <%}%>
     </table>
 </form>
-<button type="submit" form="reservation" value="ConfirmReservation">Confirm Reservation</button>
-<button type="submit" form="reservation" value="DeleteReservation">Delete Reservation</button>
-<button type="submit" form="loan" value="EndLoan">End Loan</button>
+<button type="submit" form="reservation" name="button" value="ConfirmReservation">Confirm Reservation</button>
+<button type="submit" form="reservation" name="button" value="DeleteReservation">Delete Reservation</button>
+<button type="submit" form="loan" name="button" value="EndLoan">End Loan</button>
 <button type="">History</button>
 <button type="">NewLoan</button>
 </body>

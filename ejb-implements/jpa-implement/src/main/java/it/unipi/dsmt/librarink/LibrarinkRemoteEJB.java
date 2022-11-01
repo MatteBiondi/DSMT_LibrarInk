@@ -236,10 +236,6 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
             jpql.append(" and lower(r.isbn) like concat('%', lower(:isbn), '%') ");
             parameters.put("isbn", history_reservationFilter.getIsbn());
         }
-        if (history_reservationFilter.getId_copy() != null && !history_reservationFilter.getId_copy().isEmpty()){
-            jpql.append(" and lower(r.id_copy) like concat('%', lower(:id_copy), '%') ");
-            parameters.put("id_copy", history_reservationFilter.getIsbn());
-        }
         jpql.append(" group by r ");
         Query query = entityManager.createQuery(jpql.toString());
         for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
@@ -254,7 +250,6 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
                 Librarink_history_reservationDTO history_reservationDTO = new Librarink_history_reservationDTO();
                 history_reservationDTO.setIsbn(history_reservation.getIsbn());
                 history_reservationDTO.setEnd_date(history_reservation.getEnd_date());
-                history_reservationDTO.setId_copy(history_reservation.getId_copy());
                 history_reservationDTO.setUser_email(history_reservation.getUser_email());
                 history_reservationDTO.setStart_date(history_reservation.getStart_date());
                 history_reservationDTO.setDeleted(history_reservation.isDeleted());
@@ -333,12 +328,11 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
 
     @Override
     public Librarink_history_reservationDTO findHistoryReservationByKeys(String user_email, String isbn, String id_copy, Date start_date) {
-        History_reservationKey history_reservationKey=new History_reservationKey(user_email,isbn,id_copy,start_date);
+        History_reservationKey history_reservationKey=new History_reservationKey(user_email,isbn, start_date);
         History_reservation history_reservation = entityManager.find(History_reservation.class,history_reservationKey);
         Librarink_history_reservationDTO history_reservationDTO = new Librarink_history_reservationDTO();
         history_reservationDTO.setIsbn(history_reservation.getIsbn());
         history_reservationDTO.setEnd_date(history_reservation.getEnd_date());
-        history_reservationDTO.setId_copy(history_reservation.getId_copy());
         history_reservationDTO.setUser_email(history_reservation.getUser_email());
         history_reservationDTO.setStart_date(history_reservation.getStart_date());
         history_reservationDTO.setDeleted(history_reservation.isDeleted());
@@ -406,7 +400,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
 
     @Override
     public boolean deleteHistoryReservationByKeys(String user_email, String isbn, String id_copy, Date start_date) {
-        History_reservationKey history_reservationKey = new History_reservationKey(user_email,isbn,id_copy,start_date);
+        History_reservationKey history_reservationKey = new History_reservationKey(user_email,isbn, start_date);
         History_reservation history_reservation = entityManager.find(History_reservation.class,history_reservationKey);
         if(history_reservation!=null)
         {
@@ -546,12 +540,11 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
         {
             history_reservation=entityManager.find(History_reservation.class,new History_reservationKey(
                     history_reservationDTO.getUser_email(), history_reservationDTO.getIsbn(),
-                    history_reservationDTO.getId_copy(),history_reservationDTO.getStart_date()));
+                    history_reservationDTO.getStart_date()));
         }
 
         history_reservation.setIsbn(history_reservationDTO.getIsbn());
         history_reservation.setEnd_date(history_reservationDTO.getEnd_date());
-        history_reservation.setId_copy(history_reservationDTO.getId_copy());
         history_reservation.setUser_email(history_reservationDTO.getUser_email());
         history_reservation.setStart_date(history_reservationDTO.getStart_date());
         history_reservation.setDeleted(history_reservationDTO.isDeleted());

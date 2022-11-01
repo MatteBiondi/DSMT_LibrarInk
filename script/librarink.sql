@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `librarink` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `librarink`;
 -- MySQL dump 10.13  Distrib 8.0.30, for Win64 (x86_64)
 --
 -- Host: localhost    Database: librarink
@@ -82,12 +84,11 @@ DROP TABLE IF EXISTS `history_reservation`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `history_reservation` (
   `user_email` varchar(45) NOT NULL,
-  `id_copy` varchar(45) NOT NULL,
   `isbn` varchar(45) NOT NULL,
   `start_date` date NOT NULL,
   `end_date` date DEFAULT NULL,
   `deleted` tinyint NOT NULL DEFAULT '0',
-  PRIMARY KEY (`user_email`,`id_copy`,`isbn`,`start_date`),
+  PRIMARY KEY (`user_email`,`isbn`,`start_date`),
   KEY `isbn_res_idx` (`isbn`),
   CONSTRAINT `email_user_res` FOREIGN KEY (`user_email`) REFERENCES `users` (`email`) ON DELETE CASCADE,
   CONSTRAINT `isbn_res` FOREIGN KEY (`isbn`) REFERENCES `books` (`isbn`) ON DELETE CASCADE
@@ -186,6 +187,14 @@ LOCK TABLES `wishlist` WRITE;
 /*!40000 ALTER TABLE `wishlist` DISABLE KEYS */;
 /*!40000 ALTER TABLE `wishlist` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Dumping events for database 'librarink'
+--
+
+--
+-- Dumping routines for database 'librarink'
+--
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -196,4 +205,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-09-18 16:32:47
+-- Dump completed on 2022-10-31 15:22:00
