@@ -16,22 +16,23 @@ import java.sql.Date;
 import java.util.List;
 
 
-@WebServlet(name = "admin_page_servlet", value = "", loadOnStartup = 0)
-public class admin_page_servlet extends HttpServlet {
+@WebServlet(name = "AdminPageServlet", value = "", loadOnStartup = 0)
+public class AdminPageServlet extends HttpServlet {
     //private static final Logger LOGGER = Logger.getLogger(AsyncRequestServlet.class.getName());
 
     @EJB
     private ErlangClient erlang_client;
-    private LibrarinkRemoteEJB remoteEJB;
+    @EJB
+    private LibrarinkRemote remoteEJB;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         PrintWriter writer = response.getWriter();
-        LibrarinkRemoteEJB librarinkRemoteEJB=new LibrarinkRemoteEJB();
+        //LibrarinkRemoteEJB librarinkRemoteEJB=new LibrarinkRemoteEJB();
         List<LoanDTO> loans;
         List<ReservationDTO> reservationDTOS;
         List<ReservationDTO> reservations;
-        List<Librarink_usersDTO> usersDTOList=librarinkRemoteEJB.listUsers(new Librarink_usersDTO());
+        List<Librarink_usersDTO> usersDTOList=remoteEJB.listUsers(new Librarink_usersDTO());
         loans = erlang_client.read_loans(null,null,null);
         request.setAttribute("loanList",loans);
         reservationDTOS= erlang_client.read_reservations(null,null);
@@ -99,7 +100,6 @@ public class admin_page_servlet extends HttpServlet {
 
                     for (String loanCheckbox : loan_checkbox) {
                         loan_parameter = loanCheckbox.split(";");
-                        //ToDo archive a loan
 
                         String s = erlang_client.terminate_loan(loan_parameter[0], loan_parameter[1]);
                         List<LoanDTO> loanDTOList = erlang_client.read_loans(loan_parameter[2],loan_parameter[0],loan_parameter[1]);
