@@ -1,7 +1,7 @@
 package it.unipi.dsmt.servlet;
 
 import it.unipi.dsmt.librarink.*;
-import it.unipi.dsmt.librarink.entities.History_reservation;
+
 
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
@@ -48,7 +48,7 @@ public class AdminPageServlet extends HttpServlet {
     }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        History_reservation history_reservation_filter;
+
         String[] reservation_parameter;
         String[] reservations_checkbox;
         String[] loan_parameter;
