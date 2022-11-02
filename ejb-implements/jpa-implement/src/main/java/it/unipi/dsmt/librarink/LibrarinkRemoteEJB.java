@@ -157,7 +157,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
     public List<Librarink_wishlistDTO> listWishlist(Librarink_wishlistDTO wishlistFilter) {
         Map<String, Object> parameters = new HashMap<String, Object>();
         StringBuilder jpql = new StringBuilder();
-        //jpql.append("select w, coalesce(size(w.languages),0) from wishlist w where 1 = 1 ");
+
         jpql.append("select w from Wishlist w where 1 = 1 ");
         if (wishlistFilter.getEmail_user() != null && !wishlistFilter.getEmail_user().isEmpty()){
             jpql.append(" and lower(w.email_user) like concat('%', lower(:email_user), '%') ");
@@ -167,17 +167,15 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
             jpql.append(" and lower(w.isbn) like concat('%', lower(:isbn), '%') ");
             parameters.put("isbn", wishlistFilter.getIsbn());
         }
-        jpql.append(" group by w ");
+
         Query query = entityManager.createQuery(jpql.toString());
         for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
             query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
         }
-        List<Object[]> wishlistList = query.getResultList();
+        List<Wishlist> wishlistList = query.getResultList();
         List<Librarink_wishlistDTO> toReturnList = new ArrayList<Librarink_wishlistDTO>();
         if (wishlistList != null && !wishlistList.isEmpty()) {
-            for(Object[] wishlistInfo: wishlistList){
-                Wishlist wishlist = (Wishlist) wishlistInfo[0];
-                Integer numLanguages = ((Number)wishlistInfo[1]).intValue();
+            for(Wishlist wishlist: wishlistList){
                 Librarink_wishlistDTO wishlistDTO = new Librarink_wishlistDTO();
                 wishlistDTO.setIsbn(wishlist.getIsbn());
                 wishlistDTO.setEmail_user(wishlist.getEmail_user());

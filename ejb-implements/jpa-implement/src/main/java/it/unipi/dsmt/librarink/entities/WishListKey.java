@@ -7,7 +7,9 @@ import java.io.Serializable;
 public class WishListKey implements Serializable {
     private String email_user;
     private String isbn;
+    public WishListKey() {
 
+    }
     public WishListKey(String email_user, String isbn) {
         this.email_user = email_user;
         this.isbn = isbn;
