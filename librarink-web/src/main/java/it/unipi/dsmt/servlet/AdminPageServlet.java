@@ -31,8 +31,6 @@ public class AdminPageServlet extends HttpServlet {
         //LibrarinkRemoteEJB librarinkRemoteEJB=new LibrarinkRemoteEJB();
         List<LoanDTO> loans;
         List<ReservationDTO> reservationDTOS;
-        List<ReservationDTO> reservations;
-        List<Librarink_usersDTO> usersDTOList=remoteEJB.listUsers(new Librarink_usersDTO());
         loans = erlang_client.read_loans(null,null,null);
         request.setAttribute("loanList",loans);
         reservationDTOS= erlang_client.read_reservations(null,null);
