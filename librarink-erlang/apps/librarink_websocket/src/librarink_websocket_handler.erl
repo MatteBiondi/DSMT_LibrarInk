@@ -99,10 +99,10 @@ websocket_handle(_Msg, State) ->
   {NoMessage :: none(), State :: #librarink_websocket_state{}, hibernate}).
 websocket_info({update, Update}, State) ->
   ?LOG_DEBUG("Websocket info: update message"),
-  {[{text, jsx:encode(#{type => update, data => jsx:decode(Update)})}], State, hibernate};
+  {[{text, jsx:encode(#{header => update, body => jsx:decode(Update)})}], State, hibernate};
 websocket_info({info, Info}, State) ->
   ?LOG_DEBUG("Websocket info: info message~n"),
-  {[{text, jsx:encode(#{type => info, data => Info})}], State, hibernate};
+  {[{text, jsx:encode(#{header => info, body => Info})}], State, hibernate};
 websocket_info({mqs, MqsPid}, State=#librarink_websocket_state{items = Items}) when is_pid(MqsPid) ->
   ?LOG_DEBUG("New MQS process: ~p", [MqsPid]),
   librarink_common_mqs_client:declare_queue(MqsPid, ?QUEUE_NAME),
