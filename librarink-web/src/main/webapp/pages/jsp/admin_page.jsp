@@ -95,9 +95,10 @@
             <td><%=loanDTO.getIsbn()%></td>
             <td><%=loanDTO.getUser()%></td>
             <td><%=loanDTO.getStartDate()%></td>
-            <td><%=loanDTO.getStartDate()%></td>
+            <td><%=loanDTO.getStopDate()%></td>
             <%}
             else{%>
+            <td></td>
             <td></td>
             <td></td>
             <td></td>
