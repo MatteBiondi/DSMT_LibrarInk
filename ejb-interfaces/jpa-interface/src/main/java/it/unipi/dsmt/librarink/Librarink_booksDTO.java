@@ -7,7 +7,7 @@ public class Librarink_booksDTO implements Serializable {
     String book_title;
     String book_author;
     String genre;
-    int year_of_publication;
+    String year_of_publication;
     String publisher;
     Float sum_of_stars;
     int number_of_review;
@@ -32,7 +32,7 @@ public class Librarink_booksDTO implements Serializable {
         return genre;
     }
 
-    public int getYear_of_publication() {
+    public String getYear_of_publication() {
         return year_of_publication;
     }
 
@@ -74,7 +74,7 @@ public class Librarink_booksDTO implements Serializable {
         this.genre = genre;
     }
 
-    public void setYear_of_publication(int year_of_publication) {
+    public void setYear_of_publication(String year_of_publication) {
         this.year_of_publication = year_of_publication;
     }
 
@@ -116,7 +116,7 @@ public class Librarink_booksDTO implements Serializable {
                 "isbn='" + isbn + '\'' +
                 ", book_title='" + book_title + '\'' +
                 ", genre='" + genre + '\'' +
-                ", year_of_publication=" + year_of_publication +
+                ", year_of_publication='" + year_of_publication + '\'' +
                 ", publisher='" + publisher + '\'' +
                 ", sum_of_stars=" + sum_of_stars +
                 ", number_of_review=" + number_of_review +

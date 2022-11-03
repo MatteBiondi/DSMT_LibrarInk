@@ -18,7 +18,7 @@ public class Books {
     @Column(name = "genre")
     String genre;
     @Column(name = "year_of_publication")
-    Integer year_of_publication;
+    String year_of_publication;
     @Column(name = "publisher")
     String publisher;
     @Column(name = "description")
@@ -66,11 +66,11 @@ public class Books {
         this.genre = genre;
     }
 
-    public Integer getYear_of_publication() {
+    public String getYear_of_publication() {
         return year_of_publication;
     }
 
-    public void setYear_of_publication(Integer year_of_publication) {
+    public void setYear_of_publication(String year_of_publication) {
         this.year_of_publication = year_of_publication;
     }
 
