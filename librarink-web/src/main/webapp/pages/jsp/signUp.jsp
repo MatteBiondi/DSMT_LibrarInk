@@ -1,20 +1,13 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: tummi
-  Date: 12/09/2022
-  Time: 22:34
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Librarink - Sign Up form</title>
 </head>
 <body>
 <div style="text-align: center;"> <h1> Signup </h1> </div>
-<form  action="<%= request.getContextPath()%>/signUpServlet" method="POST" >
+<form  action="<%= request.getContextPath()%>/signup" method="post" autocomplete="on">
     <div class="container">
         <label for="EnterEmail">Email : </label>
         <input type="text" id="EnterEmail" name="email" required>
@@ -29,7 +22,7 @@
         <label>Password : </label>
         <input type="password" placeholder="Enter Password" name="password" required>
 
-        <button type="submit">Login</button>
+        <button type="submit">SignUp</button>
         <button type="button" class="cancelbtn"> Cancel</button>
         <%
           if(request.getParameterMap().containsKey("message"))
@@ -39,7 +32,7 @@
         <%
             }
         %>
-        Already a member? <a href="<%= request.getContextPath()%>/loginServlet"> click here to login </a>
+        Already a member? <a href="<%= request.getContextPath()%>/login"> click here to login </a>
     </div>
 </form>
 </body>
