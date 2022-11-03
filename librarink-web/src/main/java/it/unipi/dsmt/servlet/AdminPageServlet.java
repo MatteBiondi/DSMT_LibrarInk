@@ -1,7 +1,7 @@
 package it.unipi.dsmt.servlet;
 
 import it.unipi.dsmt.librarink.*;
-import it.unipi.dsmt.librarink.entities.History_reservation;
+
 
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
@@ -31,15 +31,13 @@ public class AdminPageServlet extends HttpServlet {
         //LibrarinkRemoteEJB librarinkRemoteEJB=new LibrarinkRemoteEJB();
         List<LoanDTO> loans;
         List<ReservationDTO> reservationDTOS;
-        List<ReservationDTO> reservations;
-        List<Librarink_usersDTO> usersDTOList=remoteEJB.listUsers(new Librarink_usersDTO());
         loans = erlang_client.read_loans(null,null,null);
         request.setAttribute("loanList",loans);
         reservationDTOS= erlang_client.read_reservations(null,null);
         request.setAttribute("reservationList",reservationDTOS);
-        String targetJPS ="librarink-web/src/main/webapp/pages/jsp/admin_page.jsp";
+        String TargetJSP ="librarink-web/src/main/webapp/pages/jsp/admin_page.jsp";
 
-        RequestDispatcher requestDispatcher=request.getRequestDispatcher(targetJPS);
+        RequestDispatcher requestDispatcher=request.getRequestDispatcher(TargetJSP);
         try {
             requestDispatcher.forward(request,response);
         } catch (ServletException e) {
@@ -48,7 +46,7 @@ public class AdminPageServlet extends HttpServlet {
     }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        History_reservation history_reservation_filter;
+
         String[] reservation_parameter;
         String[] reservations_checkbox;
         String[] loan_parameter;
