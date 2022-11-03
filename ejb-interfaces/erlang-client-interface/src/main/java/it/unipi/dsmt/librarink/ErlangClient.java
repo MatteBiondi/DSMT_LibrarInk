@@ -15,7 +15,7 @@ public interface ErlangClient {
     String archive_reservations();
     List<BookCopyDTO> read_all_copies(String isbn);
     List<BookCopyDTO> read_available_copies(String isbn);
-    String count_available_copies(String isbn);
+    Integer count_available_copies(String isbn);
     List<LoanDTO> read_loans(String user, String isbn, String id);
     List<LoanDTO> read_ended_loans();
     List<ReservationDTO> read_reservations(String user, String isbn);

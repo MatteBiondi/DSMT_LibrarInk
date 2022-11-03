@@ -1,9 +1,7 @@
 package it.unipi.dsmt.servlet;
 
-import it.unipi.dsmt.librarink.BookCopyDTO;
-import it.unipi.dsmt.librarink.ErlangClient;
-import it.unipi.dsmt.librarink.LoanDTO;
-import it.unipi.dsmt.librarink.ReservationDTO;
+import com.google.gson.JsonArray;
+import it.unipi.dsmt.librarink.*;
 
 import javax.ejb.EJB;
 import javax.servlet.annotation.WebServlet;
@@ -22,18 +20,21 @@ public class AsyncRequestServlet extends HttpServlet {
     @EJB
     private ErlangClient erlang_client;
 
+    @EJB
+    private LibrarinkRemote remote;
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         LOGGER.info(String.format(
                 "Request from session-id: %s\nOperation: %s\nParams: <user: %s, isbn: %s, id: %s>",
                 request.getSession().getId(),
                 request.getParameter("request"),
-                request.getSession().getAttribute("user"),
+                request.getSession().getAttribute("email"),
                 request.getParameter("isbn"),
                 request.getParameter("id")
         ));
 
-        String user = (String) request.getSession().getAttribute("user");
+        String user = (String) request.getSession().getAttribute("email");
         String isbn = request.getParameter("isbn");
         String id = request.getParameter("id");
 
@@ -123,8 +124,23 @@ public class AsyncRequestServlet extends HttpServlet {
             case "cancel_reservation":
                 writer.write(erlang_client.cancel_reservation(user, isbn));
                 return;
+            case "add_wishlist":
+                Librarink_wishlistDTO new_item = new Librarink_wishlistDTO();
+                new_item.setEmail_user(user);
+                new_item.setIsbn(isbn);
+                Librarink_wishlistDTO result = remote.saveOrUpdateWishlist(new_item, false); // TODO: Should be boolean
+                writer.write("{\"result\": \"succeed\", \"response\": \"ok\"}");
+                return;
             case "load_wishlist":
-                writer.write("[]");//TODO: load from mysql
+                Librarink_wishlistDTO filter_item = new Librarink_wishlistDTO();
+                filter_item.setEmail_user(user);
+                List<Librarink_wishlistDTO> wishlist = remote.listWishlist(filter_item);
+
+                JsonArray wishlist_js = new JsonArray();
+                for (Librarink_wishlistDTO item: wishlist){
+                    wishlist_js.add(item.getIsbn());
+                }
+                writer.write(wishlist_js.toString());
                 return;
             default:
                 writer.write("{\"error\":\"unexpected request\"}");

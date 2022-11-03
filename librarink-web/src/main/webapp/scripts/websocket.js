@@ -1,7 +1,8 @@
 let socket
+const erlang_server = location.hostname
 
 $(document).ready(() => {
-    socket = new WebSocket("ws://" + location.hostname + ":5000/update")
+    socket = new WebSocket("ws://" + erlang_server + ":5000/update")
     setInterval(() => {if (socket.readyState === 1) socket.send("keep-alive")}, 90 * 1000)
     socket.onopen = () => track_books()
 
@@ -20,7 +21,7 @@ async function track_books(){
     // Load wishlist
     let wishlist = JSON.parse(sessionStorage.getItem("wishlist"))
     if (wishlist == null){
-        wishlist = await $.get("request/async", {request: "load_wishlist"}, "json") //TODO: which endpoint ?
+        wishlist = await $.post("request/async", {request: "load_wishlist"}, "json")
         //sessionStorage.setItem("wishlist", JSON.stringify(wishlist)) //TODO: uncomment in release
     }
 

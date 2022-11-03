@@ -82,8 +82,8 @@
             </div>
             <div class="left_column">
                 <img src="<%= request.getParameter("image")%>" alt="Book cover image">
-                <button>Reserve</button>
-                <button>Add to wishlist</button>
+                <button class="btn btn-primary" id="reserve-btn">Reserve</button><!-- TODO: reserve\cancel res.-->
+                <button class="btn btn-primary" id="wishlist-btn">Add to wishlist</button><!-- TODO: add\remove -->
             </div>
         </div>
     </body>

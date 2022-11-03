@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -238,7 +237,7 @@ public class ErlangClientEJB implements ErlangClient {
     }
 
     @Override
-    public String count_available_copies(String isbn) {
+    public Integer count_available_copies(String isbn) {
         OtpErlangAtom request = new OtpErlangAtom("read_copies");
         OtpErlangMap args = new OtpErlangMap();
 
@@ -248,9 +247,10 @@ public class ErlangClientEJB implements ErlangClient {
             args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
         }
         else
-            return properties.getProperty("bad_request");
+            return null;//properties.getProperty("bad_request");
 
-        return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+        String json_result = send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+        return parseSimpleInt(json_result);
     }
 
     @Override
@@ -362,19 +362,18 @@ public class ErlangClientEJB implements ErlangClient {
     }
 
     private List<BookCopyDTO> parseBookCopy(String json){
-        return parseJSON(json, new TypeToken<List<BookCopyDTO>>(){}.getType());
+        return parseDTO(json, new TypeToken<List<BookCopyDTO>>(){}.getType());
     }
 
     private List<ReservationDTO> parseReservation(String json){
-        return parseJSON(json, new TypeToken<List<ReservationDTO>>(){}.getType());
+        return parseDTO(json, new TypeToken<List<ReservationDTO>>(){}.getType());
     }
 
     private List<LoanDTO> parseLoan(String json){
-        return parseJSON(json, new TypeToken<List<LoanDTO>>(){}.getType());
+        return parseDTO(json, new TypeToken<List<LoanDTO>>(){}.getType());
     }
 
-    private List parseJSON(String json, Type collectionType){
-        System.out.println(json);
+    private List parseDTO(String json, Type collectionType){
         JsonObject result = new Gson().fromJson(json, JsonObject.class);
         if (result.get("result").getAsString().equals("succeed")){
             JsonObject response = new Gson().fromJson(result.get("response").toString(), JsonObject.class);
@@ -382,6 +381,16 @@ public class ErlangClientEJB implements ErlangClient {
         }
         else {
             return null;
+        }
+    }
+
+    private Integer parseSimpleInt(String json){
+        JsonObject result = new Gson().fromJson(json, JsonObject.class);
+        if (result.get("result").getAsString().equals("succeed")){
+            return new Gson().fromJson(result.get("response").toString(), Integer.class);
+        }
+        else {
+            return 0;
         }
     }
 }
