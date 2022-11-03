@@ -53,7 +53,7 @@ start_link(MasterPid) ->
 init(MasterPid) ->
   process_flag(trap_exit, true),  % Process must trap exits to call terminate/2 on supervisor:terminate_child/2 and to
                                   %   receive message in case of consumer process crash
-  {ok, Connection, Channel} = librarink_common_amqp:start_connection(?GET_ENV(host)),
+  {ok, Connection, Channel} = librarink_common_amqp:start_connection(?GET_ENV(host),?GET_ENV(user),?GET_ENV(password)),
   monitor(process, MasterPid), % Start monitor of master process, if it crash MQS process can shutdown
   MasterPid ! {mqs,self()}, % Inform the master process that the MQS process it's ready to receive configuration, in
                             %  case of crash the state will be lost, so the master process has to configure the MQS
