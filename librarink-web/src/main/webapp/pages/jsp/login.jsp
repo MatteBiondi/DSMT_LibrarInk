@@ -17,11 +17,17 @@
         <input type="checkbox" checked="checked"> Remember me
         <button type="button" class="cancelbtn"> Cancel</button>
         <%
-        if(request.getParameterMap().containsKey("message")) {
+            String message =(String) request.getSession().getAttribute("message");
+            if(message != null)
+                request.getSession().removeAttribute("message");
+            else
+                message =(String) request.getAttribute("message");
+
+            if(message != null) {
         %>
-            <h2 style="color:red;"><%=request.getAttribute("message")%></h2>
+                <h2 style="color:red;"><%=message%></h2>
         <%
-        }
+            }
         %>
         New member? <a href="<%= request.getContextPath()%>/signup"> Click here to signup </a>
     </div>

@@ -55,6 +55,7 @@ public class LoginServlet extends HttpServlet {
                 response.addCookie(userEmail);
                 response.setContentType("text/html");
                 response.sendRedirect(request.getContextPath() + "/homepage");
+                return;
                 //todo to check
                 //String TargetJSP = "/index.jsp";
                 //todo serve? request.setAttribute("user", usersDTO);
@@ -62,13 +63,12 @@ public class LoginServlet extends HttpServlet {
                 //requestDispatcher.forward(request, response);
             }
         }
-        else
-        {
-            response.setContentType("text/html");
-            String TargetJSP ="/pages/jsp/login.jsp";
-            request.setAttribute("message","Password or  email not valid");
-            RequestDispatcher requestDispatcher=request.getRequestDispatcher(TargetJSP);
-            requestDispatcher.forward(request,response);
-        }
+
+        // User not exist or incorrect credentials
+        response.setContentType("text/html");
+        String TargetJSP ="/pages/jsp/login.jsp";
+        request.setAttribute("message","Password or  email not valid");
+        RequestDispatcher requestDispatcher=request.getRequestDispatcher(TargetJSP);
+        requestDispatcher.forward(request,response);
     }
 }
