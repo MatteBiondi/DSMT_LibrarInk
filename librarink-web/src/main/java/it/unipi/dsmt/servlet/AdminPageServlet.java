@@ -35,9 +35,9 @@ public class AdminPageServlet extends HttpServlet {
         request.setAttribute("loanList",loans);
         reservationDTOS= erlang_client.read_reservations(null,null);
         request.setAttribute("reservationList",reservationDTOS);
-        String targetJPS ="librarink-web/src/main/webapp/pages/jsp/admin_page.jsp";
+        String TargetJSP ="librarink-web/src/main/webapp/pages/jsp/admin_page.jsp";
 
-        RequestDispatcher requestDispatcher=request.getRequestDispatcher(targetJPS);
+        RequestDispatcher requestDispatcher=request.getRequestDispatcher(TargetJSP);
         try {
             requestDispatcher.forward(request,response);
         } catch (ServletException e) {

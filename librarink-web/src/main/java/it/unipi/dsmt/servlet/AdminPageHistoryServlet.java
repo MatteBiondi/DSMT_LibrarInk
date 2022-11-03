@@ -15,7 +15,7 @@ import java.sql.Date;
 import java.util.List;
 
 
-@WebServlet(name = "AdminPageHistoryServlet", value = "/admin", loadOnStartup = 0)
+@WebServlet(name = "AdminPageHistoryServlet", value = "/adminHistory", loadOnStartup = 0)
 public class AdminPageHistoryServlet extends HttpServlet {
     //private static final Logger LOGGER = Logger.getLogger(AsyncRequestServlet.class.getName());
 
@@ -34,9 +34,9 @@ public class AdminPageHistoryServlet extends HttpServlet {
         request.setAttribute("loanHistoryList",history_loans);
         historyReservationDTOS= remoteEJB.listHistoryReservation(new Librarink_history_reservationDTO());
         request.setAttribute("reservationHistoryList",historyReservationDTOS);
-        String targetJPS ="librarink-web/src/main/webapp/pages/jsp/admin_page_history.jsp";
+        String TargetJSP ="librarink-web/src/main/webapp/pages/jsp/admin_page_history.jsp";
 
-        RequestDispatcher requestDispatcher=request.getRequestDispatcher(targetJPS);
+        RequestDispatcher requestDispatcher=request.getRequestDispatcher(TargetJSP);
         try {
             requestDispatcher.forward(request,response);
         } catch (ServletException e) {

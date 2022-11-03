@@ -24,8 +24,8 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
-        String targetJPS ="/pages/jsp/login.jsp";
-        RequestDispatcher requestDispatcher=request.getRequestDispatcher(targetJPS);
+        String TargetJSP ="/pages/jsp/login.jsp";
+        RequestDispatcher requestDispatcher=request.getRequestDispatcher(TargetJSP);
         requestDispatcher.forward(request,response);
     }
 
@@ -56,18 +56,18 @@ public class LoginServlet extends HttpServlet {
                 response.setContentType("text/html");
                 response.sendRedirect(request.getContextPath() + "/homepage");
                 //todo to check
-                //String targetJPS = "/index.jsp";
+                //String TargetJSP = "/index.jsp";
                 //todo serve? request.setAttribute("user", usersDTO);
-                //RequestDispatcher requestDispatcher = request.getRequestDispatcher(targetJPS);
+                //RequestDispatcher requestDispatcher = request.getRequestDispatcher(TargetJSP);
                 //requestDispatcher.forward(request, response);
             }
         }
         else
         {
             response.setContentType("text/html");
-            String targetJPS ="/pages/jsp/login.jsp";
+            String TargetJSP ="/pages/jsp/login.jsp";
             request.setAttribute("message","Password or  email not valid");
-            RequestDispatcher requestDispatcher=request.getRequestDispatcher(targetJPS);
+            RequestDispatcher requestDispatcher=request.getRequestDispatcher(TargetJSP);
             requestDispatcher.forward(request,response);
         }
     }
