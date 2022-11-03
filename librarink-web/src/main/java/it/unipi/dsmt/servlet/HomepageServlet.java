@@ -51,12 +51,12 @@ public class HomepageServlet extends HttpServlet {
         LOGGER.info(String.format(
                 "Request from session-id: %s\nParams: < user: %s, page: %s, search: %s => %s >",
                 request.getSession().getId(),
-                request.getSession().getAttribute("user"),
+                request.getSession().getAttribute("email"),
                 request.getParameter("page"),
                 request.getParameter("search"),
                 request.getParameter("keyword")
         ));
-        String user = (String) request.getSession().getAttribute("user");
+        //String user = (String) request.getSession().getAttribute("email");
 
         // Get request parameters
         String filter_attribute = request.getParameter("search") == null ? "":request.getParameter("search");
@@ -110,8 +110,8 @@ public class HomepageServlet extends HttpServlet {
         request.setAttribute("books", books);
         request.setAttribute("page_offset", page_offset);
         request.setAttribute("offsets", offsets.toArray());
-
-        if (filter_attribute.equals(""))
+        LOGGER.info(String.format("Filter attribute %s",filter_attribute));
+        if (filter_attribute.equals("")) // Only if the homepage is directly requested by typing the link
             getServletContext().getRequestDispatcher("/index.jsp").forward(request, response);
         else
             getServletContext().getRequestDispatcher("/pages/common/book_list.jsp").forward(request, response);
