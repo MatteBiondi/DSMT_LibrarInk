@@ -52,15 +52,15 @@ public class SignUpServlet extends HttpServlet {
         {
             response.setContentType("text/html");
             resourceURL = "/pages/jsp/signUp.jsp";
-            request.setAttribute("message", "user alredy exists");
+            request.setAttribute("message", "User already exists");
             RequestDispatcher rd = request.getRequestDispatcher(resourceURL);
             rd.forward(request, response);
         }
         else
         {
+            request.getSession().setAttribute("message", "User created");
             response.setContentType("text/html");
-            request.setAttribute("message", "User created");
-            response.sendRedirect(request.getContextPath() + "/pages/jsp/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/login");
             //todo to check
             //resourceURL = "/pages/jsp/login.jsp";
             //request.setAttribute("message", "user created");

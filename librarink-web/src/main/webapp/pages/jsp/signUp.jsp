@@ -25,10 +25,10 @@
         <button type="submit">SignUp</button>
         <button type="button" class="cancelbtn"> Cancel</button>
         <%
-          if(request.getParameterMap().containsKey("message"))
-          {
+            String message = (String) request.getAttribute("message");
+            if(message != null) {
         %>
-        <h2 style="color:red;"><%=request.getAttribute("message")%></h2>
+                <h2 style="color:red;"><%=message%></h2>
         <%
             }
         %>
