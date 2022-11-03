@@ -16,7 +16,8 @@
 
 -include_lib("kernel/include/logger.hrl").
 
--record(librarink_proxy_env, {mnesia_name, mnesia_nodes, request_timeout, mqs_host, exchange_type, routing_key}).
+-record(librarink_proxy_env, {mnesia_name, mnesia_nodes, request_timeout, mqs_host, mqs_user,
+  mqs_password, exchange_type, routing_key}).
 
 -define(CONNECTED_FILTER(Active, Backup), fun(Node) -> (Node =:= Active) or (Node =:= Backup) end).
 -define(CONNECTED_NODES, [node()] ++ nodes()).
@@ -60,7 +61,8 @@ work(Request, From, Tag, Env) ->
       _ -> publish_notification(Exchange, Notification, Env)
     end
 catch
-  error: Error -> ?LOG_WARNING("Notification publishment failed: ~p",[Error])
+    error: Err -> io:format("\n\nPublish error: ~p!!\n\n",[Err])
+    %error: Error -> ?LOG_WARNING("Notification publishment failed: ~p",[Error])
 end.
 
 %%%%%===================================================================
@@ -172,6 +174,8 @@ join_responses(Responses) ->
 publish_notification(Isbn, Notification, Env) ->
   librarink_common_amqp:produce_once(
     Env#librarink_proxy_env.mqs_host,
+    Env#librarink_proxy_env.mqs_user,
+    Env#librarink_proxy_env.mqs_password,
     Isbn,
     Env#librarink_proxy_env.exchange_type,
     Env#librarink_proxy_env.routing_key,

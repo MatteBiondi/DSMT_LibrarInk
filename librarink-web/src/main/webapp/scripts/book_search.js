@@ -8,6 +8,8 @@ $(document).ready(() => {
     let search;
     let keyword;
 
+    document.documentElement.style.scrollBehavior = 'auto';
+
     search = sessionStorage.getItem("search");
     keyword =  sessionStorage.getItem("keyword");
 
@@ -72,7 +74,7 @@ async function load_books(search, keyword, page){
                 sessionStorage.getItem("search"),
                 sessionStorage.getItem("keyword"),
                 event.currentTarget.getAttribute('data-offset')
-            );
+            ).then(() => window.scrollTo(0, 0));
         }
     )
 }

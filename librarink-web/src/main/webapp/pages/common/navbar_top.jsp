@@ -1,9 +1,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
-<link rel="stylesheet" href="/librarink-web/css/navbar_top.css" type="text/css" media="screen">
+<script src="${pageContext.request.contextPath}/scripts/navbar.js"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar_top.css" type="text/css" media="screen">
 <nav class="navbar-top navbar navbar-light bg-light">
-    <a class="navbar-brand" href="homepage"><header>Librarink</header></a>
+    <a class="navbar-brand" href="/librarink-web"><header id="header">Librarink</header></a>
     <c:if test="${ param.search_bar == \"true\" }">
         <div class="d-flex align-items-center" id="search">
             <div class="input-group">

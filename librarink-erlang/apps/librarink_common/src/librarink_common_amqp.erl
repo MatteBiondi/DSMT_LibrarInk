@@ -10,8 +10,8 @@
 -module(librarink_common_amqp).
 
 %% API
--export([start_connection/1, declare_queue/2, bind_queue/5, unbind_queue/4, start_consumer/3, consumer/3,
-  close_connection/2, produce/5, produce_once/5]).
+-export([start_connection/3, declare_queue/2, bind_queue/5, unbind_queue/4, start_consumer/3, consumer/3,
+  close_connection/2, produce/5, produce_once/7]).
 
 -include_lib("amqp_client/include/amqp_client.hrl").
 -include_lib("kernel/include/logger.hrl").
@@ -19,11 +19,12 @@
 %% @doc
 %% Connect to the MQS broker at the specified address and open a channel to start communication.
 %% @end
--spec(start_connection(Host :: string()) -> {ok, Connection :: pid(), Channel :: pid()}).
-start_connection(Host) ->
+-spec(start_connection(Host :: string(),User :: binary(),User :: binary()) -> {ok, Connection :: pid(), Channel :: pid
+()}).
+start_connection(Host, User, Password) ->
   % Connect to broker
   {ok, Connection} =
-    amqp_connection:start(#amqp_params_network{host = Host}),
+    amqp_connection:start(#amqp_params_network{host = Host, username = User, password = Password}),
   % Open channel
   {ok, Channel} =
     amqp_connection:open_channel(Connection),
@@ -159,9 +160,9 @@ produce(Channel, ExchangeName, ExchangeType, RoutingKey, Payload)->
 %% @doc
 %% Open a new connection, produce message on selected queue and close the connection.
 %% @end
--spec(produce_once(Host :: atom(), ExchangeName :: binary(), ExchangeType :: binary(), RoutingKey :: binary(),
-    Payload :: binary()) -> none()).
-produce_once(Host, ExchangeName, ExchangeType, RoutingKey, Payload) ->
-  {ok, Connection, Channel} = start_connection(Host),
+-spec(produce_once(Host :: string(), User :: binary(), Password :: binary(), ExchangeName :: binary(),
+    ExchangeType :: binary(), RoutingKey :: binary(), Payload :: binary()) -> none()).
+produce_once(Host, User, Password, ExchangeName, ExchangeType, RoutingKey, Payload) ->
+  {ok, Connection, Channel} = start_connection(Host, User, Password),
   librarink_common_amqp:produce(Channel, ExchangeName, ExchangeType,  RoutingKey, Payload),
   librarink_common_amqp:close_connection(Connection, Channel).

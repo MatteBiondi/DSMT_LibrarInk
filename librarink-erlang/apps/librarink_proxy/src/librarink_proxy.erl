@@ -19,7 +19,8 @@
 
 -define(GET_ENV(Param),element(2,application:get_env(librarink_proxy, Param))).
 
--record(librarink_proxy_env, {mnesia_name, mnesia_nodes, request_timeout, mqs_host, exchange_type, routing_key}).
+-record(librarink_proxy_env, {mnesia_name, mnesia_nodes, request_timeout, mqs_host, mqs_user,
+  mqs_password, exchange_type, routing_key}).
 
 %%%===================================================================
 %%% API
@@ -45,6 +46,8 @@ init([]) ->
     mnesia_nodes = ?GET_ENV(mnesia_nodes),
     request_timeout = ?GET_ENV(request_timeout),
     mqs_host = ?GET_ENV(mqs_host),
+    mqs_user = ?GET_ENV(mqs_user),
+    mqs_password = ?GET_ENV(mqs_password),
     exchange_type = ?GET_ENV(exchange_type),
     routing_key = ?GET_ENV(routing_key)
   },

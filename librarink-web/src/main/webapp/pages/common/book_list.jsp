@@ -3,8 +3,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
-<link rel="stylesheet" href="/librarink-web/css/book.css" type="text/css" media="screen">
-<link rel="stylesheet" href="/librarink-web/css/book_list.css" type="text/css" media="screen">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/book.css" type="text/css" media="screen">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/book_list.css" type="text/css" media="screen">
 
 <div id=book-items">
     <c:forEach items="${books}" var="book">

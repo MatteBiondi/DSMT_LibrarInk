@@ -1,5 +1,6 @@
 package it.unipi.dsmt.servlet;
 
+import it.unipi.dsmt.librarink.ErlangClient;
 import it.unipi.dsmt.librarink.LibrarinkRemote;
 import it.unipi.dsmt.librarink.Librarink_booksDTO;
 
@@ -17,6 +18,9 @@ public class BookDetailServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(BookDetailServlet.class.getName());
     @EJB
     LibrarinkRemote remote;
+    @EJB
+    private ErlangClient erlang_client;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         LOGGER.info(String.format(
@@ -26,10 +30,12 @@ public class BookDetailServlet extends HttpServlet {
                 request.getParameter("isbn")
         ));
         String isbn = request.getParameter("isbn");
-        Librarink_booksDTO book = remote.findBooksByIsbn(isbn);
-        LOGGER.info(book.toString());
+
+        Librarink_booksDTO book = remote.findBooksByIsbn(isbn); //TODO: what if null ?
+        Integer available_copies = erlang_client.count_available_copies(isbn);
         response.setContentType("text/html");
         request.setAttribute("book", book);
+        request.setAttribute("available_copies", available_copies);
         getServletContext().getRequestDispatcher("/pages/jsp/book_detail.jsp").forward(request, response);
     }
 }
