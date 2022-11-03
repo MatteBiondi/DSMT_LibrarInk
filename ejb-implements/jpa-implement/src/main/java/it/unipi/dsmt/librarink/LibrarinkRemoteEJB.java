@@ -1,6 +1,7 @@
 package it.unipi.dsmt.librarink;
 
 import it.unipi.dsmt.librarink.entities.*;
+import org.dom4j.util.UserDataAttribute;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -43,12 +44,10 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
         for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
             query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
         }
-        List<Object[]> usersList = query.getResultList();
+        List<Users> usersList = query.getResultList();
         List<Librarink_usersDTO> toReturnList = new ArrayList<Librarink_usersDTO>();
         if (usersList != null && !usersList.isEmpty()) {
-            for(Object[] usersInfo: usersList){
-                Users user = (Users)usersInfo[0];
-                Integer numLanguages = ((Number)usersInfo[1]).intValue();
+            for(Users user : usersList){
                 Librarink_usersDTO usersdto = new Librarink_usersDTO();
                 usersdto.setPassword(user.getPassword());
                 usersdto.setName(user.getName());
@@ -91,7 +90,6 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
         if (booksList != null && !booksList.isEmpty()) {
             for(Object[] booksInfo : booksList){
                 Books book = (Books) booksInfo[0];
-                Integer numLanguages = ((Number) booksInfo[1]).intValue();
                 Librarink_booksDTO bookDTO = new Librarink_booksDTO();
                 bookDTO.setIsbn(book.getIsbn());
                 bookDTO.setBook_title(book.getBook_title());
@@ -412,11 +410,12 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
 
     @Override
     public Librarink_usersDTO saveOrUpdateUser(Librarink_usersDTO userDTO, boolean update) {
-        Users user = null;
-        if (!update) {
+        Users user = entityManager.find(Users.class, userDTO.getEmail());
+        if (!update && user != null) {
+            //Duplicate user
+            return null;
+        } else if(!update){
             user = new Users();
-        } else {
-            user = entityManager.find(Users.class, userDTO.getEmail());
         }
 
         user.setEmail(userDTO.getEmail());
@@ -426,19 +425,17 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
         user.setName(userDTO.getName());
         user.setSurname(userDTO.getSurname());
         user.setPassword(userDTO.getPassword());
-        if(!update)
-        {
-            entityManager.persist(user);
-        }
-        else
-        {
-            try {
+        try {
+            if(!update){
+                entityManager.persist(user);
+            }
+            else{
                 entityManager.merge(user);
             }
-            catch (Exception e)
-            {
-                return null;
-            }
+        }
+        catch (Exception e)
+        {
+            return null;
         }
         return userDTO;
     }
