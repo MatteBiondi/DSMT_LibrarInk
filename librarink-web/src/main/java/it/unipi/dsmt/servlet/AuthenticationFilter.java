@@ -35,7 +35,8 @@ public class AuthenticationFilter implements Filter {
         HttpSession session = req.getSession(false);
         //todo se page non esiste -> errore senza filtro
         if(!uri.endsWith("login") && !uri.endsWith("signup") && (session == null || session.getAttribute("email") == null)){
-            this.context.log("Unauthorized access request");
+            this.context.log("Unauthorized, access request");
+            req.getSession().setAttribute("message", "Login is needed");
             res.sendRedirect(req.getContextPath() + "/login");
         }else{
             // pass the request along the filter chain
