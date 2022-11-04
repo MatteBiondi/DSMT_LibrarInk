@@ -16,6 +16,8 @@
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2]).
 
+-include_lib("kernel/include/logger.hrl").
+
 -define(SERVER, ?MODULE).
 
 -record(librarink_mnesiaDB_state, {}).
@@ -53,13 +55,13 @@ init(_Args) ->
   {stop, Reason :: term(), Reply :: term(), NewState :: #librarink_mnesiaDB_state{}} |
   {stop, Reason :: term(), NewState :: #librarink_mnesiaDB_state{}}).
 handle_call({Function, Args}, From, State = #librarink_mnesiaDB_state{}) ->
-  io:format("[~p] Handle call: ~p~n", [self(), {Function, Args}]),
-  io:format("[~p] From: ~p~n", [self(), From]),
+  ?LOG_DEBUG("[~p] Handle call: ~p~n", [self(), {Function, Args}]),
+  ?LOG_DEBUG("[~p] From: ~p~n", [self(), From]),
   {_, Tag} = From,
   librarink_mnesiaDB_worker_sup:start_worker(Function, Args, Tag, From),
   {noreply, State};
 handle_call(Request, _From, State = #librarink_mnesiaDB_state{}) ->
-  io:format("[~p] Unexpected request. Handle cast: ~p~n", [self(), Request]),
+  ?LOG_DEBUG("[~p] Unexpected request. Handle cast: ~p~n", [self(), Request]),
   {reply, {error, invalid_call_request}, State}.
 
 %% @private
@@ -69,7 +71,7 @@ handle_call(Request, _From, State = #librarink_mnesiaDB_state{}) ->
   {noreply, NewState :: #librarink_mnesiaDB_state{}, timeout() | hibernate} |
   {stop, Reason :: term(), NewState :: #librarink_mnesiaDB_state{}}).
 handle_cast(Request, State = #librarink_mnesiaDB_state{}) ->
-  io:format("[~p] Unexpected request. Handle cast: ~p~n", [self(), Request]),
+  ?LOG_DEBUG("[~p] Unexpected request. Handle cast: ~p~n", [self(), Request]),
   {noreply, State}.
 
 %% @private
@@ -79,7 +81,7 @@ handle_cast(Request, State = #librarink_mnesiaDB_state{}) ->
   {noreply, NewState :: #librarink_mnesiaDB_state{}, timeout() | hibernate} |
   {stop, Reason :: term(), NewState :: #librarink_mnesiaDB_state{}}).
 handle_info(Info, State = #librarink_mnesiaDB_state{}) ->
-  io:format("[~p] Unexpected request. Handle info: ~p~n", [self(), Info]),
+  ?LOG_DEBUG("[~p] Unexpected request. Handle info: ~p~n", [self(), Info]),
   {noreply, State}.
 
 %% @private
@@ -90,7 +92,7 @@ handle_info(Info, State = #librarink_mnesiaDB_state{}) ->
 -spec(terminate(Reason :: (normal | shutdown | {shutdown, term()} | term()),
     State :: #librarink_mnesiaDB_state{}) -> term()).
 terminate(Reason, _State = #librarink_mnesiaDB_state{}) ->
-  io:format("[~p] Termination: ~p~n", [self(), Reason]),
+  ?LOG_INFO("[~p] Termination: ~p~n", [self(), Reason]),
   ok.
 
 %%%===================================================================

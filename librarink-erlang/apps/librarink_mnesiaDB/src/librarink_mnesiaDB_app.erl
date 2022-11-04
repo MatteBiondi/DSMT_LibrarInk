@@ -10,6 +10,8 @@
 
 -behaviour(application).
 
+-include_lib("kernel/include/logger.hrl").
+
 %% Application callbacks
 -export([start/2, stop/1]).
 
@@ -45,7 +47,7 @@
   {error, mnesiaDB_installation_failed, Result :: term()} |
   {error, Reason :: term()}).
 start(StartType, _StartArgs) ->
-  io:format("StartType: ~p~n", [StartType]),
+  ?LOG_DEBUG("StartType: ~p~n", [StartType]),
   % Get active and backup nodes lists
   {ok, ActiveNodes} = application:get_env(librarink_mnesiaDB, active_nodes),
   {ok, BackupNodes} = application:get_env(librarink_mnesiaDB, backup_nodes),
