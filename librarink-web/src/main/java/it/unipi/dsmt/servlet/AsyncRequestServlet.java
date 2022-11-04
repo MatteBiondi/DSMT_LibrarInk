@@ -131,6 +131,15 @@ public class AsyncRequestServlet extends HttpServlet {
                 Librarink_wishlistDTO result = remote.saveOrUpdateWishlist(new_item, false); // TODO: Should be boolean
                 writer.write("{\"result\": \"succeed\", \"response\": \"ok\"}");
                 return;
+            case "remove_wishlist":
+                boolean deleted = remote.deleteWishlistByKey(user, isbn);
+                if(deleted){
+                    writer.write("{\"result\": \"succeed\", \"response\": \"ok\"}");
+                }
+                else {
+                    writer.write("{\"result\": \"error\"}");
+                }
+                return;
             case "load_wishlist":
                 Librarink_wishlistDTO filter_item = new Librarink_wishlistDTO();
                 filter_item.setEmail_user(user);
