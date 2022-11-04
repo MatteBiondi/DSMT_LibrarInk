@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,8 +19,8 @@
         <input type="text" id="EnterAddress" name="address" required>
         <label for="birthday">Birthday:</label>
         <input type="date" id="birthday" name="birthday">
-        <label>Password : </label>
-        <input type="password" placeholder="Enter Password" name="password" required>
+        <label for="password">Password : </label>
+        <input type="password" id="password" placeholder="Enter Password" name="password" required>
 
         <button type="submit">SignUp</button>
         <button type="button" class="cancelbtn"> Cancel</button>
