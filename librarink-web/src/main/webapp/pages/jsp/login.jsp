@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,7 +14,6 @@
         <label for="EnterPassword">Password : </label>
         <input type="password" id="EnterPassword" name="password" required>
         <button type="submit">Login</button>
-        <input type="checkbox" checked="checked"> Remember me
         <button type="button" class="cancelbtn"> Cancel</button>
         <%
             String message =(String) request.getSession().getAttribute("message");

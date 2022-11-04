@@ -15,6 +15,8 @@
   all_copies_all_book/0, all_pending_reservations/0, all_ended_reservations/0, all_pending_loans/0, all_ended_loans/0, renew_loan_by_book_copy/2]).
 
 -include_lib("stdlib/include/ms_transform.hrl").
+-include_lib("kernel/include/logger.hrl").
+
 -import(calendar, [now_to_universal_time/1]).
 -import(erlang, [insert_element/3, timestamp/0]).
 
@@ -45,11 +47,10 @@
 install(ActiveNodes, BackupNodes) ->
   %Create schema for all nodes received as parameter
   Nodes = ActiveNodes ++ BackupNodes,
-  io:format("Active, Backup: ~p~n",[{ActiveNodes, BackupNodes}]),
+  ?LOG_INFO("Active, Backup: ~p~n",[{ActiveNodes, BackupNodes}]),
   Active = lists:member(node(), ActiveNodes),
   case Active of
     true ->   %Activate Mnesia in all nodes
-      io:format("I'm active !~n"),
       mnesia:create_schema(Nodes),
       rpc:multicall(Nodes, application, start, [mnesia]),
       case mnesia:wait_for_tables([ librarink_lent_book,
@@ -78,7 +79,7 @@ install(ActiveNodes, BackupNodes) ->
               {type, bag}]),
           {succeed, install_succeeded}
       end;
-      _false -> io:format("I'm backup !~n"), {succeed, install_succeeded}
+      _false -> {succeed, install_succeeded}
   end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%

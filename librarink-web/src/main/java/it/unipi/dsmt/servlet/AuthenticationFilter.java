@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 @WebFilter(
         filterName = "AuthenticationFilter",
@@ -14,11 +15,10 @@ import java.io.IOException;
 )
 
 public class AuthenticationFilter implements Filter {
-    private ServletContext context;
+    private static final Logger LOGGER = Logger.getLogger(HomepageServlet.class.getName());
 
-    public void init(FilterConfig config) throws ServletException {
-        this.context = config.getServletContext();
-        this.context.log("AuthenticationFilter initialized");
+    public void init(FilterConfig config) {
+        LOGGER.info("AuthenticationFilter initialized");
     }
 
     public void destroy() {
@@ -30,12 +30,12 @@ public class AuthenticationFilter implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
 
         String uri = req.getRequestURI();
-        this.context.log("Requested Resource::"+uri);
+        LOGGER.info(String.format("Requested Resource:: %s", uri));
 
         HttpSession session = req.getSession(false);
         //todo se page non esiste -> errore senza filtro
         if(!uri.endsWith("login") && !uri.endsWith("signup") && (session == null || session.getAttribute("email") == null)){
-            this.context.log("Unauthorized, access request");
+            LOGGER.info("Unauthorized, access request");
             req.getSession().setAttribute("message", "Login is needed");
             res.sendRedirect(req.getContextPath() + "/login");
         }else{

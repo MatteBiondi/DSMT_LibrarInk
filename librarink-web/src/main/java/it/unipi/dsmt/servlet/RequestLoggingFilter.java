@@ -5,6 +5,7 @@ import javax.servlet.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.logging.Logger;
 
 @WebFilter(
         filterName = "RequestLoggingFilter",
@@ -13,12 +14,10 @@ import java.util.Enumeration;
         description = "Log all the logging request received"
 )
 public class RequestLoggingFilter implements Filter {
+    private static final Logger LOGGER = Logger.getLogger(HomepageServlet.class.getName());
 
-    private ServletContext context;
-
-    public void init(FilterConfig config) throws ServletException {
-        this.context = config.getServletContext();
-        this.context.log("RequestLoggingFilter initialized");
+    public void init(FilterConfig config){
+        LOGGER.info("RequestLoggingFilter initialized");
     }
 
     public void destroy() {
@@ -31,7 +30,7 @@ public class RequestLoggingFilter implements Filter {
         while(params.hasMoreElements()){
             String name = params.nextElement();
             String value = request.getParameter(name);
-            this.context.log(req.getRemoteAddr() + "::Request Params::{"+name+"="+value+"}");
+            LOGGER.info(String.format("%s::Request Params::{%s=%s}",req.getRemoteAddr(), name, value));
         }
 
         // pass the request along the filter chain

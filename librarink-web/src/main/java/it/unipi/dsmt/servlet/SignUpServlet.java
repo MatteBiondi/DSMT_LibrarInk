@@ -1,8 +1,8 @@
 package it.unipi.dsmt.servlet;
 
+import com.google.common.hash.Hashing;
 import it.unipi.dsmt.librarink.LibrarinkRemote;
 import it.unipi.dsmt.librarink.Librarink_usersDTO;
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 
 @WebServlet(name = "SignUpServlet", value = "/signup")
@@ -34,8 +35,9 @@ public class SignUpServlet extends HttpServlet {
         String surname = request.getParameter("surname");
         String password = request.getParameter("password");
         //hash psw
-        Argon2PasswordEncoder encoder = new Argon2PasswordEncoder(32,64,1,15*1024,2);
-        String hashedPsw = encoder.encode(password);
+        String hashedPsw = Hashing.sha256()
+                .hashString(password, StandardCharsets.UTF_8)
+                .toString();
         Date birthday = Date.valueOf(request.getParameter("birthday"));
         String address = request.getParameter("address");
         Librarink_usersDTO new_user = new Librarink_usersDTO();
@@ -61,12 +63,6 @@ public class SignUpServlet extends HttpServlet {
             request.getSession().setAttribute("message", "User created");
             response.setContentType("text/html");
             response.sendRedirect(request.getContextPath() + "/login");
-            //todo to check
-            //resourceURL = "/pages/jsp/login.jsp";
-            //request.setAttribute("message", "user created");
-            //RequestDispatcher rd = request.getRequestDispatcher(resourceURL);
-            //rd.forward(request, response);
-            //notify user correctly registered
         }
 
     }

@@ -31,10 +31,11 @@
 
 <%--@declare id="reservation"--%><%--@declare id="loan"--%>
 <form ACTION="src/main/java/it/unipi/dsmt/servlet/AdminPageServlet.java",id="reservation">
-    <table style="width:100%">
+    <table style="width:100%" >
+
         <tr>
             <th colspan="5">Pending Reservation</th>
-            <th colspan="5">Active Loan</th>
+
         </tr>
         <tr>
             <td>ck</td>
@@ -42,7 +43,7 @@
             <td>User ID</td>
             <td>Start Time</td>
             <td>End Time</td>
-            <td>ck</td>
+
         </tr>
         <%  while(loanDTOIterator.hasNext() ||reservationDTOIterator.hasNext()){%>
         <tr>
@@ -72,12 +73,11 @@
 <form ACTION="src/main/java/it/unipi/dsmt/servlet/AdminPageServlet.java",id="loan">
     <table style="width:100%">
         <tr>
-            <th colspan="5">Pending Reservation</th>
-            <th colspan="5">Active Loan</th>
+            <th colspan="6">Active Loan</th>
         </tr>
         <tr>
-
-            <td>Loan ID</td>
+            <td>ck</td>
+            <td>Book ID</td>
             <td>ISBN</td>
             <td>User ID</td>
             <td>Start Time</td>
@@ -91,12 +91,14 @@
             <%if(loanDTOIterator.hasNext()){
                 LoanDTO loanDTO=loanDTOIterator.next();%>
             <td><input type="checkbox" name = "loan" value=<%=loanDTO.getIsbn()+";"+loanDTO.getId()+";"+loanDTO.getUser()%> /></td>
+            <td><%=loanDTO.getId()%></td>
             <td><%=loanDTO.getIsbn()%></td>
             <td><%=loanDTO.getUser()%></td>
             <td><%=loanDTO.getStartDate()%></td>
-            <td><%=loanDTO.getStartDate()%></td>
+            <td><%=loanDTO.getStopDate()%></td>
             <%}
             else{%>
+            <td></td>
             <td></td>
             <td></td>
             <td></td>
