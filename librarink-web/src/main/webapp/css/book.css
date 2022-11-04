@@ -109,7 +109,7 @@ a, a:hover, a:visited, a:active {
     margin-top: 3%;
     background-color: royalblue;
     font-weight: bold;
-    color: white;
+    color: transparent;
     border: none;
     padding: 2%;
     border-radius: 8px;
