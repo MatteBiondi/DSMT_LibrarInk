@@ -112,7 +112,7 @@
 <button type="submit" form="reservation" name="button" value="ConfirmReservation">Confirm Reservation</button>
 <button type="submit" form="reservation" name="button" value="DeleteReservation">Delete Reservation</button>
 <button type="submit" form="loan" name="button" value="EndLoan">End Loan</button>
-<button type="">History</button>
+<a href="default.asp" target="librarink-web/src/main/java/it/unipi/dsmt/servlet/AdminPageHistoryServlet.java">History table</a>
 <button type="">NewLoan</button>
 </body>
 </html>
