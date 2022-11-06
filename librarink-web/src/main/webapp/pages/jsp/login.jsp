@@ -17,9 +17,9 @@
 </head>
 <body class="text-center">
     <main class="w-50 form-signin m-auto">
+        <img class="mb-4" src="<%=request.getContextPath()%>/images/logo.svg" alt="Librarink Logo" width="72" height="57">
+        <h1 class="mb-3 fw-normal">Librarink</h1>
         <form  action="<%= request.getContextPath()%>/login" method="post" autocomplete="on">
-            <img class="mb-4" src="<%=request.getContextPath()%>/images/logo.svg" alt="Librarink Logo" width="72" height="57">
-            <h1 class="mb-3 fw-normal">Librarink</h1>
             <div class="p-3 shadow-sm border rounded-3">
                 <h2 class="text-center mb-4 text-primary">Please sign in</h2>
                 <div class="form-floating">
