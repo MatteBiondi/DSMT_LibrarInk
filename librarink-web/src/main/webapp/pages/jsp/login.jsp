@@ -23,12 +23,12 @@
             <div class="p-3 shadow-sm border rounded-3">
                 <h2 class="text-center mb-4 text-primary">Please sign in</h2>
                 <div class="form-floating">
-                    <input type="email" class="form-control" id="EnterEmail" name="email" required>
+                    <input type="email" class="form-control" id="EnterEmail" name="email" autocomplete="on" required>
                     <label for="EnterEmail" class="text-left">Email : </label>
                 </div>
 
                 <div class="form-floating">
-                    <input type="password" class="form-control" id="EnterPassword" name="password" required>
+                    <input type="password" class="form-control" id="EnterPassword" name="password" autocomplete="on" required>
                     <label for="EnterPassword" class="text-left">Password : </label>
                 </div>
 
