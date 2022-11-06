@@ -39,6 +39,7 @@ public class AuthenticationFilter implements Filter {
         {
             LOGGER.info("Unauthorized, access request");
             req.getSession().setAttribute("message", "Login is needed");
+            req.getSession().setAttribute("messageType", "error-message");
             res.sendRedirect(req.getContextPath() + "/login");
         }else{
             // pass the request along the filter chain

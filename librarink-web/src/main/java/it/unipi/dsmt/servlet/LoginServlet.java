@@ -60,6 +60,7 @@ public class LoginServlet extends HttpServlet {
         response.setContentType("text/html");
         String TargetJSP ="/pages/jsp/login.jsp";
         request.setAttribute("message","Password or  email not valid");
+        request.setAttribute("messageType","error-message");
         RequestDispatcher requestDispatcher=request.getRequestDispatcher(TargetJSP);
         requestDispatcher.forward(request,response);
     }

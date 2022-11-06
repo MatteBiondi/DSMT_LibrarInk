@@ -61,6 +61,7 @@ public class SignUpServlet extends HttpServlet {
         else
         {
             request.getSession().setAttribute("message", "User created");
+            request.getSession().setAttribute("messageType", "success-message");
             response.setContentType("text/html");
             response.sendRedirect(request.getContextPath() + "/login");
         }

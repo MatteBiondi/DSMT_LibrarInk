@@ -37,14 +37,14 @@
 
                 <%
                     String message =(String) request.getSession().getAttribute("message");
-                    String messageType;
+                    String messageType =(String) request.getSession().getAttribute("messageType");;
                     if(message != null) {
                         request.getSession().removeAttribute("message");
-                        messageType = "success-message";
+                        request.getSession().removeAttribute("message");
                     }
                     else {
                         message = (String) request.getAttribute("message");
-                        messageType = "error-message";
+                        messageType = (String) request.getAttribute("messageType");
                     }
                     if(message != null) {
                 %>
