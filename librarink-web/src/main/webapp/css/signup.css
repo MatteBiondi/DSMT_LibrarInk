@@ -1,0 +1,15 @@
+body {
+    text-align: center!important;
+}
+
+body form{
+    text-align: left!important;
+}
+
+body main{
+    padding: 15px;
+}
+
+.error-message{
+    color: red!important;
+}
