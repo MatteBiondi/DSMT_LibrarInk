@@ -30,7 +30,8 @@ public class RequestLoggingFilter implements Filter {
         while(params.hasMoreElements()){
             String name = params.nextElement();
             String value = request.getParameter(name);
-            LOGGER.info(String.format("%s::Request Params::{%s=%s}",req.getRemoteAddr(), name, value));
+            if(!name.equals("password"))
+                LOGGER.info(String.format("%s::Request Params::{%s=%s}",req.getRemoteAddr(), name, value));
         }
 
         // pass the request along the filter chain
