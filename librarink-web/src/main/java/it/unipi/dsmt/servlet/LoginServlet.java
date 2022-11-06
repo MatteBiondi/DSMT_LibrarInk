@@ -23,10 +23,18 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/html");
-        String TargetJSP ="/pages/jsp/login.jsp";
-        RequestDispatcher requestDispatcher=request.getRequestDispatcher(TargetJSP);
-        requestDispatcher.forward(request,response);
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("email") == null) {
+            response.setContentType("text/html");
+            String TargetJSP = "/pages/jsp/login.jsp";
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher(TargetJSP);
+            requestDispatcher.forward(request, response);
+        }
+        else{
+            //Already logged user
+            response.setContentType("text/html");
+            response.sendRedirect(request.getContextPath() + "/homepage");
+        }
     }
 
     @Override

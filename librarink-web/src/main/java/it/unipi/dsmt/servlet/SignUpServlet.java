@@ -11,6 +11,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
@@ -22,10 +23,18 @@ public class SignUpServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/html");
-        String resourceURL = "/pages/jsp/signUp.jsp";
-        RequestDispatcher rd = request.getRequestDispatcher(resourceURL);
-        rd.forward(request, response);
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("email") == null) {
+            response.setContentType("text/html");
+            String resourceURL = "/pages/jsp/signUp.jsp";
+            RequestDispatcher rd = request.getRequestDispatcher(resourceURL);
+            rd.forward(request, response);
+        }
+        else{
+            //Already logged user
+            response.setContentType("text/html");
+            response.sendRedirect(request.getContextPath() + "/homepage");
+        }
     }
 
     @Override
