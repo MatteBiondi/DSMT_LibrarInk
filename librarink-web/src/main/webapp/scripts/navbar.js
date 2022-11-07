@@ -17,6 +17,8 @@ $(document).ready(() => {
     }
 })
 
+// Utilities functions //TODO move to util.js file
+
 function build_notification(id, timestamp, text, isbn){
     return`
         <li>
@@ -83,4 +85,40 @@ async function load_wishlist(){
     //sessionStorage.setItem("wishlist", JSON.stringify(wishlist)) //TODO: uncomment in release
 
     return wishlist;
+}
+
+async function load_grades(){
+    let grades = await $.post(
+        "request/async",
+        {"request": "load_grades"}, "json")
+    //sessionStorage.setItem("grades", JSON.stringify(grades)) //TODO: uncomment in release
+
+    return grades;
+}
+
+async function load_local_reservations(){
+    // Load wishlist
+    let reserved_books = JSON.parse(sessionStorage.getItem("reserved_books"))
+    if (reserved_books == null){
+        reserved_books = await load_wishlist();
+    }
+    return reserved_books;
+}
+
+async function load_local_wishlist(){
+    // Load wishlist
+    let wishlist = JSON.parse(sessionStorage.getItem("wishlist"))
+    if (wishlist == null){
+        wishlist = await load_wishlist();
+    }
+    return wishlist;
+}
+
+async function load_local_grades(){
+    // Load wishlist
+    let grades = JSON.parse(sessionStorage.getItem("grades"))
+    if (grades == null){
+        grades = await load_grades();
+    }
+    return grades;
 }
