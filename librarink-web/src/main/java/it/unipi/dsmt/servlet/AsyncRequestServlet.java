@@ -1,6 +1,7 @@
 package it.unipi.dsmt.servlet;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import it.unipi.dsmt.librarink.*;
 
 import javax.ejb.EJB;
@@ -141,15 +142,51 @@ public class AsyncRequestServlet extends HttpServlet {
                 }
                 return;
             case "load_wishlist":
-                Librarink_wishlistDTO filter_item = new Librarink_wishlistDTO();
-                filter_item.setEmail_user(user);
-                List<Librarink_wishlistDTO> wishlist = remote.listWishlist(filter_item);
+                Librarink_wishlistDTO filter_wishlist = new Librarink_wishlistDTO();
+                filter_wishlist.setEmail_user(user);
+                List<Librarink_wishlistDTO> wishlist = remote.listWishlist(filter_wishlist);
 
                 JsonArray wishlist_js = new JsonArray();
-                for (Librarink_wishlistDTO item: wishlist){
-                    wishlist_js.add(item.getIsbn());
+                for (Librarink_wishlistDTO wishlist_item: wishlist){
+                    wishlist_js.add(wishlist_item.getIsbn());
                 }
                 writer.write(wishlist_js.toString());
+                return;
+            case "rate_book":
+                float stars;
+                try{
+                    stars = Float.parseFloat(request.getParameter("grade"));
+                }
+                catch (NullPointerException | NumberFormatException ex){
+                    writer.write("{\"error\":\"something went wrong\"}");
+                    return;
+                }
+
+                Librarink_gradesDTO grade = new Librarink_gradesDTO();
+                grade.setUser_email(user);
+                grade.setIsbn(isbn);
+                grade.setStars(stars);
+
+                Librarink_gradesDTO grade_result =  remote.saveOrUpdateGrade(grade);
+                if(grade_result != null)
+                    writer.write("{\"result\": \"succeed\", \"response\": \"ok\"}");
+                else
+                    writer.write("{\"error\":\"something went wrong\"}");
+
+                return;
+            case "load_grades":
+                Librarink_gradesDTO grade_filter = new Librarink_gradesDTO();
+                grade_filter.setUser_email(user);
+                List<Librarink_gradesDTO> grades = remote.listGrades(grade_filter);
+
+                JsonArray grades_js = new JsonArray();
+                for (Librarink_gradesDTO grade_item: grades){
+                    JsonObject grade_obj = new JsonObject();
+                    grade_obj.addProperty("isbn", grade_item.getIsbn());
+                    grade_obj.addProperty("grade", grade_item.getStars());
+                    grades_js.add(grade_obj);
+                }
+                writer.write(grades_js.toString());
                 return;
             default:
                 writer.write("{\"error\":\"unexpected request\"}");

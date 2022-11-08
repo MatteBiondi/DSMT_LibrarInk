@@ -1,13 +1,12 @@
 package it.unipi.dsmt.librarink.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name="grade")
+@IdClass(GradeKey.class)
 public class Grade {
+    @Id
     @Column(name="user_email")
     String user_email;
     @Id
@@ -38,5 +37,10 @@ public class Grade {
 
     public void setStars(Float stars) {
         this.stars = stars;
+    }
+
+    public GradeKey getKey()
+    {
+        return new GradeKey(this.user_email, this.isbn);
     }
 }

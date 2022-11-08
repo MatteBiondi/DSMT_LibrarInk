@@ -1,6 +1,7 @@
 
 let reserved_books;
 let wishlist;
+let grades;
 
 $(document).ready(async () => {
     let reserve_btn = $("#reserve-btn");
@@ -8,30 +9,21 @@ $(document).ready(async () => {
     let isbn = $(".detailed")[0].id;
 
     // Load reserved books
-    reserved_books = JSON.parse(sessionStorage.getItem("reserved_books"));
-    if (reserved_books == null){
-        reserved_books = await load_reservations()
-    }
+    reserved_books = await load_local_reservations();
 
     // Load wishlist
-    wishlist = JSON.parse(sessionStorage.getItem("wishlist"))
-    if (wishlist == null){
-        wishlist = await load_wishlist();
-    }
-
-    console.log(reserved_books);
-    console.log(wishlist);
+    wishlist = await load_local_wishlist();
 
     // Check if book is already reserved
     if(reserved_books.find(reservation => reservation["isbn"] ===  isbn)){
         reserve_btn.on("click", () => cancel_reservation(reserve_btn, wishlist_btn));
         reserve_btn.text("Cancel reservation").css("color", "white");
         wishlist_btn.prop('disabled', true);
-        wishlist_btn.text("Add to wishlist").css("color", "white");;
+        wishlist_btn.text("Add to wishlist").css("color", "white");
     }
     else{
         reserve_btn.on("click", () => reserve(reserve_btn, wishlist_btn));
-        reserve_btn.text("Reserve").css("color", "white");;
+        reserve_btn.text("Reserve").css("color", "white");
         // Check if there are available copies
         if (available_copies() === 0){
             reserve_btn.prop('disabled', true);
@@ -40,13 +32,30 @@ $(document).ready(async () => {
         // Check if book is already in wishlist
         if(wishlist.find(book => book ===  isbn)){
             wishlist_btn.on("click", () => remove_wishlist(wishlist_btn));
-            wishlist_btn.text("Remove from wishlist").css("color", "white");;
+            wishlist_btn.text("Remove from wishlist").css("color", "white");
         }
         else{
             wishlist_btn.on("click", () => add_wishlist(wishlist_btn));
-            wishlist_btn.text("Add to wishlist").css("color", "white");;
+            wishlist_btn.text("Add to wishlist").css("color", "white");
         }
     }
+
+    // Old grade
+    grades = await load_local_grades();
+    let old_grade = grades.filter((grade) => grade["isbn"] === isbn)[0]
+    if (old_grade !== undefined){
+        for(let i = 1; i <= old_grade["grade"]; ++i){
+            $(`.s${i}`).css("color", "gold");
+        }
+    }
+
+    // Rate book handlers
+    $(".star").on("click", (event) => rate_book(event.currentTarget.dataset.grade));
+
+    console.log(`[BOOK_DETAILS] Reservations: ${JSON.stringify(reserved_books)}`);
+    console.log(`[BOOK_DETAILS] Wishlist: ${JSON.stringify(wishlist)}`);
+    console.log(`[BOOK_DETAILS] Grades: ${JSON.stringify(grades)}`);
+
 });
 
 async function reserve(reserve_btn, wishlist_btn){
@@ -156,6 +165,38 @@ async function remove_wishlist(wishlist_btn){
         show_message("success", "Book removed from wishlist");
     }
     else {
+        show_message("error", "Something went wrong");
+    }
+}
+
+async function rate_book(grade){
+    try{
+        let response = await $.post(
+            `request/async`,
+            {"request":"rate_book","isbn": $(".detailed")[0].id, "grade":grade},
+        );
+        grade = parseInt(grade);
+        if (response["result"] === 'succeed') {
+            // Update stars color
+            for(let i = 1; i <= grade; ++i){
+                $(`.s${i}`).css("color", "gold");
+            }
+            for(let j = grade + 1; j <= $(".star").length; ++j){
+                $(`.s${j}`).css("color", "gray");
+            }
+
+            // Update grades
+            grades = await load_grades();
+
+            // Show message
+            console.log(grades);
+            show_message("success", "Book rated");
+        }
+        else {
+            show_message("error", "Something went wrong");
+        }
+    }
+    catch (e) {
         show_message("error", "Something went wrong");
     }
 }

@@ -71,13 +71,11 @@
                     <span id="copies_counter"><%= request.getParameter("available_copies")%></span>
                 </h3>
                 <div class="stars_div">
-                    <!--todo: vote if it is the first time or otherwise change the vote-->
-                    <!--todo: Add js code-->
-                    <a href="#" class="star s1">&#x2605;</a>
-                    <a href="#" class="star s2">&#x2605;</a>
-                    <a href="#" class="star s3">&#x2605;</a>
-                    <a href="#" class="star s4">&#x2605;</a>
-                    <a href="#" class="star s5">&#x2605;</a>
+                    <a data-grade="5" href="#" class="star s5">&#x2605;</a>
+                    <a data-grade="4" href="#" class="star s4">&#x2605;</a>
+                    <a data-grade="3" href="#" class="star s3">&#x2605;</a>
+                    <a data-grade="2" href="#" class="star s2">&#x2605;</a>
+                    <a data-grade="1" href="#" class="star s1">&#x2605;</a>
                 </div>
             </div>
             <div class="left_column">
