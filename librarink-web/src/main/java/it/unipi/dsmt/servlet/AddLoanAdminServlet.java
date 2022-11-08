@@ -38,8 +38,6 @@ public class AddLoanAdminServlet {
             user= request.getParameterValues("User");
             isbn=request.getParameterValues("ISBN");
             erlang_client.write_loan(user[0],isbn[0]);
-
-
         }
     }
 }

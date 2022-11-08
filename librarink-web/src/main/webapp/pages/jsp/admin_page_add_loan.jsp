@@ -19,4 +19,5 @@
 </form>
 <button type="submit" form="loan_registration" name="button" value="AddLoan">Confirm Reservation</button>
 </body>
+
 </html>

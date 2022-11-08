@@ -91,6 +91,7 @@ public class AdminPageServlet extends HttpServlet {
                         remoteEJB.saveOrUpdateHistory_reservation(history_reservationDTO,false);
                         erlang_client.delete_reservation(reservation_parameter[0],reservation_parameter[1]);
                     }
+
                 }
                 break;
             case "EndLoan":
