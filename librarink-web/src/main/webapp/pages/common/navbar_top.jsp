@@ -3,7 +3,7 @@
 
 <script src="${pageContext.request.contextPath}/scripts/navbar.js"></script>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar_top.css" type="text/css" media="screen">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/messages.css" type="text/css" media="screen">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/message.css" type="text/css" media="screen">
 <nav class="navbar-top navbar navbar-light bg-light">
     <a class="navbar-brand" href="${pageContext.request.contextPath}/homepage"><header id="header">Librarink</header></a>
     <c:if test="${ param.search_bar == \"true\" }">

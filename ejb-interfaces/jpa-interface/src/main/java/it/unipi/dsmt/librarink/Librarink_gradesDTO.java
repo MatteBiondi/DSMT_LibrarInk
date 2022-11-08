@@ -1,6 +1,8 @@
 package it.unipi.dsmt.librarink;
 
-public class Librarink_gradesDTO {
+import java.io.Serializable;
+
+public class Librarink_gradesDTO implements Serializable {
     private String user_email;
     private String isbn;
     private float stars;

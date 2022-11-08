@@ -1,8 +1,12 @@
 package it.unipi.dsmt.librarink.entities;
 
-public class GradeKey {
+import java.io.Serializable;
+
+public class GradeKey implements Serializable {
     private String user_email;
     private String isbn;
+
+    public GradeKey(){};
 
     public GradeKey(String user_email, String isbn) {
         this.user_email = user_email;

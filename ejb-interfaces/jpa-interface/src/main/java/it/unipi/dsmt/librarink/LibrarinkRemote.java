@@ -26,7 +26,7 @@ public interface LibrarinkRemote {
     public Librarink_usersDTO saveOrUpdateUser(Librarink_usersDTO userDTO, boolean update);
     public Librarink_booksDTO saveOrUpdateBooks(Librarink_booksDTO bookDTO, boolean update);
     public Librarink_wishlistDTO saveOrUpdateWishlist(Librarink_wishlistDTO wishlistDTO, boolean update);
-    public Librarink_gradesDTO saveOrUpdateGrade(Librarink_gradesDTO gradesDTO, boolean update);
+    public Librarink_gradesDTO saveOrUpdateGrade(Librarink_gradesDTO gradesDTO);
     public Librarink_history_reservationDTO saveOrUpdateHistory_reservation(Librarink_history_reservationDTO history_reservationDTO, boolean update);
     public Librarink_history_loanDTO saveOrUpdateHistory_loan(Librarink_history_loanDTO history_loanDTO, boolean update);
 
