@@ -14,9 +14,10 @@
 <%--@declare id="loan_registration"--%><form ACTION="src/main/java/it/unipi/dsmt/servlet/AdminPageServlet.java",id="loan_registration">
   <label for="User">User email:</label><br>
   <input type="text" id="User" name="User"><br>
-  <label for="ISBM">ISBM:</label><br>
-  <input type="text" id="ISBM" name="ISBM">
+  <label for="ISBN">ISBM:</label><br>
+  <input type="text" id="ISBN" name="ISBN">
 </form>
 <button type="submit" form="loan_registration" name="button" value="AddLoan">Confirm Reservation</button>
 </body>
+
 </html>

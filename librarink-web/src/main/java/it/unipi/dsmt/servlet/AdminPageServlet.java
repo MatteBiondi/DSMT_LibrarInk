@@ -88,8 +88,10 @@ public class AdminPageServlet extends HttpServlet {
                         history_reservationDTO.setStart_date((Date) reservationDTO.get(0).getStartDate());
                         history_reservationDTO.setEnd_date((Date) reservationDTO.get(0).getStopDate());
                         history_reservationDTO.setDeleted(reservationDTO.get(0).getCancelled());
+                        remoteEJB.saveOrUpdateHistory_reservation(history_reservationDTO,false);
                         erlang_client.delete_reservation(reservation_parameter[0],reservation_parameter[1]);
                     }
+
                 }
                 break;
             case "EndLoan":
