@@ -31,8 +31,13 @@ public class AddLoanAdminServlet {
 
         }
         @Override
-        protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+        {
+            String[] user;
+            String[] isbn;
+            user= request.getParameterValues("User");
+            isbn=request.getParameterValues("ISBN");
+            erlang_client.write_loan(user[0],isbn[0]);
 
 
         }
