@@ -17,7 +17,7 @@ import java.io.PrintWriter;
 import java.util.List;
 
 public class AddLoanAdminServlet {
-    @WebServlet(name = "AdminLoanAdminServlet", value = "/adminAddLoan", loadOnStartup = 0)
+    @WebServlet(name = "AddLoanAdminServlet", value = "/adminAddLoan", loadOnStartup = 0)
     public class AdminPageHistoryServlet extends HttpServlet {
         //private static final Logger LOGGER = Logger.getLogger(AsyncRequestServlet.class.getName());
 
