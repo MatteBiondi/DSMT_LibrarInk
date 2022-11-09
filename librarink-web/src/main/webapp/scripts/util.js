@@ -36,7 +36,7 @@ function remove_notification(id){
 }
 
 function show_message(type, text){
-    $(".wrapper").append(`
+    $(".wrapper").prepend(`
         <div class="alert alert-${type} alert-dismissible fade show" role="alert">
             <i id="search-clear" class="bi bi-x-circle"></i>
             <div>${text}</div>
