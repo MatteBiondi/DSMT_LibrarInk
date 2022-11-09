@@ -44,7 +44,7 @@
                     <a class="dropdown-item" href="#">My profile</a>
                 </li>
                 <li>
-                    <a class="dropdown-item" href="logout">Logout</a>
+                    <a id="logout" class="dropdown-item" href="logout">Logout</a>
                 </li>
             </ul>
         </div>

@@ -1,48 +1,46 @@
-let socket;
-let notifications;
-const erlang_server = "localhost"
+const WS_SERVER = "172.18.0.28";
+const WS_PORT = 5000;
+const WS_ENDPOINT = "update";
+const WS_WARNING_MSG = "We are experiencing some troubles, the information may not be updated.\n" +
+                        "We apologize for the inconvenience"
+const KEEP_ALIVE_INTERVAL = 90 * 1000;
+const KEEP_ALIVE_MSG ="keep-alive";
 
-$(document).ready(() => {
-    notifications = JSON.parse(sessionStorage.getItem("notifications"));
-    if (notifications == null)
-        notifications = [];
+const UPDATE_WS = new WebSocket(`ws://${WS_SERVER}:${WS_PORT}/${WS_ENDPOINT}`);
 
-    socket = new WebSocket("ws://" + erlang_server + ":5000/update")
-    setInterval(() => {if (socket.readyState === 1) socket.send("keep-alive")}, 90 * 1000)
-    socket.onopen = () => track_books()
+UPDATE_WS.onopen = async () => {
+    console.log("[WS] WebSocket opened");
+    let wishlist = await load_local_wishlist();
+    track_books([], wishlist);
+}
 
-    socket.onmessage = (event) => update(event)
+UPDATE_WS.onmessage = (event) => update(event);
 
-    socket.onerror = () => warning_message()
+UPDATE_WS.onclose = () => {console.log("[WS] WebSocket closed"); show_message("warning", WS_WARNING_MSG);}
 
-})
+setInterval(() => {
+        if (UPDATE_WS.readyState === WebSocket.OPEN)
+            UPDATE_WS.send(KEEP_ALIVE_MSG)
+    },
+    KEEP_ALIVE_INTERVAL
+)
 
-async function track_books(){
+function track_books(displayed_books, wishlist){
 
-    if (socket.readyState !== WebSocket.OPEN)
-        return;
-
-    // Load displayed books
-    let displayed_books = $(".detailed").toArray().flatMap((book => book.id === "" ? []:[book.id]))
-
-    // Load wishlist
-    let wishlist = JSON.parse(sessionStorage.getItem("wishlist"))
-    if (wishlist == null){
-        wishlist = await load_wishlist();
-    }
-
-    console.log(`Displayed books: [${displayed_books}]`)
-    console.log(`Wishlist: [${wishlist}]`)
+    console.log(`[WS] Displayed books: [${displayed_books}]`);
+    console.log(`[WS] Wishlist: [${wishlist}]`);
 
     // Track books
-    socket.send(JSON.stringify(displayed_books.concat(wishlist)))
-
+    if (UPDATE_WS.readyState === WebSocket.OPEN)
+        UPDATE_WS.send(JSON.stringify(Array.prototype.concat(displayed_books,wishlist)));
+    else
+        console.log("[WS] WebSocket is closed");
 }
 
 async function update (event){
     console.log(event.data)
     let notification = JSON.parse(event.data)
-    let wishlist = JSON.parse(sessionStorage.getItem("wishlist"))
+    let wishlist = await load_local_wishlist()
 
     // Book copy update
     if (notification.header === "update") {
@@ -64,17 +62,20 @@ async function update (event){
                 let id = Math.random();
                 let notification_elem = build_notification(id, timestamp, notification_text, notification.body["isbn"])
                 $("#notification-items").append(notification_elem)
+                let notifications = JSON.parse(sessionStorage.getItem("notifications")); //TODO: Load local
+                if (notifications == null)
+                    notifications = [];
                 notifications = notifications.concat({id: id, elem: notification_elem})
                 sessionStorage.setItem("notifications", JSON.stringify(notifications))
             }
         }
     } else if (notification.header === "info") {
         console.log(notification.body)
-        socket.close()
+        UPDATE_WS.close()
     }
 }
 
-function update_counter(operation, old_value){
+function update_counter(operation, old_value){ //TODO
     if (typeof old_value != "number")
         old_value = parseInt(old_value)
 
@@ -85,9 +86,4 @@ function update_counter(operation, old_value){
         case "sub": return old_value - 1
         case "reset": return 0
     }
-}
-
-function warning_message(){
-    show_message("warning", "We are experiencing some troubles, the information may not be updated.\nWe apologize" +
-        " for the inconvenience")
 }
