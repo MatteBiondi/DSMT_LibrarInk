@@ -13,9 +13,7 @@
 <!--In case of list of books: not detailed representation -->
 <!-- Image + Rate + Title + Author -->
 <% if (type != null && type.equals("thumbnail")) { %>
-    <a href = "<%= request.getParameter("link")%>" id = "<%= request.getParameter("isbn")%>"> <!--todo add anchor
-    link-->
-        <div class="thumbnail">
+        <div id = "<%= request.getParameter("isbn")%>" class="thumbnail">
             <img src="<%= request.getParameter("image")%>" alt="Book cover image">
             <div class="info_container">
                 <h3>Title: </h3><p><%= request.getParameter("title")%></p>
@@ -23,7 +21,7 @@
                 <h3>Rate: </h3><p><%= request.getParameter("rate")%>/<%= MAX_RATE %></p>
             </div>
         </div>
-    </a>
+
 <% } else { %>
     <html>
     <head>

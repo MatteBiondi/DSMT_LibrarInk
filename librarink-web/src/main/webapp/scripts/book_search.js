@@ -5,13 +5,11 @@ $(document).ready(() => {
     let search_items = $(".search-item");
     let search_text = $("#search-text");
     let search_clear = $("#search-clear");
-    let search;
-    let keyword;
 
     document.documentElement.style.scrollBehavior = 'auto';
 
-    search = sessionStorage.getItem("search");
-    keyword =  sessionStorage.getItem("keyword");
+    let search = sessionStorage.getItem("search");
+    let keyword =  sessionStorage.getItem("keyword");
 
     // Init session items
     if(search == null || keyword == null){
@@ -32,6 +30,7 @@ $(document).ready(() => {
         (elem) => {
             search_text.attr("placeholder", `${elem.currentTarget.innerText}:`);
             sessionStorage.setItem("search", elem.currentTarget.innerText);
+            search_input();
         });
 
     search_clear.on(
@@ -39,9 +38,9 @@ $(document).ready(() => {
         () => {
             search_text.val("");
             sessionStorage.setItem("keyword", "");
-            load_books(sessionStorage.getItem("search"), "", 1).then(
-                () => {},
-                () => alert("Something went wrong"))
+            load_books(sessionStorage.getItem("search"), "", 1).catch(
+                () => show_message("danger", "Something went wrong")
+            )
         }
     );
 
@@ -55,28 +54,37 @@ $(document).ready(() => {
         sessionStorage.getItem("search"),
         sessionStorage.getItem("keyword"),
         sessionStorage.getItem("page")
-    ).then(() => {}, () => alert("Something went wrong"))
+    ).catch(() => show_message("danger", "Something went wrong"))
+
 });
 
 async function load_books(search, keyword, page){
     $("#search-clear").css("display", $("#search-text").val() !== "" ? "inherit":"none");
-    let book_list = await $.get(
-        `homepage?search=${search}&keyword=${keyword}&page=${page}`,
-        'text/html'
-    );
+    try{
+        let book_list = await $.get(
+            `homepage?search=${search}&keyword=${keyword}&page=${page}`,
+            'text/html'
+        );
 
-    // Update html elements
-    $("#book-list").html(book_list);
-    $(".page-link").on(
-        'click', (event) => {
-            sessionStorage.setItem("page", event.currentTarget.getAttribute('data-offset'));
-            load_books(
-                sessionStorage.getItem("search"),
-                sessionStorage.getItem("keyword"),
-                event.currentTarget.getAttribute('data-offset')
-            ).then(() => window.scrollTo(0, 0));
-        }
-    )
+        // Update html elements
+        $("#book-list").html(book_list);
+        $(".page-link").on(
+            'click', (event) => {
+                sessionStorage.setItem("page", event.currentTarget.getAttribute('data-offset'));
+                load_books(
+                    sessionStorage.getItem("search"),
+                    sessionStorage.getItem("keyword"),
+                    event.currentTarget.getAttribute('data-offset')
+                ).then(() => window.scrollTo(0, 0));
+            }
+        )
+
+        // Details handlers
+        $(".thumbnail").on("click",(elem) => show_detail(elem));
+    }
+    catch (e){
+        show_message("danger", "Something went wrong");
+    }
 }
 
 function search_input(){

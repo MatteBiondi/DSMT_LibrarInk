@@ -18,8 +18,10 @@
                 crossorigin="anonymous">
         </script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="${pageContext.request.contextPath}/scripts/util.js"></script>
         <script src="${pageContext.request.contextPath}/scripts/book_search.js"></script>
         <script src="${pageContext.request.contextPath}/scripts/websocket.js"></script>
+        <script src="${pageContext.request.contextPath}/scripts/book_details.js"></script>
     </head>
 
     <body>
@@ -28,6 +30,19 @@
                 <jsp:param name="search_bar" value="true" />
             </jsp:include>
             <section id="content">
+                <div class="modal modal-xl fade" id="book-detail" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="book-detail-title">Book detail</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div id="book-detail-body" class="modal-body">
+                                <!-- FILL BY AJAX REQUEST -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div id="book-list"><!-- FILL BY AJAX REQUEST --></div>
             </section>
         </div>
