@@ -188,9 +188,19 @@ public class AsyncRequestServlet extends HttpServlet {
                 }
                 writer.write(grades_js.toString());
                 return;
+            case "compute_rating":
+                Double rating = remote.computeRating(isbn);
+                if (rating != null){
+                    writer.write(String.format("{\"result\": \"succeed\", \"rating\": \"%f\"}", rating));
+                }
+                else {
+                    writer.write("{\"error\":\"something went wrong\"}");
+                }
+                return;
             default:
                 writer.write("{\"error\":\"unexpected request\"}");
                 return;
+
         }
         writer.write("{\"error\":\"something went wrong\"}");
     }
