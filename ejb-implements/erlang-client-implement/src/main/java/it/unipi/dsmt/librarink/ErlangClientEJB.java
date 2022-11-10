@@ -68,7 +68,7 @@ public class ErlangClientEJB implements ErlangClient {
 
             // Receive request from erlang server
             OtpErlangObject response = mbox.receive(Integer.parseInt(
-                    properties.getProperty("timeout", "30000"))
+                    properties.getProperty("timeout", "10000"))
             );
             mbox.close();
 

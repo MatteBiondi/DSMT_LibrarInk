@@ -1,7 +1,7 @@
 
 function build_notification(id, timestamp, text, isbn){
     return`
-        <li>
+        <li id="notification-${isbn}" data-isbn="${ isbn }">
             <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     <svg class="bd-placeholder-img rounded me-2" width="20" height="20" 
@@ -15,7 +15,7 @@ function build_notification(id, timestamp, text, isbn){
                             data-bs-dismiss="toast" aria-label="Close">
                     </button>
                 </div>
-                <a href="book_detail?isbn=${isbn}"><div class="toast-body">${ text }</div></a>
+                <div class="toast-body">${ text }</div>
             </div>
         </li>`
 }
@@ -36,7 +36,7 @@ function remove_notification(id){
 }
 
 function show_message(type, text){
-    $(".wrapper").append(`
+    $(".wrapper").prepend(`
         <div class="alert alert-${type} alert-dismissible fade show" role="alert">
             <i id="search-clear" class="bi bi-x-circle"></i>
             <div>${text}</div>
@@ -53,7 +53,8 @@ async function load_reservations(){
         "request/async",
         {"request": "read_reservations"}
     );
-    //sessionStorage.setItem("reserved_books", JSON.stringify(reserved_books)) //TODO: uncomment in release
+    reserved_books = reserved_books.flatMap((reservation) => reservation["isbn"]);
+    sessionStorage.setItem("reserved_books", JSON.stringify(reserved_books))
 
     return reserved_books;
 }
@@ -62,7 +63,7 @@ async function load_wishlist(){
     let wishlist = await $.post(
         "request/async",
         {"request": "load_wishlist"}, "json")
-    //sessionStorage.setItem("wishlist", JSON.stringify(wishlist)) //TODO: uncomment in release
+    sessionStorage.setItem("wishlist", JSON.stringify(wishlist))
 
     return wishlist;
 }
@@ -71,7 +72,7 @@ async function load_grades(){
     let grades = await $.post(
         "request/async",
         {"request": "load_grades"}, "json")
-    //sessionStorage.setItem("grades", JSON.stringify(grades)) //TODO: uncomment in release
+    sessionStorage.setItem("grades", JSON.stringify(grades))
 
     return grades;
 }
@@ -100,5 +101,67 @@ async function load_local_grades(){
     if (grades == null){
         grades = await load_grades();
     }
+    return grades;
+}
+
+function add_local_reserved_book(newBook){
+    let reserved_books = JSON.parse(sessionStorage.getItem("reserved_books"))
+    if(reserved_books == null){
+        reserved_books = [];
+    }
+    reserved_books = Array.prototype.concat(reserved_books, newBook);
+    sessionStorage.setItem("reserved_books", JSON.stringify(reserved_books));
+
+    return reserved_books;
+}
+
+function remove_local_reserved_book(oldBook){
+    let reserved_books = JSON.parse(sessionStorage.getItem("reserved_books"))
+    if(reserved_books == null){
+        reserved_books = [];
+    }
+    reserved_books = reserved_books.filter((book) => book !== oldBook);
+
+    sessionStorage.setItem("reserved_books", JSON.stringify(reserved_books));
+
+    return reserved_books;
+}
+
+function add_local_wishlist(newBook){
+    let wishlist = JSON.parse(sessionStorage.getItem("wishlist"))
+    if(wishlist == null){
+        wishlist = [];
+    }
+    wishlist = Array.prototype.concat(wishlist, newBook);
+    sessionStorage.setItem("wishlist", JSON.stringify(wishlist));
+
+    return wishlist;
+}
+
+function remove_local_wishlist(oldBook){
+    let wishlist = JSON.parse(sessionStorage.getItem("wishlist"))
+    if(wishlist == null){
+        wishlist = [];
+    }
+    wishlist = wishlist.filter((book) => book !== oldBook);
+    sessionStorage.setItem("wishlist", JSON.stringify(wishlist));
+
+    return wishlist;
+}
+
+function update_local_grades(grade){
+    let grades = JSON.parse(sessionStorage.getItem("grades"))
+    if(grades == null){
+        grades = [];
+    }
+    let index = grades.findIndex((oldGrade) => oldGrade["isbn"] === grade["isbn"]);
+    if(index !== -1){
+        grades[index]["grade"] = grade["grade"];
+    }
+    else {
+        grades = Array.prototype.concat(grades, grade);
+    }
+    sessionStorage.setItem("grades", JSON.stringify(grades));
+
     return grades;
 }

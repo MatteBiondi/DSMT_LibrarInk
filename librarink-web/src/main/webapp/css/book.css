@@ -41,11 +41,6 @@
     display: block;
 }
 
-a, a:hover, a:visited, a:active {
-    color: inherit;
-    text-decoration: none;
-}
-
 .info_container{
     padding: 2% 5%;
 }
@@ -109,7 +104,7 @@ a, a:hover, a:visited, a:active {
     margin-top: 3%;
     background-color: royalblue;
     font-weight: bold;
-    color: transparent;
+    color: white;
     border: none;
     padding: 2%;
     border-radius: 8px;
@@ -121,7 +116,7 @@ a, a:hover, a:visited, a:active {
     direction: rtl;
 }
 
-.stars_div a {
+.star {
     font-size: 2em;
     color: grey;
     text-decoration: none;
@@ -130,10 +125,15 @@ a, a:hover, a:visited, a:active {
     -o-transition: all 0.4s;
     transition: all 0.4s;
 }
-.stars_div a:hover {
-    color: gold;
-    transform: scale(1.3);
+
+.grade{
+    color: gold !important;
 }
+
+.star:hover {
+    color: gold;
+}
+
 .s1:hover ~ a,
 .s2:hover ~ a,
 .s3:hover ~ a,

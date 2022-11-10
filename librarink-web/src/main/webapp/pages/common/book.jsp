@@ -5,7 +5,9 @@
   Time: 18:07
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8" %>
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ page contentType="text/html;charset=UTF-8" %>   
 <%
     String type = request.getParameter("type");
     final int MAX_RATE = 5;
@@ -13,7 +15,7 @@
 <!--In case of list of books: not detailed representation -->
 <!-- Image + Rate + Title + Author -->
 <% if (type != null && type.equals("thumbnail")) { %>
-        <div id = "<%= request.getParameter("isbn")%>" class="thumbnail">
+        <div id = "<%= request.getParameter("isbn")%>" class="thumbnail" data-isbn="${ isbn }>
             <img src="<%= request.getParameter("image")%>" alt="Book cover image">
             <div class="info_container">
                 <h3>Title: </h3><p><%= request.getParameter("title")%></p>
@@ -63,7 +65,14 @@
                 <h3>Brief Description: </h3>
                 <p><%= request.getParameter("description")%></p>
                 <h3>Users rate the book:
-                    <span id="avg_rate"><%= request.getParameter("rate")%></span>/<%= MAX_RATE %>
+                    <span id="avg_rate">
+                        <c:choose>
+                            <c:when test="${rating != null}">
+                                <span id="user-rating">${rating}</span>/<%= MAX_RATE %>
+                            </c:when>
+                            <c:otherwise><span id="user-rating">-</span>/<%= MAX_RATE %></c:otherwise>
+                        </c:choose>
+                    </span>
                 </h3>
                 <h3>Number of available copies:
                     <span id="copies_counter"><%= request.getParameter("available_copies")%></span>
