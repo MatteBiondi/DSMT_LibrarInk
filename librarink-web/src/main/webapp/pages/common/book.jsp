@@ -7,7 +7,7 @@
 --%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ page contentType="text/html;charset=UTF-8" %>   
+<%@ page contentType="text/html;charset=UTF-8" %>
 <%
     String type = request.getParameter("type");
     final int MAX_RATE = 5;
@@ -15,7 +15,7 @@
 <!--In case of list of books: not detailed representation -->
 <!-- Image + Rate + Title + Author -->
 <% if (type != null && type.equals("thumbnail")) { %>
-        <div id = "<%= request.getParameter("isbn")%>" class="thumbnail" data-isbn="${ isbn }>
+        <div id = "<%= request.getParameter("isbn")%>" class="thumbnail">
             <img src="<%= request.getParameter("image")%>" alt="Book cover image">
             <div class="info_container">
                 <h3>Title: </h3><p><%= request.getParameter("title")%></p>
