@@ -48,14 +48,14 @@ public class HomepageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        LOGGER.info(String.format(
-                "Request from session-id: %s\nParams: < user: %s, page: %s, search: %s => %s >",
-                request.getSession().getId(),
-                request.getSession().getAttribute("email"),
-                request.getParameter("page"),
-                request.getParameter("search"),
-                request.getParameter("keyword")
-        ));
+        //LOGGER.info(String.format(
+        //        "Request from session-id: %s\nParams: < user: %s, page: %s, search: %s => %s >",
+        //        request.getSession().getId(),
+        //        request.getSession().getAttribute("email"),
+        //        request.getParameter("page"),
+        //        request.getParameter("search"),
+        //        request.getParameter("keyword")
+        //));
         //String user = (String) request.getSession().getAttribute("email");
 
         // Get request parameters
@@ -79,7 +79,7 @@ public class HomepageServlet extends HttpServlet {
 
         }
         int page_offset;
-        int max_offset = Math.max(1,(int) Math.ceil((double) remote.count_book(filter) / page_length));
+        int max_offset = Math.max(1,(int) Math.ceil((double) remote.countBooks(filter) / page_length));
         try {
             page_offset = Integer.parseInt(request.getParameter("page"));
             page_offset = Math.max(page_offset, 1);
@@ -87,7 +87,7 @@ public class HomepageServlet extends HttpServlet {
         }
         catch (NumberFormatException ignored){ page_offset = 1; }
 
-        books = remote.list_pagination_book(page_offset - 1, page_length, filter);
+        books = remote.listPaginationBook(page_offset - 1, page_length, filter);
 
         // Compute pagination indexes
         ArrayList<Integer> offsets  = new ArrayList<>();
@@ -110,7 +110,9 @@ public class HomepageServlet extends HttpServlet {
         request.setAttribute("books", books);
         request.setAttribute("page_offset", page_offset);
         request.setAttribute("offsets", offsets.toArray());
-        LOGGER.info(String.format("Filter attribute %s",filter_attribute));
+
+        //LOGGER.info(String.format("Filter attribute %s",filter_attribute));
+
         if (filter_attribute.equals("")) // Only if the homepage is directly requested by typing the link
             getServletContext().getRequestDispatcher("/index.jsp").forward(request, response);
         else
