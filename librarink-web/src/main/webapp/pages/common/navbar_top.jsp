@@ -40,10 +40,10 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
                 <li>
-                    <a class="dropdown-item" href="#">My profile</a>
+                    <a class="dropdown-item" href="${pageContext.request.contextPath}/user">My profile</a>
                 </li>
                 <li>
-                    <a id="logout" class="dropdown-item" href="logout">Logout</a>
+                    <a id="logout" class="dropdown-item" href="${pageContext.request.contextPath}/logout">Logout</a>
                 </li>
             </ul>
         </div>

@@ -197,6 +197,15 @@ public class AsyncRequestServlet extends HttpServlet {
                     writer.write("{\"error\":\"something went wrong\"}");
                 }
                 return;
+            case "load_image_url":
+                Librarink_booksDTO book = remote.findBooksByIsbn(isbn);
+
+                JsonObject book_and_url_obj = new JsonObject();
+                book_and_url_obj.addProperty("isbn", book.getIsbn());
+                book_and_url_obj.addProperty("url", book.getImage_url_l());
+
+                writer.write(book_and_url_obj.toString());
+                return;
             default:
                 writer.write("{\"error\":\"unexpected request\"}");
                 return;

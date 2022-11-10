@@ -1,0 +1,16 @@
+html,
+body {
+    scroll-behavior: smooth;
+}
+
+body{
+    background-color: #eee!important;
+}
+
+.book-img{
+    height: 22em;
+}
+
+.book-container{
+    cursor: pointer;
+}
