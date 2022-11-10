@@ -6,6 +6,7 @@
     transition: 0.3s;
     display: inline-block;
     margin: 2.5% 2.5% 2.5% 2.1%;
+    cursor: pointer;
 }
 
 .thumbnail:hover{
@@ -29,7 +30,7 @@
 }
 
 .thumbnail > img{
-    width: 9em;
+    width: 60%;
     height: 13em;
     display: block;
     margin-left: auto;

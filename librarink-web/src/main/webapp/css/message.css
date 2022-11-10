@@ -5,4 +5,5 @@
     width: 40%;
     max-height: 25%;
     text-align: center;
+    z-index: 3;
 }
