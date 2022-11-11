@@ -21,7 +21,7 @@
 
 -define(CONNECTED_FILTER(Active, Backup), fun(Node) -> (Node =:= Active) or (Node =:= Backup) end).
 -define(CONNECTED_NODES, [node()] ++ nodes()).
--define(ADD_NOTIFICATION(Isbn),{Isbn, jsx:encode(#{isbn => Isbn, operation => add})}).
+-define(ADD_NOTIFICATION(Isbn, FirstCopy),{Isbn, jsx:encode(#{isbn => Isbn, operation => add, first_copy => FirstCopy})}).
 -define(REMOVE_NOTIFICATION(Isbn),{Isbn, jsx:encode(#{isbn => Isbn, operation => sub})}).
 -define(SET_NOTIFICATION(Isbn),{Isbn, jsx:encode(#{isbn => Isbn, operation => reset})}).
 
@@ -54,15 +54,29 @@ work(Request, From, Tag, Env) ->
     error: _ ->  From ! {Tag, jsx:encode(#{result => error, response => unexpected_error})}
   end,
 
-  {Exchange, Notification} = build_notification(Request, Result),
-  try
-    case Notification of
-      no_notification -> ok;
-      _ -> publish_notification(Exchange, Notification, Env)
-    end
-catch
-    error: Err -> io:format("\n\nPublish error: ~p!!\n\n",[Err])
-    %error: Error -> ?LOG_WARNING("Notification publishment failed: ~p",[Error])
+  {_, #{isbn := Isbn}} = Request,
+  case lookup_server(Isbn, Env) of
+    {true, Node} ->
+      Name = Env#librarink_proxy_env.mnesia_name,
+      try
+        {succeed, Copies} = gen_server:call(
+          {Name, Node},
+          {read_copies,  #{type => available, operation => count, isbn => Isbn}},
+          Env#librarink_proxy_env.request_timeout
+        ),
+        {Exchange, Notification} = build_notification(Request, Result, Copies),
+        try
+          case Notification of
+            no_notification -> ok;
+            _ -> publish_notification(Exchange, Notification, Env)
+          end
+        catch
+          error: Error -> ?LOG_WARNING("Notification publishment failed: ~p",[Error])
+        end
+        catch
+          exit:{timeout, _} -> {error, timeout_exceeded}
+      end;
+    false -> {error, server_unavailable}
 end.
 
 %%%%%===================================================================
@@ -186,13 +200,16 @@ publish_notification(Isbn, Notification, Env) ->
 %% @doc
 %% Return the correct notification based on requested operation and relative response
 %% @end
--spec(build_notification(Request :: term(), Result :: atom()) -> Notification :: binary()).
-build_notification(Request, Result) ->
+-spec(build_notification(Request :: term(), Result :: atom(), Copies :: integer()) -> Notification :: binary()).
+build_notification(Request, Result, Copies) ->
   if Result == succeed ->
     case Request of
-      {write_copy, #{isbn := Isbn}} -> ?ADD_NOTIFICATION(Isbn);
-      {update_reservation, #{isbn := Isbn}} -> ?ADD_NOTIFICATION(Isbn);
-      {update_loan, #{isbn := Isbn}} -> ?ADD_NOTIFICATION(Isbn);
+      {write_copy, #{isbn := Isbn}} when Copies == 1-> ?ADD_NOTIFICATION(Isbn, true);
+      {update_reservation, #{isbn := Isbn}} when Copies == 1 -> ?ADD_NOTIFICATION(Isbn, true);
+      {update_loan, #{isbn := Isbn}} when Copies == 1 -> ?ADD_NOTIFICATION(Isbn, true);
+      {write_copy, #{isbn := Isbn}} when Copies =/= 1-> ?ADD_NOTIFICATION(Isbn, false);
+      {update_reservation, #{isbn := Isbn}} when Copies =/= 1 -> ?ADD_NOTIFICATION(Isbn, false);
+      {update_loan, #{isbn := Isbn}} when Copies =/= 1 -> ?ADD_NOTIFICATION(Isbn, false);
       {write_reservation, #{isbn := Isbn}} -> ?REMOVE_NOTIFICATION(Isbn);
       {delete_copy, #{isbn := Isbn, id := _}} -> ?SET_NOTIFICATION(Isbn);
       {delete_copy, #{isbn := Isbn}} -> ?REMOVE_NOTIFICATION(Isbn);

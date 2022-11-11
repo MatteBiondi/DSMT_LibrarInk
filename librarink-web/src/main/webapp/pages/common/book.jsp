@@ -15,7 +15,7 @@
 <!--In case of list of books: not detailed representation -->
 <!-- Image + Rate + Title + Author -->
 <% if (type != null && type.equals("thumbnail")) { %>
-        <div id = "<%= request.getParameter("isbn")%>" class="thumbnail">
+        <div id="<%= request.getParameter("isbn") %>" class="thumbnail" data-isbn="<%= request.getParameter("isbn") %>">
             <img src="<%= request.getParameter("image")%>" alt="Book cover image">
             <div class="info_container">
                 <h3>Title: </h3><p><%= request.getParameter("title")%></p>

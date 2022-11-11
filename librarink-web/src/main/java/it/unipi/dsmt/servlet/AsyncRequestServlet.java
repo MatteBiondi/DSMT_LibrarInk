@@ -197,6 +197,13 @@ public class AsyncRequestServlet extends HttpServlet {
                     writer.write("{\"error\":\"something went wrong\"}");
                 }
                 return;
+            case "book_title":
+                Librarink_booksDTO book_title = remote.findBooksByIsbn(isbn);
+                if(book_title != null)
+                    writer.write(String.format("{\"result\": \"succeed\", \"title\": \"%s\"}", book_title.getBook_title()));
+                else
+                    writer.write("{\"error\":\"Book not found\"}");
+                return;
             case "load_image_url":
                 Librarink_booksDTO book = remote.findBooksByIsbn(isbn);
 

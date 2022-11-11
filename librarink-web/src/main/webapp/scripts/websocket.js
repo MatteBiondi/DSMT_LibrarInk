@@ -32,7 +32,7 @@ function track_books(displayed_books, wishlist){
 
     // Track books
     if (UPDATE_WS.readyState === WebSocket.OPEN)
-        UPDATE_WS.send(JSON.stringify(Array.prototype.concat(displayed_books,wishlist)));
+        UPDATE_WS.send(JSON.stringify(Array.prototype.concat(displayed_books, wishlist)));
     else
         console.log("[WS] WebSocket is closed");
 }
@@ -46,44 +46,68 @@ async function update (event){
     if (notification.header === "update") {
         let counter = $("#" + notification.body["isbn"]).find("#copies_counter")
         if (counter.length){
-            console.log("Update displayed book")
             counter.text(update_counter(notification.body["operation"], counter.text()))
         }
         // Wishlist notification
         if (wishlist != null && wishlist.includes(notification.body["isbn"])) {
-            console.log("Update wishlist")
-            if (notification.body['operation'] === "add"){
-                let counter = $("#notification-counter");
-                counter.attr("data-counter", parseInt(counter.attr("data-counter")) + 1)
-                counter.text(counter.attr("data-counter"))
+            if (notification.body['operation'] === "add" && notification["body"]["first_copy"] === true){
+
+                let response =  await $.post(
+                    "request/async",
+                    {"request": "book_title", "isbn": notification.body["isbn"]}, "json");
+
+                if(response["result"] !== "succeed")
+                    return;
+
+                // Build notification element
                 let time = new Date()
                 let timestamp = time.getUTCHours() + ":" + time.getUTCMinutes() + ":" + time.getUTCSeconds()
-                let notification_text = `New copy of ${ notification.body["isbn"] }`
-                let id = Math.random();
+                let notification_text = `New copy of <b>${ response["title"]}</b>`
+                let id = Math.random().toString(16).slice(2);
                 let notification_elem = build_notification(id, timestamp, notification_text, notification.body["isbn"])
+
+                // Update session data
+                update_notifications(id, notification_elem);
+
+                // Update elements
+                $("#no-notifications").remove();
                 $("#notification-items").append(notification_elem)
-                let notifications = JSON.parse(sessionStorage.getItem("notifications")); //TODO: Load local
-                if (notifications == null)
-                    notifications = [];
-                notifications = notifications.concat({id: id, elem: notification_elem})
-                sessionStorage.setItem("notifications", JSON.stringify(notifications))
+
+                // Add handlers
+                $(`#${id}-body`).on("click", (event) => show_detail(
+                    event, {"main": () => remove_notification(id, true)})
+                )
+
+                // Update notification counter
+                let counter = $("#notification-counter")
+                counter.attr("data-counter", parseInt(counter.attr("data-counter")) + 1)
+                counter.text(counter.attr("data-counter"))
+
             }
         }
     } else if (notification.header === "info") {
-        console.log(notification.body)
         UPDATE_WS.close()
     }
 }
 
-function update_counter(operation, old_value){ //TODO
+function update_counter(operation, old_value){
     if (typeof old_value != "number")
         old_value = parseInt(old_value)
 
     old_value = isNaN(old_value) ? 0:old_value
-
+    let reserve_btn = $("#reserve-btn");
     switch (operation){
-        case "add" : return old_value + 1
-        case "sub": return old_value - 1
-        case "reset": return 0
+        case "add" :
+            if (old_value === 0){
+                reserve_btn.prop("disabled", false);
+            }
+            return old_value + 1
+        case "sub":
+            if(old_value === 1 && reserve_btn[0].dataset.reserved !== "true"){
+                reserve_btn.prop("disabled", true);
+            }
+            return old_value - 1
+        case "reset":
+            return 0
     }
 }
