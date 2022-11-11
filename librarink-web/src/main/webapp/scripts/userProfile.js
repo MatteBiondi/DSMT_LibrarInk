@@ -90,7 +90,7 @@ function gui_book_elements(url_list, type) {
             let url = book["url"];
             let new_element = `
                 <div id='${type}-book-${isbn}' class="col-lg-3">
-                    <div id='${isbn}' class="card img-container book-container"> 
+                    <div id='${isbn}' class="card img-container book-container" data-isbn="${isbn}"> 
                        <img src='${url}' alt='Book cover image for ${isbn}' class='card-img-top book-img'>
                     </div>
                 </div>`
@@ -98,13 +98,21 @@ function gui_book_elements(url_list, type) {
         }
     }
 
+    let callback_obj = {
+        remove_from_res : remove_from_carousel.bind(null, "reservations"),
+        remove_from_wish: remove_from_carousel.bind(null, "wishlist"),
+        insert_into_res : insert_into_carousel.bind(null, "reservations"),
+        insert_into_wish: insert_into_carousel.bind(null, "wishlist")
+    }
+
     $(".book-container").on(
-        'click', (event) => show_detail(event, () => remove_from_carousel(event.currentTarget.id,type))
+        'click', (event) => show_detail(event, callback_obj)
     )
 }
 
 //Callback in case of remove from wishlist or cancel reservation
-function remove_from_carousel(isbn, type){
+function remove_from_carousel(type,isbn){
+    /*
     let list_books_elems = $("[id^="+type+"-book]");
     let book_elem = $("#"+type+"-"+isbn);
     let index = list_books_elems.index(book_elem);
@@ -115,4 +123,12 @@ function remove_from_carousel(isbn, type){
 
     if($("#"+type+"Gallery").lastChild.find(".row").empty())
         $("#"+type+"Gallery").lastChild.remove();
+    */
+    console.log("Removed");
+}
+
+//Callback in case of insert into wishlist or reservation
+function insert_into_carousel(type,isbn){
+    //sposto da un posto all'altro
+    console.log("Inserted");
 }
