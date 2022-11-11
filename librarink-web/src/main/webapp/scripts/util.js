@@ -104,7 +104,10 @@ async function load_loans(){
         {"request": "read_loans"}, "json"
     );
 
-    lent_books = lent_books.flatMap((loan) => loan["isbn"]);
+    lent_books = lent_books.flatMap((loan) => [{
+        isbn : loan["isbn"],
+        start_date : loan["start_date"]
+    }]);
     sessionStorage.setItem("lent_books", JSON.stringify(lent_books))
 
     return lent_books;
