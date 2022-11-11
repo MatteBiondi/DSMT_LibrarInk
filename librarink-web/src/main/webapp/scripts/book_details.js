@@ -119,10 +119,24 @@ function update_details(detail_page, callbacks){
 
     let old_reserved_books = reserved_books.slice();
     let old_wishlist = wishlist.slice()
-    $("#modal-close").on("click", () => update_user_page(
+    let modal_close = $("#modal-close");
+    let modal_xl =  $(".modal-xl");
+    let modal_dialog = $(".modal-dialog");
+
+    modal_close.off("click");
+    modal_xl.off("click");
+
+    modal_dialog.off("click");
+
+    modal_close.on("click", () => update_user_page(
         callbacks,
         {"reserved_books": old_reserved_books, "wishlist": old_wishlist})
     )
+    modal_xl.on("click", () => update_user_page(
+        callbacks,
+        {"reserved_books": old_reserved_books, "wishlist": old_wishlist})
+    )
+    modal_dialog.on("click", (event) => event.stopPropagation());
 }
 
 async function reserve(reserve_btn, wishlist_btn){
@@ -301,7 +315,7 @@ function available_copies(){
 function update_user_page(callbacks, old_books){
     let reservation_cancelled = old_books["reserved_books"].filter(isbn => !reserved_books.includes(isbn));
     let wishlist_removed = old_books["wishlist"].filter(isbn => !wishlist.includes(isbn));
-    let reservation_added = reserved_books.filter(isbn => old_books["reserved_books"].includes(isbn));
+    let reservation_added = reserved_books.filter(isbn => !old_books["reserved_books"].includes(isbn));
     let wishlist_added = wishlist.filter(isbn => !old_books["wishlist"].includes(isbn));
 
     console.log(reservation_cancelled)
@@ -309,16 +323,19 @@ function update_user_page(callbacks, old_books){
     console.log(reservation_added)
     console.log(wishlist_added)
 
-    if(callbacks !== undefined && callbacks["remove_from_res"] !== undefined){
-        callbacks["remove_from_res"](reservation_cancelled);
+    if(callbacks !== undefined){
+        if(callbacks["remove_from_res"] !== undefined && reservation_cancelled !== undefined){
+            callbacks["remove_from_res"](reservation_cancelled);
+        }
+        if(callbacks["remove_from_wish"] !== undefined && wishlist_removed !== undefined){
+            callbacks["remove_from_wish"](wishlist_removed);
+        }
+        if(callbacks["insert_into_res"] !== undefined && reservation_added !== undefined){
+            callbacks["insert_into_res"](reservation_added);
+        }
+        if(callbacks["insert_into_wish"] !== undefined && wishlist_added !== undefined){
+            callbacks["insert_into_wish"](wishlist_added);
+        }
     }
-    if(callbacks !== undefined && callbacks["remove_from_wish"] !== undefined){
-        callbacks["remove_from_wish"](wishlist_removed);
-    }
-    if(callbacks !== undefined && callbacks["insert_into_res"] !== undefined){
-        callbacks["insert_into_res"](reservation_added);
-    }
-    if(callbacks !== undefined && callbacks["insert_into_wish"] !== undefined){
-        callbacks["insert_into_wish"](wishlist_added);
-    }
+
 }
