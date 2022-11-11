@@ -309,16 +309,19 @@ function update_user_page(callbacks, old_books){
     console.log(reservation_added)
     console.log(wishlist_added)
 
-    if(callbacks !== undefined && callbacks["remove_from_res"] !== undefined){
-        callbacks["remove_from_res"](reservation_cancelled);
+    if(callbacks !== undefined){
+        if(callbacks["remove_from_res"] !== undefined && reservation_cancelled !== undefined){
+            callbacks["remove_from_res"](reservation_cancelled);
+        }
+        if(callbacks["remove_from_wish"] !== undefined && wishlist_removed !== undefined){
+            callbacks["remove_from_wish"](wishlist_removed);
+        }
+        if(callbacks["insert_into_res"] !== undefined && reservation_added !== undefined){
+            callbacks["insert_into_res"](reservation_added);
+        }
+        if(callbacks["insert_into_wish"] !== undefined && wishlist_added !== undefined){
+            callbacks["insert_into_wish"](wishlist_added);
+        }
     }
-    if(callbacks !== undefined && callbacks["remove_from_wish"] !== undefined){
-        callbacks["remove_from_wish"](wishlist_removed);
-    }
-    if(callbacks !== undefined && callbacks["insert_into_res"] !== undefined){
-        callbacks["insert_into_res"](reservation_added);
-    }
-    if(callbacks !== undefined && callbacks["insert_into_wish"] !== undefined){
-        callbacks["insert_into_wish"](wishlist_added);
-    }
+
 }
