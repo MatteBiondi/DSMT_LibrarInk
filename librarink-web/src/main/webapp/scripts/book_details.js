@@ -7,8 +7,8 @@ let book_detail;
 
 $(document).ready(() => book_detail = new bootstrap.Modal("#book-detail"));
 
-async function show_detail(event, callback){
-    let isbn = event.currentTarget.id;
+async function show_detail(event, callbacks){
+    let isbn = event.currentTarget.dataset.isbn;
     let aborted = false;
 
     // Response timeout, trigger error if no response in time
@@ -41,24 +41,25 @@ async function show_detail(event, callback){
 
         if (!aborted){
             // Update and show style elements
-            update_details(detail_page);
+            update_details(detail_page, callbacks);
             book_detail.show();
 
             // Track displayed book copy counter
             track_books([isbn], wishlist);
 
-            if(callback !== undefined){
-                callback();
+            if(callbacks !== undefined && callbacks["main"] !== undefined){
+                callbacks["main"]();
             }
         }
     }
     catch (e) {
+        console.error(e);
         clearTimeout(timeout);
         show_message("danger", "Something went wrong");
     }
 }
 
-function update_details(detail_page){
+function update_details(detail_page, callbacks){
     $("#book-detail-body").html(detail_page);
 
     let reserve_btn = $("#reserve-btn");
@@ -100,12 +101,23 @@ function update_details(detail_page){
 
     // Rate book handlers
     $(".star").on("click", (event) => rate_book(event.currentTarget.dataset.grade));
+
+    if(callbacks !== undefined && callbacks["remove_wishlist"] !== undefined){
+        wishlist_btn.on("click", callbacks["remove_wishlist"]);
+    }
+    if(callbacks !== undefined && callbacks["add_reservation"] !== undefined){
+        reserve_btn.on("click", callbacks["add_reservation"])
+    }
+    if(callbacks !== undefined && callbacks["cancel_reservation"] !== undefined){
+        reserve_btn.on("click", callbacks["cancel_reservation"])
+    }
 }
 
 async function reserve(reserve_btn, wishlist_btn){
     // Send reservation request
     try{
         let displayed_isbn = $(".detailed")[0].id;
+        reserve_btn[0].dataset.reserved = "true";
         let response = await $.post(
             `request/async`,
             {"request":"write_reservation","isbn": displayed_isbn},
@@ -114,21 +126,22 @@ async function reserve(reserve_btn, wishlist_btn){
         // Show message and update buttons
         if (response["result"] === 'succeed') {
 
-            // Remove from wishlist, if present
-            if(wishlist.find((book) => book ===  displayed_isbn)){
-                remove_wishlist(wishlist_btn, false);
-            }
-
             // Update buttons
             reserve_btn.off();
             reserve_btn.on("click", () => cancel_reservation(reserve_btn, wishlist_btn));
             reserve_btn.text("Cancel reservation");
             wishlist_btn.prop('disabled', true);
+            reserve_btn.prop("data-reserved", "true");
 
             // Update reserved book list
             reserved_books = add_local_reserved_book(displayed_isbn);
 
             show_message("success", "Book reserved");
+
+            // Remove from wishlist, if present
+            if(wishlist.find((book) => book ===  displayed_isbn)){
+                remove_wishlist(wishlist_btn, false);
+            }
         }
         else {
             show_message("danger", response["response"]);

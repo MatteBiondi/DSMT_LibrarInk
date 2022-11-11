@@ -1,7 +1,7 @@
 
 function build_notification(id, timestamp, text, isbn){
     return`
-        <li id="notification-${isbn}" data-isbn="${ isbn }">
+        <li id="${id}">
             <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     <svg class="bd-placeholder-img rounded me-2" width="20" height="20" 
@@ -11,20 +11,20 @@ function build_notification(id, timestamp, text, isbn){
                     </svg>
                     <strong class="me-auto">Wishlist</strong>
                     <small>${ timestamp }</small>
-                    <button type="button" class="btn-close" onclick="remove_notification(${id})" 
+                    <button type="button" class="btn-close" onclick="remove_notification('${id}')" 
                             data-bs-dismiss="toast" aria-label="Close">
                     </button>
                 </div>
-                <div class="toast-body">${ text }</div>
+                <div id="${id}-body" class="toast-body" data-isbn="${isbn }">${ text }</div>
             </div>
         </li>`
 }
 
-function remove_notification(id){
+function remove_notification(id, remove_elem){
+    //Update session data
     let notifications = JSON.parse(sessionStorage.getItem("notifications"));
     notifications = notifications.filter(elem => elem["id"] !== id);
-    console.log(notifications)
-    console.log(id)
+
     sessionStorage.setItem("notifications", JSON.stringify(notifications));
 
     let counter = $("#notification-counter");
@@ -33,6 +33,44 @@ function remove_notification(id){
         counter.text("")
     else
         counter.text(counter.attr("data-counter"))
+
+    if(remove_elem !== undefined){
+        $(`#${id}`).remove();
+    }
+
+    // Add no notifications message
+    if(notifications.length === 0){
+        add_notification_placeholder();
+    }
+}
+
+function update_notifications(id, elem){
+    let notifications = JSON.parse(sessionStorage.getItem("notifications"));
+    if (notifications == null)
+        notifications = [];
+
+    notifications = Array.prototype.concat(
+        notifications,
+        [{id: id, elem: elem}]
+    )
+
+    sessionStorage.setItem("notifications", JSON.stringify(notifications))
+}
+
+function add_notification_placeholder(){
+    $("#notification-items").append(`
+    <li id="no-notifications">
+        <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <svg class="bd-placeholder-img rounded me-2" width="20" height="20" 
+                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true" 
+                        preserveAspectRatio="xMidYMid slice" focusable="false">
+                    <rect width="100%" height="100%" fill="#007aff"></rect>
+                </svg>
+                <strong class="me-auto">No notifications</strong>
+            </div>
+        </div>
+    </li>`);
 }
 
 function show_message(type, text){
@@ -51,8 +89,9 @@ function show_message(type, text){
 async function load_reservations(){
     let reserved_books = await $.post(
         "request/async",
-        {"request": "read_reservations"}
+        {"request": "read_reservations"}, "json"
     );
+
     reserved_books = reserved_books.flatMap((reservation) => reservation["isbn"]);
     sessionStorage.setItem("reserved_books", JSON.stringify(reserved_books))
 
