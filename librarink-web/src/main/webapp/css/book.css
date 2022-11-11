@@ -17,7 +17,7 @@
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    font-size: 1em;
+        font-size: 1em;
     margin: 0.5em 1em;
 }
 
@@ -145,4 +145,15 @@
 
 .page_title{
     margin: 2%;
+}
+
+.date{
+    display: flex;
+    align-items: center;
+    gap: 10%;
+    margin: 10%;
+}
+.date span{
+    font-style: italic ;
+    font-size: 1.4em;
 }

@@ -3,6 +3,7 @@ const TIMEOUT_INTERVAL = 1000 * 2.5;
 let reserved_books;
 let wishlist;
 let grades;
+let loans;
 let book_detail;
 
 $(document).ready(() => book_detail = new bootstrap.Modal("#book-detail"));
@@ -26,12 +27,14 @@ async function show_detail(event, callbacks){
         let reserved_books_promise = load_local_reservations();
         let wishlist_promise = load_local_wishlist();
         let grades_promise = load_local_grades();
+        let loans_promise = load_local_loans();
 
         // Wait for all responses
         let detail_page = await page_promise;
         reserved_books = await reserved_books_promise;
         wishlist = await wishlist_promise;
         grades = await grades_promise;
+        loans = await  loans_promise;
 
         console.log(`[BOOK_DETAILS] Reservations: ${JSON.stringify(reserved_books)}`);
         console.log(`[BOOK_DETAILS] Wishlist: ${JSON.stringify(wishlist)}`);
@@ -66,29 +69,41 @@ function update_details(detail_page, callbacks){
     let wishlist_btn = $("#wishlist-btn");
     let displayed_isbn = $(".detailed")[0].id;
 
-    // Check if book is already reserved
-    if(reserved_books.find((book) => book ===  displayed_isbn)){
-        reserve_btn.on("click", () => cancel_reservation(reserve_btn, wishlist_btn));
-        reserve_btn.text("Cancel reservation");
-        wishlist_btn.prop('disabled', true);
-        wishlist_btn.text("Add to wishlist");
+    if(loans.find(loan => loan["isbn"] === displayed_isbn)){
+        // Book already borrowed
+        reserve_btn.remove()
+        wishlist_btn.remove();
+        let loan_date = new Date(loans.find(loan => loan["isbn"] === displayed_isbn)["start_date"]);
+        loan_date.setDate(loan_date.getDate() + 30);
+        $(".left_column").append(`
+            <div class="date"><h3>Book lent until:  </h3><span>${loan_date.toDateString()}</span> </div>`
+        )
     }
-    else{
-        reserve_btn.on("click", () => reserve(reserve_btn, wishlist_btn));
-        reserve_btn.text("Reserve");
-        // Check if there are available copies
-        if (available_copies() === 0){
-            reserve_btn.prop('disabled', true);
-        }
-
-        // Check if book is already in wishlist
-        if(wishlist.find((book) => book ===  displayed_isbn)){
-            wishlist_btn.on("click", () => remove_wishlist(wishlist_btn, true));
-            wishlist_btn.text("Remove from wishlist");
+    else {
+        // Check if book is already reserved
+        if(reserved_books.find((book) => book ===  displayed_isbn)){
+            reserve_btn.on("click", () => cancel_reservation(reserve_btn, wishlist_btn));
+            reserve_btn.text("Cancel reservation");
+            wishlist_btn.prop('disabled', true);
+            wishlist_btn.text("Add to wishlist");
         }
         else{
-            wishlist_btn.on("click", () => add_wishlist(wishlist_btn));
-            wishlist_btn.text("Add to wishlist");
+            reserve_btn.on("click", () => reserve(reserve_btn, wishlist_btn));
+            reserve_btn.text("Reserve");
+            // Check if there are available copies
+            if (available_copies() === 0){
+                reserve_btn.prop('disabled', true);
+            }
+
+            // Check if book is already in wishlist
+            if(wishlist.find((book) => book ===  displayed_isbn)){
+                wishlist_btn.on("click", () => remove_wishlist(wishlist_btn, true));
+                wishlist_btn.text("Remove from wishlist");
+            }
+            else{
+                wishlist_btn.on("click", () => add_wishlist(wishlist_btn));
+                wishlist_btn.text("Add to wishlist");
+            }
         }
     }
 
@@ -102,15 +117,12 @@ function update_details(detail_page, callbacks){
     // Rate book handlers
     $(".star").on("click", (event) => rate_book(event.currentTarget.dataset.grade));
 
-    if(callbacks !== undefined && callbacks["remove_wishlist"] !== undefined){
-        wishlist_btn.on("click", callbacks["remove_wishlist"]);
-    }
-    if(callbacks !== undefined && callbacks["add_reservation"] !== undefined){
-        reserve_btn.on("click", callbacks["add_reservation"])
-    }
-    if(callbacks !== undefined && callbacks["cancel_reservation"] !== undefined){
-        reserve_btn.on("click", callbacks["cancel_reservation"])
-    }
+    let old_reserved_books = reserved_books.slice();
+    let old_wishlist = wishlist.slice()
+    $("#modal-close").on("click", () => update_user_page(
+        callbacks,
+        {"reserved_books": old_reserved_books, "wishlist": old_wishlist})
+    )
 }
 
 async function reserve(reserve_btn, wishlist_btn){
@@ -284,4 +296,29 @@ async function rate_book(grade){
 function available_copies(){
     let counter = parseInt($("#copies_counter").text());
     return isNaN(counter) ? 0:counter;
+}
+
+function update_user_page(callbacks, old_books){
+    let reservation_cancelled = old_books["reserved_books"].filter(isbn => !reserved_books.includes(isbn));
+    let wishlist_removed = old_books["wishlist"].filter(isbn => !wishlist.includes(isbn));
+    let reservation_added = reserved_books.filter(isbn => old_books["reserved_books"].includes(isbn));
+    let wishlist_added = wishlist.filter(isbn => !old_books["wishlist"].includes(isbn));
+
+    console.log(reservation_cancelled)
+    console.log(wishlist_removed)
+    console.log(reservation_added)
+    console.log(wishlist_added)
+
+    if(callbacks !== undefined && callbacks["remove_from_res"] !== undefined){
+        callbacks["remove_from_res"](reservation_cancelled);
+    }
+    if(callbacks !== undefined && callbacks["remove_from_wish"] !== undefined){
+        callbacks["remove_from_wish"](wishlist_removed);
+    }
+    if(callbacks !== undefined && callbacks["insert_into_res"] !== undefined){
+        callbacks["insert_into_res"](reservation_added);
+    }
+    if(callbacks !== undefined && callbacks["insert_into_wish"] !== undefined){
+        callbacks["insert_into_wish"](wishlist_added);
+    }
 }

@@ -37,7 +37,10 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="book-detail-title">Book detail</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div id="modal-close">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
                     </div>
                     <div id="book-detail-body" class="modal-body">
                         <!-- FILL BY AJAX REQUEST -->
