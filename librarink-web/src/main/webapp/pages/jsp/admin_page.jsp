@@ -60,14 +60,8 @@
                 <td><%=reservationDTO.getUser()%></td>
                 <td><%=reservationDTO.getStartDate()%></td>
                 <td><%=reservationDTO.getStopDate()%></td>
-            <%}
-            else{%>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
             <%}%>
+
             <%if(loanDTOIterator.hasNext()){
             loanDTOIterator.next();}%>
         </tr>
@@ -101,15 +95,8 @@
             <td><%=loanDTO.getUser()%></td>
             <td><%=loanDTO.getStartDate()%></td>
             <td><%=loanDTO.getStopDate()%></td>
-            <%}
-            else{%>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
             <%}%>
+
         </tr>
         <%}%>
     </table>
