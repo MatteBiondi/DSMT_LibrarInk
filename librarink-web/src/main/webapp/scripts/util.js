@@ -98,6 +98,18 @@ async function load_reservations(){
     return reserved_books;
 }
 
+async function load_loans(){
+    let lent_books = await $.post(
+        "request/async",
+        {"request": "read_loans"}, "json"
+    );
+
+    lent_books = lent_books.flatMap((loan) => loan["isbn"]);
+    sessionStorage.setItem("lent_books", JSON.stringify(lent_books))
+
+    return lent_books;
+}
+
 async function load_wishlist(){
     let wishlist = await $.post(
         "request/async",
@@ -117,12 +129,21 @@ async function load_grades(){
 }
 
 async function load_local_reservations(){
-    // Load wishlist
+    // Load reservations
     let reserved_books = JSON.parse(sessionStorage.getItem("reserved_books"))
     if (reserved_books == null){
         reserved_books = await load_reservations();
     }
     return reserved_books;
+}
+
+async function load_local_loans(){
+    // Load loans
+    let lent_books = JSON.parse(sessionStorage.getItem("lent_books"))
+    if (lent_books == null){
+        lent_books = await load_loans();
+    }
+    return lent_books;
 }
 
 async function load_local_wishlist(){
