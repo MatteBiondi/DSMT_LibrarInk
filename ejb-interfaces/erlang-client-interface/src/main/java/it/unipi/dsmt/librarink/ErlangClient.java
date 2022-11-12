@@ -11,8 +11,8 @@ public interface ErlangClient {
     String delete_copy(String isbn, String id);
     String delete_loan(String user, String isbn, String id);
     String delete_reservation(String user, String isbn);
-    String archive_loans();
-    String archive_reservations();
+    List<LoanDTO> archive_loans();
+    List<ReservationDTO> archive_reservations();
     List<BookCopyDTO> read_all_copies(String isbn);
     List<BookCopyDTO> read_available_copies(String isbn);
     Integer count_available_copies(String isbn);

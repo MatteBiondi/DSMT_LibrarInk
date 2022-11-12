@@ -193,17 +193,19 @@ public class ErlangClientEJB implements ErlangClient {
     }
 
     @Override
-    public String archive_loans() {
+    public List<LoanDTO> archive_loans() {
         OtpErlangAtom request = new OtpErlangAtom("archive_loans");
         OtpErlangMap args = new OtpErlangMap();
-        return send_request(new OtpErlangTuple(new OtpErlangObject[]{request,args}));
+        String json_result = send_request(new OtpErlangTuple(new OtpErlangObject[]{request,args}));
+        return parseLoan(json_result);
     }
 
     @Override
-    public String archive_reservations() {
+    public List<ReservationDTO> archive_reservations() {
         OtpErlangAtom request = new OtpErlangAtom("archive_reservations");
         OtpErlangMap args = new OtpErlangMap();
-        return send_request(new OtpErlangTuple(new OtpErlangObject[]{request,args}));
+        String json_result = send_request(new OtpErlangTuple(new OtpErlangObject[]{request,args}));
+        return parseReservation(json_result);
     }
 
     @Override

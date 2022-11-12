@@ -65,12 +65,12 @@ public class AsyncRequestServlet extends HttpServlet {
             case "delete_reservation":
                 writer.write(erlang_client.delete_reservation(user, isbn));
                 return;
-            case "archive_loans":
-                writer.write(erlang_client.archive_loans());
-                return;
-            case "archive_reservations":
-                writer.write(erlang_client.archive_reservations());
-                return;
+            //case "archive_loans":
+            //    writer.write(erlang_client.archive_loans());
+            //    return;
+            //case "archive_reservations":
+            //    writer.write(erlang_client.archive_reservations());
+            //    return;
             case "read_all_copies":
                copies = erlang_client.read_all_copies(isbn);
                 if (copies != null){
