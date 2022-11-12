@@ -1,7 +1,7 @@
 
 function build_notification(id, timestamp, text, isbn){
     return`
-        <li id="${id}">
+        <li id="${id}" class="notification">
             <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     <svg class="bd-placeholder-img rounded me-2" width="20" height="20" 
