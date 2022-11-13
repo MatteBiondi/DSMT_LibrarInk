@@ -1,3 +1,10 @@
+callback_obj = {
+    remove_from_res : remove_from_carousel.bind(null, "reservations"),
+    remove_from_wish: remove_from_carousel.bind(null, "wishlist"),
+    insert_into_res : insert_into_carousel.bind(null, "reservations"),
+    insert_into_wish: insert_into_carousel.bind(null, "wishlist")
+}
+
 $(document).ready(() => {
         put_carousel("wishlist");
         put_carousel("loans");
@@ -104,13 +111,6 @@ function gui_book_elements(url_list, type) {
         }
     }
 
-    let callback_obj = {
-        remove_from_res : remove_from_carousel.bind(null, "reservations"),
-        remove_from_wish: remove_from_carousel.bind(null, "wishlist"),
-        insert_into_res : insert_into_carousel.bind(null, "reservations"),
-        insert_into_wish: insert_into_carousel.bind(null, "wishlist")
-    }
-
     $(".book-container").on(
         'click', (event) => show_detail(event, callback_obj)
     )
@@ -164,5 +164,8 @@ function insert_into_carousel(new_type,isbn){
         last_carousel_item = $(new_gallery).children().last();
     }
     // append book to last carousel item
+    book_elem.find(".book-container").on(
+        'click', (event) => show_detail(event, callback_obj)
+    )
     book_elem.appendTo($(last_carousel_item.find(".row")));
 }
