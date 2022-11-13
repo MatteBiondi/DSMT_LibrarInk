@@ -194,7 +194,8 @@ async function cancel_reservation(reserve_btn, wishlist_btn){
             // Update buttons
             reserve_btn.off();
             reserve_btn.on("click", () => reserve(reserve_btn, wishlist_btn));
-            reserve_btn.text("Reserve")
+            reserve_btn.text("Reserve");
+            wishlist_btn.on("click", () => add_wishlist(wishlist_btn, true));
             wishlist_btn.prop('disabled', false);
 
             // Show message

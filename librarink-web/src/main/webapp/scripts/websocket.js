@@ -61,7 +61,7 @@ async function update (event){
 
                 // Build notification element
                 let time = new Date()
-                let timestamp = time.getUTCHours() + ":" + time.getUTCMinutes() + ":" + time.getUTCSeconds()
+                let timestamp = time.toLocaleString('us-US',{hour:'2-digit', minute:'2-digit' ,second:'2-digit'})
                 let notification_text = `New copy of <b>${ response["title"]}</b>`
                 let id = Math.random().toString(16).slice(2);
                 let notification_elem = build_notification(id, timestamp, notification_text, notification.body["isbn"])
