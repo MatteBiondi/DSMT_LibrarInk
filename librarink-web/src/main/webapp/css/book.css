@@ -1,11 +1,7 @@
 .thumbnail{
-    width: 20%;
-    height: fit-content;
     /*Card effect*/
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     transition: 0.3s;
-    display: inline-block;
-    margin: 2.5% 2.5% 2.5% 2.1%;
     cursor: pointer;
 }
 
@@ -30,24 +26,15 @@
 }
 
 .thumbnail > img{
-    width: 60%;
-    height: 13em;
-    display: block;
+    width: auto;
+    max-width: 100%;
+    margin-top: 2%;
     margin-left: auto;
     margin-right: auto;
 }
 
-.thumbnail > *{
-    margin: 2%;
-    display: block;
-}
-
 .info_container{
     padding: 2% 5%;
-}
-
-.detailed{
-
 }
 
 .right_column{

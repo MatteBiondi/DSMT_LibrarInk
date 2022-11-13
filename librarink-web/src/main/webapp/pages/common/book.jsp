@@ -15,15 +15,16 @@
 <!--In case of list of books: not detailed representation -->
 <!-- Image + Rate + Title + Author -->
 <% if (type != null && type.equals("thumbnail")) { %>
-        <div id="<%= request.getParameter("isbn") %>" class="thumbnail" data-isbn="<%= request.getParameter("isbn") %>">
-            <img src="<%= request.getParameter("image")%>" alt="Book cover image">
-            <div class="info_container">
+    <div>
+        <div id="<%= request.getParameter("isbn") %>" class="thumbnail card h-100" data-isbn="<%= request.getParameter("isbn") %>">
+            <img src="<%= request.getParameter("image")%>" alt="Book cover image" class="card-img-top h-50">
+            <div class="info_container card-body h-50">
                 <h3>Title: </h3><p><%= request.getParameter("title")%></p>
                 <h3>Author: </h3><p><%= request.getParameter("author")%></p>
                 <h3>Rate: </h3><p><%= request.getParameter("rate")%>/<%= MAX_RATE %></p>
             </div>
         </div>
-
+    </div>
 <% } else { %>
     <html>
     <head>

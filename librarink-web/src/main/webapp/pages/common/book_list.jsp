@@ -8,17 +8,18 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/book_list.css" type="text/css" media="screen">
 
 <div id="book-items">
-
-    <c:forEach items="${books}" var="book">
-        <jsp:include page="book.jsp">
-            <jsp:param name="type" value="thumbnail" />
-            <jsp:param name="image" value="${book.getImage_url_m()}" />
-            <jsp:param name="title" value="${book.getBook_title()}" />
-            <jsp:param name="author" value="${book.getBook_author()}" />
-            <jsp:param name="isbn" value="${book.getIsbn()}" />
-            <jsp:param name="rate" value="${book.getSum_of_stars()}" />
-        </jsp:include>
-    </c:forEach>
+    <div class="row row-cols-2 row-cols-md-5 g-4">
+        <c:forEach items="${books}" var="book">
+            <jsp:include page="book.jsp">
+                <jsp:param name="type" value="thumbnail" />
+                <jsp:param name="image" value="${book.getImage_url_m()}" />
+                <jsp:param name="title" value="${book.getBook_title()}" />
+                <jsp:param name="author" value="${book.getBook_author()}" />
+                <jsp:param name="isbn" value="${book.getIsbn()}" />
+                <jsp:param name="rate" value="${book.getSum_of_stars()}" />
+            </jsp:include>
+        </c:forEach>
+    </div>
 </div>
 <nav id="pagination-menu">
     <jsp:include page="pagination.jsp"/>

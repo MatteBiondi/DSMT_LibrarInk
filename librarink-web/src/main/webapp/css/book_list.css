@@ -1,6 +1,7 @@
 #pagination-menu {
     display: flex;
     justify-content: center;
+    margin-top: 2%;
 }
 
 #pagination-menu span{
