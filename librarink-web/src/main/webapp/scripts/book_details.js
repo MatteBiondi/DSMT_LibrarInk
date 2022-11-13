@@ -38,6 +38,7 @@ async function show_detail(event, callbacks){
 
         console.log(`[BOOK_DETAILS] Reservations: ${JSON.stringify(reserved_books)}`);
         console.log(`[BOOK_DETAILS] Wishlist: ${JSON.stringify(wishlist)}`);
+        console.log(`[BOOK_DETAILS] Loans: ${JSON.stringify(loans)}`);
         console.log(`[BOOK_DETAILS] Grades: ${JSON.stringify(grades)}`);
 
         clearTimeout(timeout);
@@ -73,7 +74,13 @@ function update_details(detail_page, callbacks){
         // Book already borrowed
         reserve_btn.remove()
         wishlist_btn.remove();
-        let loan_date = new Date(loans.find(loan => loan["isbn"] === displayed_isbn)["start_date"]);
+        let loan_date = new Date(                                               // Build JS date
+            loans
+                .find(loan => loan["isbn"] === displayed_isbn)["start_date"]    // Find string date
+                .split(" ")                                                     // Split string date by whitespace
+                .filter(elem => elem !== "CET")                                 // Remove CET token
+                .join(" ")                                                      // Join tokens
+        );
         loan_date.setDate(loan_date.getDate() + 30);
         $(".left_column").append(`
             <div class="date"><h3>Book lent until:  </h3><span>${loan_date.toDateString()}</span> </div>`
