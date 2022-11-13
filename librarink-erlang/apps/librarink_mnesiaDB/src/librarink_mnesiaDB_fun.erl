@@ -174,7 +174,7 @@ from_reservation_to_loan(User, Isbn, Copy_id) ->
                 %Strange situation, there should be at least an available (reserved) copy (the one for this user)
                 {error, error_zero_copies_available};
               {succeed, Available_copies} ->
-                case lists:member(Copy_id, Available_copies) of
+                case lists:member(#{isbn => Isbn, id => Copy_id}, Available_copies) of
                   true ->
                     %Transforms the reservation into a loan
                     %Put a stop_date to reservation
@@ -184,7 +184,7 @@ from_reservation_to_loan(User, Isbn, Copy_id) ->
                     %Insert a loan row
                     New_loan = #{ user => User,
                                   isbn => Isbn,
-                                  physical_copy_id => Copy_id,
+                                  id => Copy_id,
                                   start_date => Timestamp,
                                   stop_date => null},
                     Loan_row = from_map_to_record(librarink_lent_book, New_loan),
