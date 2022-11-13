@@ -5,7 +5,7 @@
 %%%-------------------------------------------------------------------
 -module(librarink_mnesiaDB_fun).
 
--export([install/2, start_librarink_mnesia/1, stop_librarink_mnesia/1, add_book_copy/2, from_reservation_to_loan/2,
+-export([install/2, start_librarink_mnesia/1, stop_librarink_mnesia/1, add_book_copy/2, from_reservation_to_loan/3,
   add_book_reservation/2, delete_book_copy/2, delete_all_book_copies/1, delete_lent_book/3, delete_lent_by_book/1,
   delete_lent_book_by_user/1, delete_book_reservation/2, delete_books_reservation_by_user/1,
   delete_book_reservations_by_book/1, copies_by_book/1, count_available_copies_by_book/1,
@@ -148,7 +148,8 @@ add_book_copy(Isbn, Physical_copy_id) ->
 %%  In:   - User: User's identifier
 %%        - Isbn: Book's ISBN
 %%  Out:  - {succeed, ok} -> No error
-%%        - {error, error_not_available_copy} -> No loanable copies
+%%        - {error, error_not_available_copy} -> The selected physical copy is unavailable
+%%        - {error, error_zero_copies_available} -> No loanable copies
 %%        - {error, reservation_not_found} -> There is no reservation for this couple user - book
 %%        - {error, undefined_book} -> The ISBN has no copies
 %%        - {error, unexpected_error} -> Unexpected error
@@ -156,9 +157,10 @@ add_book_copy(Isbn, Physical_copy_id) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(from_reservation_to_loan ( User::binary() , Isbn::string() )
-      -> {succeed, ok} | {error, error_not_available_copy | undefined_book | reservation_not_found | unexpected_error}).
-from_reservation_to_loan(User, Isbn) ->
+-spec(from_reservation_to_loan ( User::binary() , Isbn::binary(), Copy_id::binary() )
+      ->  {succeed, New_loan::map()} | {error, error_not_available_copy | undefined_book | reservation_not_found |
+          unexpected_error | error_zero_copies_available}).
+from_reservation_to_loan(User, Isbn, Copy_id) ->
   F = fun() ->
         Timestamp =now_to_universal_time(timestamp()),
         %Check that there was a reservation for that user and book
@@ -166,27 +168,30 @@ from_reservation_to_loan(User, Isbn) ->
           {succeed,{0,_}} ->
             {error, reservation_not_found};
           {succeed,{_,[Res | _]}} ->
-            %Find an available copy
+            %check if the specified copy is available
             case list_available_copies_by_book(Isbn) of
-              {succeed, [H | _]} ->
-                Selected_id = maps:get(id, H),
-                %Transforms the reservation into a loan
-                %Put a stop_date to reservation
-                Old_res = from_map_to_record(librarink_reserved_book, Res),
-                mnesia:write(Old_res#librarink_reserved_book{stop_date = Timestamp, cancelled = false}),
-                mnesia:delete_object(Old_res),
-                %Insert a loan row
-                New_loan = #librarink_lent_book{
-                  user = User,
-                  isbn = Isbn,
-                  physical_copy_id = Selected_id,
-                  start_date = Timestamp,
-                  stop_date = null},
-                mnesia:write(New_loan),
-                {succeed, ok};
               {succeed, []} ->
                 %Strange situation, there should be at least an available (reserved) copy (the one for this user)
-                {error, error_not_available_copy};
+                {error, error_zero_copies_available};
+              {succeed, Available_copies} ->
+                case lists:member(Copy_id, Available_copies) of
+                  true ->
+                    %Transforms the reservation into a loan
+                    %Put a stop_date to reservation
+                    Old_res = from_map_to_record(librarink_reserved_book, Res),
+                    mnesia:write(Old_res#librarink_reserved_book{stop_date = Timestamp, cancelled = false}),
+                    mnesia:delete_object(Old_res),
+                    %Insert a loan row
+                    New_loan = #{ user => User,
+                                  isbn => Isbn,
+                                  physical_copy_id => Copy_id,
+                                  start_date => Timestamp,
+                                  stop_date => null},
+                    Loan_row = from_map_to_record(librarink_lent_book, New_loan),
+                    mnesia:write(Loan_row),
+                    {succeed, New_loan};
+                  false -> {error, error_not_available_copy}
+                end;
               _ ->
                 {error, unexpected_error}
             end;
@@ -214,7 +219,7 @@ from_reservation_to_loan(User, Isbn) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(add_book_reservation ( User::string(), Isbn::string()) ->
+-spec(add_book_reservation ( User::binary(), Isbn::binary()) ->
   {succeed, ok} | {error, unavailable_copies_to_reserve | error_insert_failed | book_already_reserved | undefined_book}).
 add_book_reservation(User, Isbn) ->
   F = fun() ->
@@ -267,7 +272,7 @@ add_book_reservation(User, Isbn) ->
 %% </pre>
 %% @end
 %%--------------------------------------------------------------------
--spec(delete_book_copy ( Isbn::string(), Physical_copy_id::binary()) ->
+-spec(delete_book_copy ( Isbn::binary(), Physical_copy_id::binary()) ->
   {succeed, ok} | {error, undefined_book_copy | error_pending_loan | error_all_copies_reserved_or_lent | undefined_book | unexpected_error}).
 delete_book_copy(Isbn, Physical_copy_id) ->
   F = fun() ->
