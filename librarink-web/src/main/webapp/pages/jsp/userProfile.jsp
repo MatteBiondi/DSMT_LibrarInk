@@ -106,7 +106,9 @@
                 <h1 class="mb-3 fw-normal">My wishlist</h1>
             </div>
 
-
+            <div class="row" id="loansRow">
+                <h1 class="mb-3 fw-normal">My loans</h1>
+            </div>
 
             <div class="row" id="reservationsRow">
                 <h1 class="mb-3 fw-normal">My reservations</h1>

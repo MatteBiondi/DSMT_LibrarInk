@@ -1,7 +1,9 @@
 $(document).ready(() => {
         put_carousel("wishlist");
+        put_carousel("loans");
         put_carousel("reservations");
         load_books_image("wishlist");
+        load_books_image("loans");
         load_books_image("reservations");
     }
 )
@@ -52,6 +54,10 @@ async function load_books_image(type) {
         isbn_list = await load_local_reservations();
     else if (type === "wishlist")
         isbn_list = await load_local_wishlist();
+    else if (type === "loans"){
+        let lent_books = await load_local_loans();
+        isbn_list = lent_books.map((book) => book.isbn);
+    }
 
     let images_url_array = [];
     for (const book_isbn of isbn_list){
@@ -112,23 +118,51 @@ function gui_book_elements(url_list, type) {
 
 //Callback in case of remove from wishlist or cancel reservation
 function remove_from_carousel(type,isbn){
-    /*
     let list_books_elems = $("[id^="+type+"-book]");
-    let book_elem = $("#"+type+"-"+isbn);
+    let book_elem = $("#"+type+"-book-"+isbn);
     let index = list_books_elems.index(book_elem);
 
-    for (let i = index; i<list_books_elems.length - 1; i++){
-        list_books_elems[i].replaceWith(list_books_elems[i+1]);
-    }
+    let last_index = list_books_elems.length-1;
+    if(index === last_index)
+        $(book_elem).remove();
+    else
+       $(list_books_elems[index]).replaceWith($(list_books_elems[last_index]));
 
-    if($("#"+type+"Gallery").lastChild.find(".row").empty())
-        $("#"+type+"Gallery").lastChild.remove();
-    */
-    console.log("Removed");
+    let last_carousel_item = $("#"+type+"Gallery").children().last();
+
+    if(last_carousel_item.find(".row").children().length === 0) {
+        if ($(last_carousel_item).hasClass("active"))
+            $("#"+type+"Gallery").children().first().addClass("active");
+        last_carousel_item.remove();
+    }
 }
 
 //Callback in case of insert into wishlist or reservation
-function insert_into_carousel(type,isbn){
-    //sposto da un posto all'altro
-    console.log("Inserted");
+function insert_into_carousel(new_type,isbn){
+    let old_type = (new_type === "reservations")?"wishlist":"reservations";
+    let book_elem=$("#"+old_type+"-book-"+isbn).clone();
+    let new_gallery= $("#"+new_type+"Gallery");
+    let new_gallery_num_item = $(new_gallery).children().length;
+
+    $(book_elem).attr("id", new_type+"-book-"+isbn);
+
+    //take last carousel-item of the new_type gallery
+    let last_carousel_item = null;
+    if( new_gallery_num_item > 0)
+        last_carousel_item = $(new_gallery).children().last();
+    //if it is full => create new one and append to gallery
+    if( last_carousel_item===null || last_carousel_item.find(".row").children().length === 4){
+        let row_status = (last_carousel_item===null)?"active":"";
+        let new_row=`
+            <div class='carousel-item ${row_status}'>
+                <div class='container'>
+                    <div class='row' id='${new_type}-gallery-row-${new_gallery_num_item}'>
+                    </div>
+                </div>
+            </div>`;
+        $(new_gallery).append(new_row);
+        last_carousel_item = $(new_gallery).children().last();
+    }
+    // append book to last carousel item
+    book_elem.appendTo($(last_carousel_item.find(".row")));
 }
