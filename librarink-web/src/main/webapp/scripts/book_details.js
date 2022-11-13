@@ -314,10 +314,10 @@ function available_copies(){
 }
 
 function update_user_page(callbacks, old_books){
-    let reservation_cancelled = old_books["reserved_books"].filter(isbn => !reserved_books.includes(isbn));
-    let wishlist_removed = old_books["wishlist"].filter(isbn => !wishlist.includes(isbn));
-    let reservation_added = reserved_books.filter(isbn => !old_books["reserved_books"].includes(isbn));
-    let wishlist_added = wishlist.filter(isbn => !old_books["wishlist"].includes(isbn));
+    let reservation_cancelled = old_books["reserved_books"].filter(isbn => !reserved_books.includes(isbn))[0];
+    let wishlist_removed = old_books["wishlist"].filter(isbn => !wishlist.includes(isbn))[0];
+    let reservation_added = reserved_books.filter(isbn => !old_books["reserved_books"].includes(isbn))[0];
+    let wishlist_added = wishlist.filter(isbn => !old_books["wishlist"].includes(isbn))[0];
 
     console.log(reservation_cancelled)
     console.log(wishlist_removed)
@@ -325,17 +325,17 @@ function update_user_page(callbacks, old_books){
     console.log(wishlist_added)
 
     if(callbacks !== undefined){
-        if(callbacks["remove_from_res"] !== undefined && reservation_cancelled !== undefined){
-            callbacks["remove_from_res"](reservation_cancelled);
-        }
-        if(callbacks["remove_from_wish"] !== undefined && wishlist_removed !== undefined){
-            callbacks["remove_from_wish"](wishlist_removed);
-        }
         if(callbacks["insert_into_res"] !== undefined && reservation_added !== undefined){
             callbacks["insert_into_res"](reservation_added);
         }
         if(callbacks["insert_into_wish"] !== undefined && wishlist_added !== undefined){
             callbacks["insert_into_wish"](wishlist_added);
+        }
+        if(callbacks["remove_from_res"] !== undefined && reservation_cancelled !== undefined){
+            callbacks["remove_from_res"](reservation_cancelled);
+        }
+        if(callbacks["remove_from_wish"] !== undefined && wishlist_removed !== undefined){
+            callbacks["remove_from_wish"](wishlist_removed);
         }
     }
 
