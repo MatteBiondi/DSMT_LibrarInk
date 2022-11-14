@@ -3,15 +3,12 @@ package it.unipi.dsmt.librarink;
 import com.ericsson.otp.erlang.OtpErlangRef;
 import com.ericsson.otp.erlang.OtpMbox;
 import com.ericsson.otp.erlang.OtpNode;
-import com.sun.java.swing.plaf.windows.WindowsDesktopPaneUI;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.Stateless;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Logger;
 
