@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -106,16 +108,17 @@ public class ErlangClientEJB implements ErlangClient {
     }
 
     @Override
-    public String write_loan(String user, String isbn) {
-        if (user == null || isbn == null)
-            return properties.getProperty("bad_request");
+    public LoanDTO write_loan(String user, String isbn, String id) {
+        if (user == null || isbn == null || id == null)
+            return null; //properties.getProperty("bad_request");
 
         OtpErlangAtom request = new OtpErlangAtom("write_loan");
         OtpErlangMap args = new OtpErlangMap();
         args.put(new OtpErlangAtom("user"),new OtpErlangBinary(user.getBytes(StandardCharsets.UTF_8)));
         args.put(new OtpErlangAtom("isbn"),new OtpErlangBinary(isbn.getBytes(StandardCharsets.UTF_8)));
+        args.put(new OtpErlangAtom("id"),new OtpErlangBinary(id.getBytes(StandardCharsets.UTF_8)));
 
-        return send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+        return parseSingleLoan(send_request(new OtpErlangTuple(new OtpErlangObject[]{request, args})));
     }
 
     @Override
@@ -375,11 +378,19 @@ public class ErlangClientEJB implements ErlangClient {
         return parseDTO(json, new TypeToken<List<LoanDTO>>(){}.getType());
     }
 
+    private LoanDTO parseSingleLoan(String json){
+        List<LoanDTO> loan = parseDTO(json, new TypeToken<LoanDTO>(){}.getType());
+        return loan != null ? loan.get(0) : null;
+    }
+
     private List parseDTO(String json, Type collectionType){
         JsonObject result = new Gson().fromJson(json, JsonObject.class);
         if (result.get("result").getAsString().equals("succeed")){
             JsonObject response = new Gson().fromJson(result.get("response").toString(), JsonObject.class);
-            return new Gson().fromJson(response.get("values").toString(), collectionType);
+            if(response.has("values"))
+                return new Gson().fromJson(response.get("values").toString(), collectionType);
+            else
+                return Collections.singletonList(new Gson().fromJson(response, collectionType));
         }
         else {
             return null;

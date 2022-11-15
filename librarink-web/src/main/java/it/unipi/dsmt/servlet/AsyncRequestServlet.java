@@ -56,13 +56,17 @@ public class AsyncRequestServlet extends HttpServlet {
             case "write_copy":
                 writer.write(erlang_client.write_copy(isbn, id));
                 return;
-            case "write_loan":
-                writer.write(erlang_client.write_loan(user, isbn));
+            case "write_loan"://TODO: remove
+                LoanDTO loan = erlang_client.write_loan(user, isbn, id);
+                if (loan!=null)
+                    writer.write(String.format("{\"id\":\"%s\"}",loan.getId()));
+                else
+                    writer.write("{\"error\":\"Unexpected error\"}");
                 return;
             case "write_reservation":
                 writer.write(erlang_client.write_reservation(user, isbn));
                 return;
-            case "delete_copy":
+            case "delete_copy"://TODO: remove
                 writer.write(erlang_client.delete_copy(isbn, id));
                 return;
             case "delete_loan":
@@ -78,14 +82,14 @@ public class AsyncRequestServlet extends HttpServlet {
             //case "archive_reservations":
             //    writer.write(erlang_client.archive_reservations());
             //    return;
-            case "read_all_copies":
+            case "read_all_copies"://TODO: remove
                copies = erlang_client.read_all_copies(isbn);
                 if (copies != null){
                     writer.write(copies.toString());
                     return;
                 }
                 break;
-            case "read_available_copies":
+            case "read_available_copies"://TODO: remove
                 copies = erlang_client.read_available_copies(isbn);
                 if (copies != null){
                     writer.write(copies.toString());
@@ -102,7 +106,7 @@ public class AsyncRequestServlet extends HttpServlet {
                     return;
                 }
                 break;
-            case "read_ended_loans":
+            case "read_ended_loans"://TODO: remove
                 loans = erlang_client.read_ended_loans();
                 if (loans != null){
                     writer.write(loans.toString());
@@ -116,17 +120,17 @@ public class AsyncRequestServlet extends HttpServlet {
                     return;
                 }
                 break;
-            case "read_ended_reservations":
+            case "read_ended_reservations"://TODO: remove
                 reservations = erlang_client.read_ended_reservations();
                 if (reservations != null){
                     writer.write(reservations.toString());
                     return;
                 }
                 break;
-            case "terminate_loan":
+            case "terminate_loan"://TODO: remove
                 writer.write(erlang_client.terminate_loan(isbn, id));
                 return;
-            case "renew_loan":
+            case "renew_loan"://TODO: remove
                 writer.write(erlang_client.renew_loan(isbn, id));
                 return;
             case "cancel_reservation":

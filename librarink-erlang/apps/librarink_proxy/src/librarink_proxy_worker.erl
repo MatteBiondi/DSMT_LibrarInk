@@ -45,7 +45,9 @@ work(Request, From, Tag, Env) ->
     case Response of
       {Counter, Values} when is_list(Values) ->#{counter=>Counter, values=>Values};
       Value when is_atom(Value) -> Value;
-      Value when is_number(Value) -> Value
+      Value when is_number(Value) -> Value;
+      Loan when is_map(Loan) -> Loan;
+      _ -> #{error => <<"something went wrong">>}
     end,
 
   try
@@ -54,30 +56,36 @@ work(Request, From, Tag, Env) ->
     error: _ ->  From ! {Tag, jsx:encode(#{result => error, response => unexpected_error})}
   end,
 
-  {_, #{isbn := Isbn}} = Request,
-  case lookup_server(Isbn, Env) of
-    {true, Node} ->
-      Name = Env#librarink_proxy_env.mnesia_name,
-      try
-        {succeed, Copies} = gen_server:call(
-          {Name, Node},
-          {read_copies,  #{type => available, operation => count, isbn => Isbn}},
-          Env#librarink_proxy_env.request_timeout
-        ),
-        {Exchange, Notification} = build_notification(Request, Result, Copies),
-        try
-          case Notification of
-            no_notification -> ok;
-            _ -> publish_notification(Exchange, Notification, Env)
-          end
-        catch
-          error: Error -> ?LOG_WARNING("Notification publishment failed: ~p",[Error])
-        end
-        catch
-          exit:{timeout, _} -> {error, timeout_exceeded}
+  {_, RequestArgs} = Request,
+  ContainsIsbn = maps:is_key(isbn, RequestArgs),
+  if
+    ContainsIsbn ->
+      {_, #{isbn := Isbn}} = Request,
+      case lookup_server(Isbn, Env) of
+        {true, Node} ->
+          Name = Env#librarink_proxy_env.mnesia_name,
+          try
+            {succeed, Copies} = gen_server:call(
+              {Name, Node},
+              {read_copies,  #{type => available, operation => count, isbn => Isbn}},
+              Env#librarink_proxy_env.request_timeout
+            ),
+            {Exchange, Notification} = build_notification(Request, Result, Copies),
+            try
+              case Notification of
+                no_notification -> ok;
+                _ -> publish_notification(Exchange, Notification, Env)
+              end
+            catch
+              error: Error -> ?LOG_WARNING("Notification publishment failed: ~p",[Error])
+            end
+          catch
+            exit:{timeout, _} -> {error, timeout_exceeded}
+          end;
+        false -> {error, server_unavailable}
       end;
-    false -> {error, server_unavailable}
-end.
+    true -> ok
+  end.
 
 %%%%%===================================================================
 %%%%% INTERNAL FUNCTIONS

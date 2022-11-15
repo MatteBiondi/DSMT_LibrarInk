@@ -6,7 +6,7 @@ import java.util.List;
 @Remote
 public interface ErlangClient {
     String write_copy(String isbn, String id);
-    String write_loan(String user, String isbn);
+    LoanDTO write_loan(String user, String isbn, String id);
     String write_reservation(String user, String isbn);
     String delete_copy(String isbn, String id);
     String delete_loan(String user, String isbn, String id);
