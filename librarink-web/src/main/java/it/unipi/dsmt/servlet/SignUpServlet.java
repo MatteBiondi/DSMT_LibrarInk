@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 
+/**
+ * This class allow the user to create its own profile and to see the signup form page.
+ */
 @WebServlet(name = "SignUpServlet", value = "/signup")
 public class SignUpServlet extends HttpServlet {
     @EJB
@@ -23,15 +26,19 @@ public class SignUpServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Get request are handled to let user see the signup page in case of not logged-in user.
+        // Otherwise, user is redirected to the homepage
+
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("email") == null) {
+            // User is not logged in
             response.setContentType("text/html");
             String resourceURL = "/pages/jsp/signUp.jsp";
             RequestDispatcher rd = request.getRequestDispatcher(resourceURL);
             rd.forward(request, response);
         }
         else{
-            //Already logged user
+            // Already logged user
             response.setContentType("text/html");
             response.sendRedirect(request.getContextPath() + "/homepage");
         }
@@ -39,16 +46,22 @@ public class SignUpServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Post request are handled to let user create its own profile in the system.
+
+        // Get signup form data
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String surname = request.getParameter("surname");
         String password = request.getParameter("password");
-        //hash psw
+        Date birthday = Date.valueOf(request.getParameter("birthday"));
+        String address = request.getParameter("address");
+
+        // Hash user inserted password
         String hashedPsw = Hashing.sha256()
                 .hashString(password, StandardCharsets.UTF_8)
                 .toString();
-        Date birthday = Date.valueOf(request.getParameter("birthday"));
-        String address = request.getParameter("address");
+
+        // Store the new user information into the database
         Librarink_usersDTO new_user = new Librarink_usersDTO();
         new_user.setPassword(hashedPsw);
         new_user.setBirthday(birthday);
@@ -58,9 +71,11 @@ public class SignUpServlet extends HttpServlet {
         new_user.setSurname(surname);
         new_user.setImage("https://cdn.onlinewebfonts.com/svg/img_335286.png");
         Librarink_usersDTO user= librarinkRemote.saveOrUpdateUser(new_user,false);
+
         String resourceURL;
         if (user==null)
         {
+            // Saving failed
             response.setContentType("text/html");
             resourceURL = "/pages/jsp/signUp.jsp";
             request.setAttribute("message", "User already exists");
@@ -69,6 +84,7 @@ public class SignUpServlet extends HttpServlet {
         }
         else
         {
+            // Saving success. User is redirected to login page
             request.getSession().setAttribute("message", "User created");
             request.getSession().setAttribute("messageType", "success-message");
             response.setContentType("text/html");

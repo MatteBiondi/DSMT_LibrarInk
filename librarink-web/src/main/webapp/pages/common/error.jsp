@@ -1,10 +1,7 @@
-<%--
-  Created by IntelliJ IDEA.
-  Date: 12/09/2022
-  Time: 18:14
---%>
 <%@ page import="org.apache.commons.httpclient.HttpStatus" %>
 <%@ page isErrorPage = "true" contentType="text/html;charset=UTF-8" %>
+
+<!-- Page that rappresents the details for the error occured -->
 <html>
 <%
     int statusCode = response.getStatus();

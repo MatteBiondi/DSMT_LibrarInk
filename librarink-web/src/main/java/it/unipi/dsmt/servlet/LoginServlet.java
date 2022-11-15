@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+/**
+ * This class implement the login behind the user login and login page visualization
+ */
 @WebServlet(name = "loginServlet", value = "/login")
 public class LoginServlet extends HttpServlet {
     @EJB
@@ -23,8 +26,12 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Get request are handled to let user see the login page in case of not logged-in user.
+        // Otherwise, user is redirected to the homepage
+
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("email") == null) {
+            // Not logged in user
             response.setContentType("text/html");
             String TargetJSP = "/pages/jsp/login.jsp";
             RequestDispatcher requestDispatcher = request.getRequestDispatcher(TargetJSP);
@@ -39,25 +46,35 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Post request are handled to let user log-in the system.
+
         Librarink_usersDTO usersFilter = new Librarink_usersDTO();
+        // Get user inserted credentials
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+
+        // Retrieve a user with that email
         usersFilter.setEmail(email);
         List<Librarink_usersDTO> usersDTO_list = librarinkRemote.listUsers(usersFilter);
         if (!usersDTO_list.isEmpty())
         {
+            // Check password correctness
+
             Librarink_usersDTO usersDTO = usersDTO_list.get(0);
-            //check psw
+            // Hash inserted password
             String hashedPsw = Hashing.sha256()
                     .hashString(password, StandardCharsets.UTF_8)
                     .toString();
             String savedPsw = usersDTO.getPassword();
             if(hashedPsw.equals(savedPsw)) {
+                // Credentials match
+                // Create a session
                 HttpSession session = request.getSession(true);
-                //a user session is composed by email and password
+                // In a session we save the user email
                 session.setAttribute("email", email);
-                //setting session to expiry in 30 mins
+                // Set session to expire in 30 mins
                 session.setMaxInactiveInterval(30 * 60);
+
                 response.setContentType("text/html");
                 response.sendRedirect(request.getContextPath() + "/homepage");
                 return;

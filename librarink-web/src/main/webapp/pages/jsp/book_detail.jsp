@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
+<!-- Section in charge of containing all the book detailed information. See "book.jsp" -->
 <div class="wrapper">
     <section id="content">
         <c:choose>
@@ -8,6 +9,7 @@
                 <h1>Details no available !</h1>
             </c:when>
             <c:otherwise>
+                <!-- Pass parameter to book.jsp that is in charge of book details visualization -->
                 <jsp:include page="../common/book.jsp">
                     <jsp:param name="type" value="detail" />
                     <jsp:param name="image" value="${book.getImage_url_m()}" />
@@ -26,4 +28,3 @@
         </c:choose>
     </section>
 </div>
-<!-- TODO language-->

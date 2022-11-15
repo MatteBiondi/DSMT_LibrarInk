@@ -13,6 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+/**
+ * This class allow a user to see the detailed page for a selected book
+ */
 @WebServlet(name = "BookDetailServlet", value = "/book_detail", loadOnStartup = 0)
 public class BookDetailServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(BookDetailServlet.class.getName());
@@ -23,12 +26,6 @@ public class BookDetailServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //LOGGER.info(String.format(
-        //        "Request from session-id: %s\nParams: < user: %s, isbn: %s >",
-        //        request.getSession().getId(),
-        //        request.getSession().getAttribute("user"),
-        //        request.getParameter("isbn")
-        //));
         String isbn = request.getParameter("isbn");
 
         // Load data from DB

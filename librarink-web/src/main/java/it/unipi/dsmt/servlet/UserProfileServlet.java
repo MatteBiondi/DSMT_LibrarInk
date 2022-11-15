@@ -11,33 +11,32 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * This class allow user to access its own profile page when it's logged-in
+ */
 @WebServlet(name = "UserProfileServlet", value = "/user")
 public class UserProfileServlet extends HttpServlet {
     @EJB
     LibrarinkRemote remote;
 
     @Override
-    public void init(){
-    }
-
-    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String email = (String) request.getSession().getAttribute("email");
+
+        // Retrieve any user information from database
         Librarink_usersDTO user = remote.findUsersByEmail(email);
 
+        // Set any information as parameter for JSP page
         request.setAttribute("name", user.getName());
         request.setAttribute("surname", user.getSurname());
         request.setAttribute("address", user.getAddress());
         request.setAttribute("birthday", user.getBirthday());
-        //todo è necessario?
         request.setAttribute("email", email);
-        //todo toglierei img da db e metterei semplicemente url in html
         request.setAttribute("image", user.getImage());
+        // todo toglierei img da db e metterei semplicemente url in html
+
+        // Redirect user to the profile page
         response.setContentType("text/html");
         getServletContext().getRequestDispatcher("/pages/jsp/userProfile.jsp").forward(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     }
 }

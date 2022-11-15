@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
+<!-- Page containing user details, including wishlist and pending loans/reservations-->
 <html>
 <head>
     <title>Librarink - User profile</title>
@@ -21,6 +22,7 @@
             crossorigin="anonymous">
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+
     <script src="${pageContext.request.contextPath}/scripts/userProfile.js"></script>
     <script src="${pageContext.request.contextPath}/scripts/util.js"></script>
     <script src="${pageContext.request.contextPath}/scripts/book_details.js"></script>
@@ -28,10 +30,13 @@
 
 </head>
 <body>
+    <!-- Navbar section -->
     <jsp:include page="../common/navbar_top.jsp">
         <jsp:param name="search_bar" value="false" />
     </jsp:include>
+
     <section>
+        <!-- Popup use to show book details in case of click on book thumbnail -->
         <div class="modal modal-xl fade" id="book-detail" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -49,7 +54,10 @@
             </div>
         </div>
 
+        <!-- User information content -->
         <div class="container py-5">
+
+            <!-- Personal information -->
             <div class="row">
                 <div class="col-lg-4">
                     <div class="card mb-4">
@@ -102,6 +110,8 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Information about user wishlist, pendant loans and pendant reservations -->
             <div class="row" id="wishlistRow">
                 <h1 class="mb-3 fw-normal">My wishlist</h1>
             </div>

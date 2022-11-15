@@ -7,11 +7,15 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
+/**
+ * This class allow to create a log sentence for any received request.
+ * This sentence contains any request parameter (but password in case of login)
+ */
 @WebFilter(
         filterName = "RequestLoggingFilter",
         urlPatterns = {"/*"},
         dispatcherTypes = DispatcherType.REQUEST,
-        description = "Log all the logging request received"
+        description = "Log all the request received"
 )
 public class RequestLoggingFilter implements Filter {
     private static final Logger LOGGER = Logger.getLogger(HomepageServlet.class.getName());
@@ -26,15 +30,18 @@ public class RequestLoggingFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
         HttpServletRequest req = (HttpServletRequest) request;
+        // Get and write all the request parameters
         Enumeration<String> params = req.getParameterNames();
         while(params.hasMoreElements()){
             String name = params.nextElement();
             String value = request.getParameter(name);
+
             if(!name.equals("password"))
+                // Password are not stored in log for privacy reason
                 LOGGER.info(String.format("%s::Request Params::{%s=%s}",req.getRemoteAddr(), name, value));
         }
 
-        // pass the request along the filter chain
+        // Pass the request along the filter chain
         chain.doFilter(request, response);
     }
 }

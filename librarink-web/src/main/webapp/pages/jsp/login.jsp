@@ -1,4 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+
+<!-- Page containing user login form -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,20 +15,23 @@
           integrity="sha384-xeJqLiuOvjUBq3iGOjvSQSIlwrpqjSHXpduPd6rQpuiM3f5/ijby8pCsnbu5S81n"
           crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
-
 </head>
 <body class="text-center">
     <main class="w-50 form-signin m-auto">
         <img class="mb-4" src="<%=request.getContextPath()%>/images/logo.svg" alt="Librarink Logo" width="72" height="57">
         <h1 class="mb-3 fw-normal">Librarink</h1>
+
+        <!-- Login form sends data to loginServlet by post method -->
         <form  action="<%= request.getContextPath()%>/login" method="post" autocomplete="on">
             <div class="p-3 shadow-sm border rounded-3">
                 <h2 class="text-center mb-4 text-primary">Please sign in</h2>
+
+                <!-- Email field -->
                 <div class="form-floating">
                     <input type="email" class="form-control" id="EnterEmail" name="email" autocomplete="on" required>
                     <label for="EnterEmail" class="text-left">Email : </label>
                 </div>
-
+                <!-- Password field -->
                 <div class="form-floating">
                     <input type="password" class="form-control" id="EnterPassword" name="password" autocomplete="on" required>
                     <label for="EnterPassword" class="text-left">Password : </label>
@@ -35,6 +40,7 @@
                 <button type="submit" class="btn btn-lg btn-primary">Login</button>
                 <button type="reset" class="btn btn-lg btn-primary"> Cancel</button>
 
+                <!-- If present, get message coming as request or session attribute and show it -->
                 <%
                     String message =(String) request.getSession().getAttribute("message");
                     String messageType =(String) request.getSession().getAttribute("messageType");;
@@ -52,6 +58,8 @@
                 <%
                     }
                 %>
+
+                <!-- Section with link to signup page -->
                 <div class="form-text">
                     New member?
                     <a href="<%= request.getContextPath()%>/signup"> Click here to signup </a>

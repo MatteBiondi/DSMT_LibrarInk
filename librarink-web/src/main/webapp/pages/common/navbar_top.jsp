@@ -1,10 +1,17 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
+<!-- Code in charge of show the navbar section including homepage link, searchbar and
+user utilitis (notification, user page, logout) -->
+
 <script src="${pageContext.request.contextPath}/scripts/navbar.js"></script>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar_top.css" type="text/css" media="screen">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/message.css" type="text/css" media="screen">
+
 <nav class="navbar-top navbar navbar-light bg-light">
+    <!-- "Librarink" link to homepage -->
     <a class="navbar-brand" href="${pageContext.request.contextPath}/homepage"><header id="header">Librarink</header></a>
+
+    <!-- Search bar -->
     <c:if test="${ param.search_bar == \"true\" }">
         <div class="d-flex align-items-center" id="search">
             <div class="input-group">
@@ -23,6 +30,8 @@
             </div>
         </div>
     </c:if>
+
+    <!-- Notification icon and user icon for logout and profile page -->
     <div class="d-flex align-items-center" id="icons">
         <div id="notification" class="dropdown">
             <a class="d-flex align-items-center text-reset hidden-arrow" href="#" data-bs-toggle="dropdown">

@@ -1,13 +1,20 @@
+// Code in charge of searching books and load their content on the page
+
+// *********** Constant section ***********
 const DEFAULT_SEARCH = "Title";
 const DEFAULT_KEYWORD = "";
+// ****************************************
 
+// Code on document ready
 $(document).ready(() => {
+    // Get search element of the page
     let search_items = $(".search-item");
     let search_text = $("#search-text");
     let search_clear = $("#search-clear");
 
     document.documentElement.style.scrollBehavior = 'auto';
 
+    // Get information stored on session
     let search = sessionStorage.getItem("search");
     let keyword =  sessionStorage.getItem("keyword");
 
@@ -58,9 +65,16 @@ $(document).ready(() => {
 
 });
 
+// *********** Functions section ***********
+
+// This function is in charge of loading in the homepage the list of books thumbnails for the books
+// that result from searching action
 async function load_books(search, keyword, page){
+    // If text is different from "", then shows the "x" to clear search
     $("#search-clear").css("display", $("#search-text").val() !== "" ? "inherit":"none");
+
     try{
+        // Perform search request and get the resulted list of book
         let book_list = await $.get(
             `homepage?search=${search}&keyword=${keyword}&page=${page}`,
             'text/html'
@@ -79,7 +93,7 @@ async function load_books(search, keyword, page){
             }
         )
 
-        // Details handlers
+        // Details handler
         $(".thumbnail").on("click",(elem) => show_detail(elem));
     }
     catch (e){
@@ -87,10 +101,18 @@ async function load_books(search, keyword, page){
     }
 }
 
+// This function is in charge of perform search operation by means of load_books function in case of text
+// typing or click on search item
 function search_input(){
     let search_text = $("#search-text")
+
+    // Removes events handlers
     search_text.off("input");
+
+    // Save value on session storage
     sessionStorage.setItem("keyword", search_text.val());
+
+    // Load new books list and insert again events handlers
     load_books(sessionStorage.getItem("search"), search_text.val(), 1)
         .then(
             () => {},

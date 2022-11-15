@@ -14,6 +14,10 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * This class is in charge of forward the received requests to the erlang client,
+ * that allows manipulation of mnesia db.
+ */
 @WebServlet(name = "AsyncRequestServlet", value = "/request/async", loadOnStartup = 0)
 public class AsyncRequestServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(AsyncRequestServlet.class.getName());
@@ -35,6 +39,7 @@ public class AsyncRequestServlet extends HttpServlet {
                 request.getParameter("id")
         ));
 
+        //Get each parameter and session attributes
         String user = (String) request.getSession().getAttribute("email");
         String isbn = request.getParameter("isbn");
         String id = request.getParameter("id");
@@ -46,6 +51,7 @@ public class AsyncRequestServlet extends HttpServlet {
         List<LoanDTO> loans;
         List<ReservationDTO> reservations;
 
+        // Identify the requested action, forward it to erlang client and send back a response to client
         switch (request.getParameter("request")){
             case "write_copy":
                 writer.write(erlang_client.write_copy(isbn, id));
@@ -65,7 +71,8 @@ public class AsyncRequestServlet extends HttpServlet {
             case "delete_reservation":
                 writer.write(erlang_client.delete_reservation(user, isbn));
                 return;
-            //case "archive_loans":
+            //Todo: do we need them?
+            // case "archive_loans":
             //    writer.write(erlang_client.archive_loans());
             //    return;
             //case "archive_reservations":
@@ -205,6 +212,7 @@ public class AsyncRequestServlet extends HttpServlet {
                     writer.write("{\"error\":\"Book not found\"}");
                 return;
             case "load_image_url":
+                // Given an isbn, retrieve the book's cover url
                 Librarink_booksDTO book = remote.findBooksByIsbn(isbn);
 
                 JsonObject book_and_url_obj = new JsonObject();

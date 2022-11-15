@@ -1,20 +1,31 @@
-callback_obj = {
+// This code is in charge of handling any user visualization for wishlist, pending loans and pending reservations
+
+// *********** Constant section ***********
+const CALLBACK_OBJ = {
     remove_from_res : remove_from_carousel.bind(null, "reservations"),
     remove_from_wish: remove_from_carousel.bind(null, "wishlist"),
     insert_into_res : insert_into_carousel.bind(null, "reservations"),
     insert_into_wish: insert_into_carousel.bind(null, "wishlist")
 }
+// ****************************************
 
+
+// Code on document ready
 $(document).ready(() => {
+        // Put carousels that will contain books
         put_carousel("wishlist");
         put_carousel("loans");
         put_carousel("reservations");
+
+        // Load books into relative carousel
         load_books_image("wishlist");
         load_books_image("loans");
         load_books_image("reservations");
     }
 )
 
+// *********** Functions section ***********
+// This function is in charge of create the skeleton of the carousel
 function put_carousel(type){
     let carousel = `
         <!-- Carousel wrapper -->
@@ -23,8 +34,10 @@ function put_carousel(type){
                 class="carousel slide carousel-dark text-center"
                 data-bs-ride="carousel"
         >
+        
             <!-- Controls -->
             <div class="d-flex justify-content-center mb-4">
+                <!-- Previous carousel row -->
                 <button
                         class="carousel-control-prev position-relative"
                         type="button"
@@ -34,6 +47,8 @@ function put_carousel(type){
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Previous</span>
                 </button>
+                
+                <!-- Next carousel row -->
                 <button
                         class="carousel-control-next position-relative"
                         type="button"
@@ -44,19 +59,26 @@ function put_carousel(type){
                     <span class="visually-hidden">Next</span>
                 </button>
             </div>
-            <!-- Inner -->
+            
+            
+            <!-- Inner content -->
             <div class="carousel-inner py-4" id="${type}Gallery">
                 <!-- FILLED BY AJAX REQUEST -->
             </div>
-            <!-- Inner -->
+            
+            
         </div>
-        <!-- Carousel wrapper -->
     `;
+
     $("#"+type+"Row").append(carousel);
 }
 
+
+// This function is in charge of load books image for the carousel type passed as parameter
 async function load_books_image(type) {
     let isbn_list = [];
+
+    // Get books for the selected carousel
     if (type === "reservations")
         isbn_list = await load_local_reservations();
     else if (type === "wishlist")
@@ -66,6 +88,7 @@ async function load_books_image(type) {
         isbn_list = lent_books.map((book) => book.isbn);
     }
 
+    // Load image for that books
     let images_url_array = [];
     for (const book_isbn of isbn_list){
         let image_url = await $.post(
@@ -77,18 +100,22 @@ async function load_books_image(type) {
         images_url_array.push(image_url);
     }
 
+    // Shows images in the carousel
     gui_book_elements(images_url_array, type);
 }
 
+
+// This function is in charge of putting images in carousel
 function gui_book_elements(url_list, type) {
-    console.log(url_list);
     let num_rows = Math.ceil(url_list.length/4);
     let row_status = "active";
+
+    // Create as many rows as needed and put the first one as "active"
     for (let i = 0; i < num_rows; i++){
-        //new gallery row
         if (i>0)
             row_status = "";
 
+        // New gallery row
         let new_row=`
             <div class='carousel-item ${row_status}'>
                 <div class='container'>
@@ -96,8 +123,11 @@ function gui_book_elements(url_list, type) {
                     </div>
                 </div>
             </div>`;
+
+        // Append row to gallery
         $("#"+type+"Gallery").append(new_row);
 
+        // Append books to the current row
         for (const book of url_list.slice(4*i, 4*(i+1))) {
             let isbn = book["isbn"];
             let url = book["url"];
@@ -111,12 +141,13 @@ function gui_book_elements(url_list, type) {
         }
     }
 
+    // Details handler
     $(".book-container").on(
-        'click', (event) => show_detail(event, callback_obj)
+        'click', (event) => show_detail(event, CALLBACK_OBJ)
     )
 }
 
-//Callback in case of remove from wishlist or cancel reservation
+// Callback function in case of remove from wishlist or cancel reservation
 function remove_from_carousel(type,isbn){
     let list_books_elems = $("[id^="+type+"-book]");
     let book_elem = $("#"+type+"-book-"+isbn);
@@ -124,12 +155,14 @@ function remove_from_carousel(type,isbn){
 
     let last_index = list_books_elems.length-1;
     if(index === last_index)
+        // If it's the last book of the carousel, just remove it
         $(book_elem).remove();
     else
-       $(list_books_elems[index]).replaceWith($(list_books_elems[last_index]));
+        // Otherwise replace it with the last one
+        $(list_books_elems[index]).replaceWith($(list_books_elems[last_index]));
 
+    // If the last row is empty, remove it
     let last_carousel_item = $("#"+type+"Gallery").children().last();
-
     if(last_carousel_item.find(".row").children().length === 0) {
         if ($(last_carousel_item).hasClass("active"))
             $("#"+type+"Gallery").children().first().addClass("active");
@@ -137,7 +170,7 @@ function remove_from_carousel(type,isbn){
     }
 }
 
-//Callback in case of insert into wishlist or reservation
+//Callback function in case of insert into wishlist or reservation
 function insert_into_carousel(new_type,isbn){
     let old_type = (new_type === "reservations")?"wishlist":"reservations";
     let book_elem=$("#"+old_type+"-book-"+isbn).clone();
@@ -146,11 +179,12 @@ function insert_into_carousel(new_type,isbn){
 
     $(book_elem).attr("id", new_type+"-book-"+isbn);
 
-    //take last carousel-item of the new_type gallery
+    // Take last carousel-item of the new_type gallery
     let last_carousel_item = null;
     if( new_gallery_num_item > 0)
         last_carousel_item = $(new_gallery).children().last();
-    //if it is full => create new one and append to gallery
+
+    // If it is full => create new one and append to gallery
     if( last_carousel_item===null || last_carousel_item.find(".row").children().length === 4){
         let row_status = (last_carousel_item===null)?"active":"";
         let new_row=`
@@ -163,9 +197,10 @@ function insert_into_carousel(new_type,isbn){
         $(new_gallery).append(new_row);
         last_carousel_item = $(new_gallery).children().last();
     }
-    // append book to last carousel item
+
+    // Append book to last carousel item and define details handler
     book_elem.find(".book-container").on(
-        'click', (event) => show_detail(event, callback_obj)
+        'click', (event) => show_detail(event, CALLBACK_OBJ)
     )
     book_elem.appendTo($(last_carousel_item.find(".row")));
 }

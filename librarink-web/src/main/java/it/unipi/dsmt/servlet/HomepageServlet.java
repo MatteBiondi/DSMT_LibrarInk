@@ -14,10 +14,15 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Logger;
 
+/**
+ * This class allow user to handle pagination and searching feature in the homepage
+ */
 @WebServlet(name = "HomepageServlet", value = "/homepage", loadOnStartup = 0)
 public class HomepageServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(HomepageServlet.class.getName());
+    // Number of book for each page
     private int page_length;
+    // Number or items in the book menu
     private int nav_items_length;
     @EJB
     LibrarinkRemote remote;
@@ -27,6 +32,7 @@ public class HomepageServlet extends HttpServlet {
         InputStream input = null;
         Properties properties = new Properties();
         try {
+            // Load servlet properties. See in "src/main/resources/servlet.properties"
             input = this.getClass().getClassLoader().getResourceAsStream("servlet.properties");
             properties.load(input);
         } catch (IOException e) {
@@ -40,6 +46,8 @@ public class HomepageServlet extends HttpServlet {
                 e.printStackTrace();
             }
         }
+
+        // Read interested values
         page_length = Integer.parseInt(properties.getProperty("page_length", "50"));
         nav_items_length = Integer.parseInt(properties.getProperty("nav_items_length", "11"));
 
@@ -48,16 +56,6 @@ public class HomepageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        //LOGGER.info(String.format(
-        //        "Request from session-id: %s\nParams: < user: %s, page: %s, search: %s => %s >",
-        //        request.getSession().getId(),
-        //        request.getSession().getAttribute("email"),
-        //        request.getParameter("page"),
-        //        request.getParameter("search"),
-        //        request.getParameter("keyword")
-        //));
-        //String user = (String) request.getSession().getAttribute("email");
-
         // Get request parameters
         String filter_attribute = request.getParameter("search") == null ? "":request.getParameter("search");
         String filter_keyword = request.getParameter("keyword") == null ? "":request.getParameter("keyword");
@@ -65,6 +63,7 @@ public class HomepageServlet extends HttpServlet {
         List<Librarink_booksDTO> books;
         Librarink_booksDTO filter = new Librarink_booksDTO();
 
+        // Set filter parameter
         switch (filter_attribute.toLowerCase(Locale.ROOT)) {
             case "title":
                 filter.setBook_title(filter_keyword);
@@ -78,6 +77,8 @@ public class HomepageServlet extends HttpServlet {
             default: break;
 
         }
+
+        // Handle pagination
         int page_offset;
         int max_offset = Math.max(1,(int) Math.ceil((double) remote.countBooks(filter) / page_length));
         try {
@@ -87,6 +88,7 @@ public class HomepageServlet extends HttpServlet {
         }
         catch (NumberFormatException ignored){ page_offset = 1; }
 
+        // Get book of the requested page
         books = remote.listPaginationBook(page_offset - 1, page_length, filter);
 
         // Compute pagination indexes
@@ -110,8 +112,6 @@ public class HomepageServlet extends HttpServlet {
         request.setAttribute("books", books);
         request.setAttribute("page_offset", page_offset);
         request.setAttribute("offsets", offsets.toArray());
-
-        //LOGGER.info(String.format("Filter attribute %s",filter_attribute));
 
         if (filter_attribute.equals("")) // Only if the homepage is directly requested by typing the link
             getServletContext().getRequestDispatcher("/index.jsp").forward(request, response);

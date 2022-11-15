@@ -26,18 +26,23 @@
 
     <body>
         <div class="wrapper">
+            <!-- Navbar section -->
             <jsp:include page="pages/common/navbar_top.jsp">
                 <jsp:param name="search_bar" value="true" />
             </jsp:include>
+
+            <!-- Popup that will contain the book detailed in case of user Click event on book thumbnail -->
             <section id="content">
                 <div class="modal modal-xl fade" id="book-detail" tabindex="-1">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h1 class="modal-title fs-5" id="book-detail-title">Book detail</h1>
-                                <div id="modal-close"><button type="button" class="btn-close"
+                                <div id="modal-close">
+                                    <button type="button" class="btn-close"
                                              data-bs-dismiss="modal"
-                                             aria-label="Close"></button></div>
+                                             aria-label="Close"></button>
+                                </div>
                             </div>
                             <div id="book-detail-body" class="modal-body">
                                 <!-- FILL BY AJAX REQUEST -->
@@ -45,7 +50,11 @@
                         </div>
                     </div>
                 </div>
-                <div id="book-list"><!-- FILL BY AJAX REQUEST --></div>
+
+                <!-- List of book for the current page -->
+                <div id="book-list">
+                    <!-- FILL BY AJAX REQUEST -->
+                </div>
             </section>
         </div>
     </body>
