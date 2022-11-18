@@ -7,6 +7,6 @@ import javax.ejb.Local;
 
 @Local
 public interface ErlangClientNode {
-    OtpMbox getMbox() throws NullPointerException;
-    OtpErlangRef makeRef() throws NullPointerException;
+    OtpMbox getMbox() throws ErlangClientException;
+    OtpErlangRef makeRef() throws ErlangClientException;
 }

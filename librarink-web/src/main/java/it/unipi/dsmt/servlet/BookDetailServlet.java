@@ -1,16 +1,18 @@
 package it.unipi.dsmt.servlet;
 
-import it.unipi.dsmt.librarink.ErlangClient;
-import it.unipi.dsmt.librarink.LibrarinkRemote;
-import it.unipi.dsmt.librarink.Librarink_booksDTO;
+import it.unipi.dsmt.librarink.*;
 
 import javax.ejb.EJB;
+import javax.ejb.EJBException;
+import javax.ejb.NoSuchEJBException;
+import javax.ejb.TransactionRolledbackLocalException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.logging.Logger;
 
 /**
@@ -19,6 +21,7 @@ import java.util.logging.Logger;
 @WebServlet(name = "BookDetailServlet", value = "/book_detail", loadOnStartup = 0)
 public class BookDetailServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(BookDetailServlet.class.getName());
+
     @EJB
     LibrarinkRemote remote;
     @EJB
@@ -26,18 +29,30 @@ public class BookDetailServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        PrintWriter writer = response.getWriter();
         String isbn = request.getParameter("isbn");
+        try {
+            // Load data from DB
+            Integer available_copies = erlang_client.count_available_copies(isbn);
+            Librarink_booksDTO book = remote.findBooksByIsbn(isbn);
+            Double rating = remote.computeRating(isbn);
 
-        // Load data from DB
-        Integer available_copies = erlang_client.count_available_copies(isbn);
-        Librarink_booksDTO book = remote.findBooksByIsbn(isbn);
-        Double rating = remote.computeRating(isbn);
+            // Prepare data for JSP page
+            response.setContentType("text/html");
+            request.setAttribute("book", book);
+            request.setAttribute("rating", rating);
+            request.setAttribute("available_copies", available_copies);
+            getServletContext().getRequestDispatcher("/pages/jsp/book_detail.jsp").forward(request, response);
+        }
+        catch (ErlangClientException ex){
+            response.setContentType("application/json");
+            writer.write(String.format("{\"error\":\"%s\"}", ex.getMessage()));
+        }
+        catch (EJBException ex){
+            LOGGER.warning(String.format("EJB exception %s", ex.getMessage()));
+            response.setContentType("application/json");
+            writer.write("{\"error\":\"server error\"}");
+        }
 
-        // Prepare data for JSP page
-        response.setContentType("text/html");
-        request.setAttribute("book", book);
-        request.setAttribute("rating", rating);
-        request.setAttribute("available_copies", available_copies);
-        getServletContext().getRequestDispatcher("/pages/jsp/book_detail.jsp").forward(request, response);
     }
 }

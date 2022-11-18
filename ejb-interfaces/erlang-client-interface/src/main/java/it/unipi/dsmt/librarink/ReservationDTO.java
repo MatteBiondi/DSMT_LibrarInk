@@ -5,7 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ReservationDTO implements Serializable {
+public class ReservationDTO extends DTO implements Serializable {
     String user;
     String isbn;
     Date start_date;

@@ -2,7 +2,7 @@ package it.unipi.dsmt.librarink;
 
 import java.io.Serializable;
 
-public class BookCopyDTO implements Serializable {
+public class BookCopyDTO extends DTO implements Serializable {
     String isbn;
     String id;
 

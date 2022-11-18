@@ -5,7 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class LoanDTO implements Serializable {
+public class LoanDTO extends DTO implements Serializable {
     String user; 
     String isbn; 
     String id;

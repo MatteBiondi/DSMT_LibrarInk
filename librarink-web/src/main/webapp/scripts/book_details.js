@@ -56,10 +56,10 @@ async function show_detail(event, callbacks){
             }
         }
     }
-    catch (e) {
-        console.error(e);
+    catch (exception) {
         clearTimeout(timeout);
-        show_message("danger", "Something went wrong");
+        if(!aborted)
+            show_message("danger", "Something went wrong: " +  exception);
     }
 }
 
@@ -180,8 +180,8 @@ async function reserve(reserve_btn, wishlist_btn){
             show_message("danger", response["response"]);
         }
     }
-    catch (e){
-        show_message("danger", "Something went wrong");
+    catch (exception){
+        show_message("danger", exception);
     }
 }
 
@@ -212,8 +212,8 @@ async function cancel_reservation(reserve_btn, wishlist_btn){
             show_message("danger", response["response"]);
         }
     }
-    catch (e){
-        show_message("danger", "Something went wrong");
+    catch (exception){
+        show_message("danger", exception);
     }
 }
 
@@ -242,9 +242,8 @@ async function add_wishlist(wishlist_btn){
             show_message("danger", response["response"]);
         }
     }
-    catch (e){
-        show_message("danger", "Something went wrong");
-
+    catch (exception){
+        show_message("danger", exception);
     }
 }
 
@@ -273,8 +272,8 @@ async function remove_wishlist(wishlist_btn, notification){
             show_message("danger", response["response"]);
         }
     }
-    catch (e){
-        show_message("danger", "Something went wrong");
+    catch (exception){
+        show_message("danger", exception);
 
     }
 }
@@ -310,8 +309,8 @@ async function rate_book(grade){
             show_message("danger", response["response"]);
         }
     }
-    catch (e) {
-        show_message("danger", "Something went wrong");
+    catch (exception) {
+        show_message("danger", exception);
     }
 }
 
