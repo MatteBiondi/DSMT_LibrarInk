@@ -1,2 +1,2 @@
--name active@172.18.0.29
+-name mnesia_active1@172.18.0.29
 -setcookie librarink_secret_cookie

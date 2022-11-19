@@ -137,16 +137,22 @@ forward_multi_request(Request, Env) ->
 %% @end
 -spec(lookup_server(Isbn :: binary(), Env :: #librarink_proxy_env{}) -> Node :: node()).
 lookup_server(Isbn,Env) ->
-  GroupId = binary:decode_unsigned(crypto:hash(md5, Isbn)) rem erlang:length(Env#librarink_proxy_env.mnesia_nodes) + 1,
+    GroupId = binary:decode_unsigned(crypto:hash(md5, Isbn)) rem erlang:length(Env#librarink_proxy_env.mnesia_nodes) + 1,
   {Active, Backup} = lists:nth(GroupId, Env#librarink_proxy_env.mnesia_nodes),
-  retrieve_active_node(Active, Backup).
+  retrieve_active_node(Active, Backup, Env).
 
 %% @private
 %% @doc
 %% Select the node that is currently active
 %% @end
--spec(retrieve_active_node(Active :: node(), Backup :: node()) -> Node :: node()).
-retrieve_active_node(Active, Backup) ->
+-spec(retrieve_active_node(Active :: node(), Backup :: node(), Env :: #librarink_proxy_env{}) -> Node :: node()).
+retrieve_active_node(Active, Backup, Env) ->
+  ConnectedNodes = length(nodes()),
+  if (ConnectedNodes == 0) ->
+      {ok, Nodes} = Env#librarink_proxy_env.mnesia_nodes,
+      lists:foreach(fun({Active, Backup}) -> net_adm:ping(Active),net_adm:ping(Backup) end, Nodes);
+    true -> ok
+  end,
   ResActive = lists:member(Active, ?CONNECTED_NODES),
   ResBackup = lists:member(Backup, ?CONNECTED_NODES),
   if ResActive ->
