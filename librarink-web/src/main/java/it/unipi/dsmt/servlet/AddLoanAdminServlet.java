@@ -1,9 +1,6 @@
 package it.unipi.dsmt.servlet;
 
-import it.unipi.dsmt.librarink.ErlangClient;
-import it.unipi.dsmt.librarink.LibrarinkRemote;
-import it.unipi.dsmt.librarink.Librarink_history_loanDTO;
-import it.unipi.dsmt.librarink.Librarink_history_reservationDTO;
+import it.unipi.dsmt.librarink.*;
 
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
@@ -14,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Date;
 import java.util.List;
 
 public class AddLoanAdminServlet {
@@ -33,11 +31,23 @@ public class AddLoanAdminServlet {
         @Override
         protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
         {
-            String[] user;
-            String[] isbn;
-            user= request.getParameterValues("User");
-            isbn=request.getParameterValues("ISBN");
-            erlang_client.write_loan(user[0],isbn[0]);
+            String user;
+            String isbn;
+            user= request.getParameter("User");
+            isbn=request.getParameter("ISBN");
+            erlang_client.write_reservation(user,isbn);
+            erlang_client.write_loan(user,isbn,"id");//todo select a correct id
+            List<ReservationDTO> reservationDTOList=
+                    erlang_client.archive_reservations();
+            for(ReservationDTO reservationDTO:reservationDTOList) {
+                Librarink_history_reservationDTO history_reservationDTO = new Librarink_history_reservationDTO();
+                history_reservationDTO.setUser_email(reservationDTO.getUser());
+                history_reservationDTO.setIsbn(reservationDTO.getIsbn());
+                history_reservationDTO.setStart_date((Date) reservationDTO.getStartDate());
+                history_reservationDTO.setEnd_date((Date) reservationDTO.getStopDate());
+                history_reservationDTO.setDeleted(false);
+                remoteEJB.saveOrUpdateHistory_reservation(history_reservationDTO, false);
+            }
         }
     }
 }

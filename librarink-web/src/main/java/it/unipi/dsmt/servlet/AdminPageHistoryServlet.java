@@ -20,28 +20,20 @@ public class AdminPageHistoryServlet extends HttpServlet {
     //private static final Logger LOGGER = Logger.getLogger(AsyncRequestServlet.class.getName());
 
     @EJB
-    private ErlangClient erlang_client;
-    @EJB
     private LibrarinkRemote remoteEJB;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        PrintWriter writer = response.getWriter();
-        //LibrarinkRemoteEJB librarinkRemoteEJB=new LibrarinkRemoteEJB();
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         List<Librarink_history_loanDTO> history_loans;
         List<Librarink_history_reservationDTO> historyReservationDTOS;
         history_loans = remoteEJB.listHistoryLoan(new Librarink_history_loanDTO());
         request.setAttribute("loanHistoryList",history_loans);
         historyReservationDTOS= remoteEJB.listHistoryReservation(new Librarink_history_reservationDTO());
         request.setAttribute("reservationHistoryList",historyReservationDTOS);
-        String TargetJSP ="librarink-web/src/main/webapp/pages/jsp/admin_page_history.jsp";
-
+        String TargetJSP ="/pages/jsp/admin_page_history.jsp";
         RequestDispatcher requestDispatcher=request.getRequestDispatcher(TargetJSP);
-        try {
-            requestDispatcher.forward(request,response);
-        } catch (ServletException e) {
-            throw new RuntimeException(e);
-        }
+        requestDispatcher.forward(request,response);
+
     }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

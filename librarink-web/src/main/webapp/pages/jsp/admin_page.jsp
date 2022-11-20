@@ -32,7 +32,7 @@
 
 
 <%--@declare id="reservation"--%><%--@declare id="loan"--%>
-<form ACTION="src/main/java/it/unipi/dsmt/servlet/AdminPageServlet.java" id="reservation">
+<form ACTION="<%= request.getContextPath()%>/admin" id="reservation">
     <table style="width:100%" id="reservation_table">
 
         <tr>
@@ -68,7 +68,7 @@
         <%}%>
     </table>
 </form>
-<form ACTION="src/main/java/it/unipi/dsmt/servlet/AdminPageServlet.java" id="loan">
+<form ACTION="<%= request.getContextPath()%>/admin" id="loan">
     <table style="width:100%"id="loan_table">
         <tr>
             <th colspan="6">Active Loan</th>
@@ -101,34 +101,112 @@
         <%}%>
     </table>
 </form>
-<button type="submit" form="reservation" name="button" value="ConfirmReservation"onclick="">Confirm Reservation</button>
-<button type="submit" form="reservation" name="button" value="DeleteReservation" onclick="myDeleteFunction('reservationTable','reservation','reservation')">Delete Reservation</button>
-<button type="submit" form="loan" name="button" value="EndLoan">End Loan</button>
-<a href="default.asp" target="librarink-web/src/main/java/it/unipi/dsmt/servlet/AdminPageHistoryServlet.java">History table</a>
+<button type="submit" form="reservation" name="button" value="ConfirmReservation"onclick="submitRequest('reservationTable','ConfirmReservation','reservation_table','reservation')">Confirm Reservation</button>
+<button type="submit" form="reservation" name="button" value="DeleteReservation" onclick="submitRequest('reservationTable','DeleteReservation','reservation_table','reservation')">Delete Reservation</button>
+<button type="submit" form="loan" name="button" value="EndLoan" onclick="submitRequest('loanTable','EndLoan','loan_table','loan')">End Loan</button>
+<a href="<%= request.getContextPath()%>/adminHistory">History table</a>
 <button type="">NewLoan</button>
 <script>
+
     function myDeleteFunction(tableName,formName,checkBoxName) {
-        var formElementHTMLCollectionOfElement=document.forms[formName];
-        var allOption=formElementHTMLCollectionOfElement.elements[checkBoxName];
-        var selectedOptions=[];
-        var indexes=[];
+        let formElementHTMLCollectionOfElement=document.forms[formName];
+        let allOption=formElementHTMLCollectionOfElement.elements[checkBoxName];
+        let selectedOptions=[];
         allOption.forEach((element)=>{
             if (element.checked) {
                 selectedOptions.push(element.value);
+                element.parent().parent().remove();//with the first .parent()
+                // i get the <td> element with the second element i get the <tr> element
             }
 
         });
-        selectedOptions.forEach((element)=>{
-            indexes.push(element.split(";").pop())
+
+    }
+
+    //submit a request and update a table
+    async function submitRequest(formName,button,tableName,checkboxName)
+    {
+
+        let reservation = '';
+        let loan = '';
+        let sap = '';
+        if(formName=="reservation"){
+        $( ".relocation" ).each(function() {
+            if($( this ).is(':checked')){
+                reservation = reservation+''+sap+''+$( this ).val();
+                sap = ',';
+            }
+
         });
-        let i;
-        for(i = 0; i<indexes.length; i++)
+            let loanList = await $.post("<%= request.getContextPath()%>/admin", {
+                button: button,
+                reservation: reservation
+            })
+            let loanListJson = JSON.parse(loanList);
+
+            for (let i = 0; i < reservationListJson.length; i++)
+                myCreateFunctionSingleElement("loan_table",loanListJson[i],"loan");
+        }
+        else
         {
-            document.getElementById(tableName).deleteRow(i);
+            ( ".relocation" ).each(function() {
+                if($( this ).is(':checked')){
+                    loan = loan+''+sap+''+$( this ).val();
+                    sap = ',';
+            }
+
+        });
+            let loanList = await $.post("<%= request.getContextPath()%>/admin", {
+                button: button,
+                loan: loan }
+            )
+            /*let loanListJson = JSON.parse(loanList);
+
+            for (let i = 0; i < loanListJson.length; i++)
+                myCreateFunctionSingleElement("loan_table",loanListJson[i],"loan");*/
+        }
+        //Delete the row updated.
+        myDeleteFunction(tableName,formName,checkboxName);
+
+    }
+
+    //add a single element at the table
+    function myCreateFunctionSingleElement(nameTable,value,typeValue) {
+        let table = document.getElementById(nameTable);
+        let element = value;
+
+
+        if(typeValue=="reservation") {
+            let row = table.insertRow(0);
+            let checkbox = row.insertCell(0);
+            let ISBN = row.insertCell(1);
+            let UserID = row.insertCell(2);
+            let StartTime = row.insertCell(3);
+            let EndTime = row.insertCell(4);
+            checkbox.innerHTML="<input type='checkbox' name = 'reservation' value="+element.user+"+';'+"+element.isbn+"+';'+"+element.startDate+"+';'/>"
+            ISBN.innerHTML = element.isbn;
+            ISBN.innerHTML = element.isbn;
+            UserID.innerHTML = element.user;
+            StartTime.innerHTML = element.startDate;
+            EndTime.innerHTML = element.stopDate;
+        }
+        else{
+            let row = table.insertRow(0);
+            let checkbox = row.insertCell(0);
+            let ISBN = row.insertCell(2);
+            let Id = row.insertCell(1);
+            let UserID = row.insertCell(3);
+            let StartTime = row.insertCell(4);
+            let EndTime = row.insertCell(5);
+            checkbox.innerHTML="<input type='checkbox' name = 'loan' value="+element.isbn+"+';'+"+element.id+"+';'+"+element.user+"+';'+loanIndex />"
+            ISBN.innerHTML = element.isbn;
+            UserID.innerHTML = element.user;
+            Id.innerHTML = element.id;
+            StartTime.innerHTML = element.startDate;
+            EndTime.innerHTML = element.stopDate;
         }
 
     }
-    //toDO update loanTable
 </script>
 </body>
 </html>
