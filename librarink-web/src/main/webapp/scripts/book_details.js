@@ -1,4 +1,4 @@
-const TIMEOUT_INTERVAL = 1000 * 2.5;
+const TIMEOUT_INTERVAL = 1000 * 3;
 
 let reserved_books;
 let wishlist;
@@ -58,17 +58,25 @@ async function show_detail(event, callbacks){
     }
     catch (exception) {
         clearTimeout(timeout);
-        if(!aborted)
-            show_message("danger", "Something went wrong: " +  exception);
+        if(!aborted){
+            if(exception.responseText !== undefined)
+                show_message("danger", "Something went wrong: " +
+                    exception.responseText.charAt(0).toUpperCase());
+            else
+                show_message("danger", "Something went wrong")
+        }
     }
 }
 
 function update_details(detail_page, callbacks){
     $("#book-detail-body").html(detail_page);
-
     let reserve_btn = $("#reserve-btn");
     let wishlist_btn = $("#wishlist-btn");
-    let displayed_isbn = $(".detailed")[0].id;
+    let details = $(".detailed", detail_page)[0];
+    if(details === undefined)
+        throw "unexpected error";
+
+    let displayed_isbn = details.id;
 
     if(loans.find(loan => loan["isbn"] === displayed_isbn)){
         // Book already borrowed
@@ -325,10 +333,10 @@ function update_user_page(callbacks, old_books){
     let reservation_added = reserved_books.filter(isbn => !old_books["reserved_books"].includes(isbn))[0];
     let wishlist_added = wishlist.filter(isbn => !old_books["wishlist"].includes(isbn))[0];
 
-    console.log(reservation_cancelled)
-    console.log(wishlist_removed)
-    console.log(reservation_added)
-    console.log(wishlist_added)
+    //console.log(reservation_cancelled)
+    //console.log(wishlist_removed)
+    //console.log(reservation_added)
+    //console.log(wishlist_added)
 
     if(callbacks !== undefined){
         if(callbacks["insert_into_res"] !== undefined && reservation_added !== undefined){

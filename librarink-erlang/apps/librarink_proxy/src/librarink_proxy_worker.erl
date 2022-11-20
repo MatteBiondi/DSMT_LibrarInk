@@ -34,6 +34,7 @@
 %% @end
 -spec(work(Request :: term(), From :: pid(), Tag :: reference(), Env :: #librarink_proxy_env{}) -> ok).
 work(Request, From, Tag, Env) ->
+  %% Check request format and forward
   {Result, Response} =
     case Request of
       {Operation, #{isbn := Isbn_}} when is_atom(Operation) and is_binary(Isbn_) -> forward_request(Request, Env);
@@ -41,6 +42,7 @@ work(Request, From, Tag, Env) ->
       _Others -> {error, malformed_request}
     end,
 
+  %% Encode response
   EncodedResponse =
     case Response of
       {Counter, Values} when is_list(Values) ->#{counter=>Counter, values=>Values};
@@ -49,13 +51,13 @@ work(Request, From, Tag, Env) ->
       Loan when is_map(Loan) -> Loan;
       _ -> #{error => <<"something went wrong">>}
     end,
-
   try
     From ! {Tag, jsx:encode(#{result => Result, response => EncodedResponse})}
   catch
     error: _ ->  From ! {Tag, jsx:encode(#{result => error, response => unexpected_error})}
   end,
 
+  %% Send notification, if needed
   {_, RequestArgs} = Request,
   ContainsIsbn = maps:is_key(isbn, RequestArgs),
   if
@@ -64,23 +66,28 @@ work(Request, From, Tag, Env) ->
       case lookup_server(Isbn, Env) of
         {true, Node} ->
           Name = Env#librarink_proxy_env.mnesia_name,
+          %% Check number of copies available
           try
-            {succeed, Copies} = gen_server:call(
+           CopiesResponse = gen_server:call(
               {Name, Node},
               {read_copies,  #{type => available, operation => count, isbn => Isbn}},
               Env#librarink_proxy_env.request_timeout
             ),
-            {Exchange, Notification} = build_notification(Request, Result, Copies),
-            try
-              case Notification of
-                no_notification -> ok;
-                _ -> publish_notification(Exchange, Notification, Env)
-              end
-            catch
-              error: Error -> ?LOG_WARNING("Notification publishment failed: ~p",[Error])
+           case CopiesResponse of
+            {succeed, Copies} ->
+              {Exchange, Notification} = build_notification(Request, Result, Copies),
+              try
+                case Notification of
+                  no_notification -> ok;
+                  _ -> publish_notification(Exchange, Notification, Env)
+                end
+              catch
+                error: Error -> ?LOG_WARNING("Notification publishment failed: ~p",[Error])
+              end;
+            _ -> ok
             end
           catch
-            exit:{timeout, _} -> {error, timeout_exceeded}
+              exit:{timeout, _} -> {error, timeout_exceeded}
           end;
         false -> {error, server_unavailable}
       end;
@@ -116,7 +123,8 @@ forward_request(Request = {_Operation, #{isbn := Isbn}}, Env) ->
   Reason :: term()}).
 forward_multi_request(Request, Env) ->
   ExpectedNodesSize = length(Env#librarink_proxy_env.mnesia_nodes),
-  case lists:filtermap(fun({Active, Backup}) -> retrieve_active_node(Active, Backup) end, Env#librarink_proxy_env.mnesia_nodes) of
+  case lists:filtermap(fun({Active, Backup}) -> retrieve_active_node(Active, Backup, Env) end, Env#librarink_proxy_env
+  .mnesia_nodes) of
     Nodes when length(Nodes) =:= ExpectedNodesSize ->
       Name = Env#librarink_proxy_env.mnesia_name,
       try
@@ -150,7 +158,7 @@ retrieve_active_node(Active, Backup, Env) ->
   ConnectedNodes = length(nodes()),
   if (ConnectedNodes == 0) ->
       {ok, Nodes} = Env#librarink_proxy_env.mnesia_nodes,
-      lists:foreach(fun({Active, Backup}) -> net_adm:ping(Active),net_adm:ping(Backup) end, Nodes);
+      lists:foreach(fun({ActiveNode, BackupNode}) -> net_adm:ping(ActiveNode),net_adm:ping(BackupNode) end, Nodes);
     true -> ok
   end,
   ResActive = lists:member(Active, ?CONNECTED_NODES),

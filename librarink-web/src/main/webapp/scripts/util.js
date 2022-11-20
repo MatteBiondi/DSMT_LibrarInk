@@ -46,7 +46,7 @@ function remove_notification(id, remove_elem){
 
 function update_notifications(id, elem){
     let notifications = JSON.parse(sessionStorage.getItem("notifications"));
-    if (notifications == null)
+    if (notifications === null)
         notifications = [];
 
     notifications = Array.prototype.concat(
@@ -92,8 +92,10 @@ async function load_reservations(){
         {"request": "read_reservations"}, "json"
     );
 
-    reserved_books = reserved_books.flatMap((reservation) => reservation["isbn"]);
-    sessionStorage.setItem("reserved_books", JSON.stringify(reserved_books))
+    if(Array.isArray(reserved_books)){
+        reserved_books = reserved_books.flatMap((reservation) => reservation["isbn"]);
+        sessionStorage.setItem("reserved_books", JSON.stringify(reserved_books))
+    }
 
     return reserved_books;
 }
@@ -104,11 +106,10 @@ async function load_loans(){
         {"request": "read_loans"}, "json"
     );
 
-    lent_books = lent_books.flatMap((loan) => [{
-        isbn : loan["isbn"],
-        start_date : loan["start_date"]
-    }]);
-    sessionStorage.setItem("lent_books", JSON.stringify(lent_books))
+    if(Array.isArray(lent_books)){
+        lent_books = lent_books.flatMap((loan) => [{isbn : loan["isbn"], start_date : loan["start_date"]}]);
+        sessionStorage.setItem("lent_books", JSON.stringify(lent_books))
+    }
 
     return lent_books;
 }
@@ -134,25 +135,31 @@ async function load_grades(){
 async function load_local_reservations(){
     // Load reservations
     let reserved_books = JSON.parse(sessionStorage.getItem("reserved_books"))
-    if (reserved_books == null){
+    if (reserved_books === null){
         reserved_books = await load_reservations();
     }
+    if(reserved_books !== null && reserved_books["error"]  !== undefined)
+        throw reserved_books["error"]
     return reserved_books;
 }
 
-async function load_local_loans(){
+async function load_local_loans() {
     // Load loans
     let lent_books = JSON.parse(sessionStorage.getItem("lent_books"))
-    if (lent_books == null){
-        lent_books = await load_loans();
+    if (lent_books === null){
+        await load_loans();
+    }
+    if( lent_books !== null && lent_books["error"] !== undefined){
+        throw lent_books["error"]
     }
     return lent_books;
+
 }
 
 async function load_local_wishlist(){
     // Load wishlist
     let wishlist = JSON.parse(sessionStorage.getItem("wishlist"))
-    if (wishlist == null){
+    if (wishlist === null){
         wishlist = await load_wishlist();
     }
     return wishlist;
@@ -161,7 +168,7 @@ async function load_local_wishlist(){
 async function load_local_grades(){
     // Load wishlist
     let grades = JSON.parse(sessionStorage.getItem("grades"))
-    if (grades == null){
+    if (grades === null){
         grades = await load_grades();
     }
     return grades;
@@ -169,7 +176,7 @@ async function load_local_grades(){
 
 function add_local_reserved_book(newBook){
     let reserved_books = JSON.parse(sessionStorage.getItem("reserved_books"))
-    if(reserved_books == null){
+    if(reserved_books === null){
         reserved_books = [];
     }
     reserved_books = Array.prototype.concat(reserved_books, newBook);
@@ -180,7 +187,7 @@ function add_local_reserved_book(newBook){
 
 function remove_local_reserved_book(oldBook){
     let reserved_books = JSON.parse(sessionStorage.getItem("reserved_books"))
-    if(reserved_books == null){
+    if(reserved_books === null){
         reserved_books = [];
     }
     reserved_books = reserved_books.filter((book) => book !== oldBook);
@@ -192,7 +199,7 @@ function remove_local_reserved_book(oldBook){
 
 function add_local_wishlist(newBook){
     let wishlist = JSON.parse(sessionStorage.getItem("wishlist"))
-    if(wishlist == null){
+    if(wishlist === null){
         wishlist = [];
     }
     wishlist = Array.prototype.concat(wishlist, newBook);
@@ -203,7 +210,7 @@ function add_local_wishlist(newBook){
 
 function remove_local_wishlist(oldBook){
     let wishlist = JSON.parse(sessionStorage.getItem("wishlist"))
-    if(wishlist == null){
+    if(wishlist === null){
         wishlist = [];
     }
     wishlist = wishlist.filter((book) => book !== oldBook);
@@ -214,7 +221,7 @@ function remove_local_wishlist(oldBook){
 
 function update_local_grades(grade){
     let grades = JSON.parse(sessionStorage.getItem("grades"))
-    if(grades == null){
+    if(grades === null){
         grades = [];
     }
     let index = grades.findIndex((oldGrade) => oldGrade["isbn"] === grade["isbn"]);

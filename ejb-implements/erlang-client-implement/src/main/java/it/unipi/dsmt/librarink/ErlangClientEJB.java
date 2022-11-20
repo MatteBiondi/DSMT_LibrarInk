@@ -267,6 +267,7 @@ public class ErlangClientEJB implements ErlangClient {
         }
 
         String json_result = sendRequest(new OtpErlangTuple(new OtpErlangObject[]{request, args}));
+
         return parseReservations(json_result);
     }
 
