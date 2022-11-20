@@ -16,6 +16,8 @@
   <input type="text" id="User" name="User"><br>
   <label for="ISBN">ISBN:</label><br>
   <input type="text" id="ISBN" name="ISBN">
+    <label for="IDBook">ISBN:</label><br>
+    <input type="text" id="IDBook" name="IDBook">
 </form>
 <button type="submit" form="loan_registration" name="button" value="AddLoan">Confirm Reservation</button>
 </body>
