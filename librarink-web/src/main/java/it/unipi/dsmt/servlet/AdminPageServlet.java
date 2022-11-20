@@ -64,7 +64,7 @@ public class AdminPageServlet extends HttpServlet {
                     for (String reservationsCheckbox : reservations_checkbox) {
 
                         reservation_parameter = reservationsCheckbox.split(";");
-                        LoanDTO newloanDTO=erlang_client.write_loan(reservation_parameter[0], reservation_parameter[1],"id");//da cambiare
+                        LoanDTO newloanDTO=erlang_client.write_loan(reservation_parameter[0], reservation_parameter[1],reservation_parameter[3]);
 
                         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
                         String newloan = ow.writeValueAsString(newloanDTO);

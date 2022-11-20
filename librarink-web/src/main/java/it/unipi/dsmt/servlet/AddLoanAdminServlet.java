@@ -13,10 +13,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Date;
 import java.util.List;
+@WebServlet(name = "AddLoanAdminServlet", value = "/adminAddLoan", loadOnStartup = 0)
+public class AddLoanAdminServlet extends HttpServlet{
 
-public class AddLoanAdminServlet {
-    @WebServlet(name = "AddLoanAdminServlet", value = "/adminAddLoan", loadOnStartup = 0)
-    public class AdminPageHistoryServlet extends HttpServlet {
+
         //private static final Logger LOGGER = Logger.getLogger(AsyncRequestServlet.class.getName());
 
         @EJB
@@ -33,10 +33,12 @@ public class AddLoanAdminServlet {
         {
             String user;
             String isbn;
+            String idBook;
             user= request.getParameter("User");
             isbn=request.getParameter("ISBN");
+            idBook=request.getParameter("IDBook");
             erlang_client.write_reservation(user,isbn);
-            erlang_client.write_loan(user,isbn,"id");//todo select a correct id
+            erlang_client.write_loan(user,isbn,idBook);
             List<ReservationDTO> reservationDTOList=
                     erlang_client.archive_reservations();
             for(ReservationDTO reservationDTO:reservationDTOList) {
@@ -49,5 +51,5 @@ public class AddLoanAdminServlet {
                 remoteEJB.saveOrUpdateHistory_reservation(history_reservationDTO, false);
             }
         }
-    }
+
 }

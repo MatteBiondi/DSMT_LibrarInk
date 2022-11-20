@@ -31,7 +31,7 @@
 <body>
 
 
-<%--@declare id="reservation"--%><%--@declare id="loan"--%>
+
 <form ACTION="<%= request.getContextPath()%>/admin" id="reservation">
     <table style="width:100%" id="reservation_table">
 
@@ -45,21 +45,23 @@
             <td>User ID</td>
             <td>Start Time</td>
             <td>End Time</td>
+            <td>Book ID</td>
 
         </tr>
-        <%  int indexReservation=0;
+        <%
             while(loanDTOIterator.hasNext() ||reservationDTOIterator.hasNext()){%>
         <tr>
             <%
                 if(reservationDTOIterator.hasNext()){
-                    ++indexReservation;
                     ReservationDTO reservationDTO=reservationDTOIterator.next();%>
-            <td><input type="checkbox" name = "reservation" value=<%=
-            reservationDTO.getUser()+";"+reservationDTO.getIsbn()+";"+reservationDTO.getStartDate()+";"+indexReservation%> /></td>
+            <td><input type="checkbox" name = "reservation" class="reservation_checkbox" value=<%=
+            reservationDTO.getUser()+";"+reservationDTO.getIsbn()+";"+reservationDTO.getStartDate()%> /></td>
                 <td><%=reservationDTO.getIsbn()%></td>
                 <td><%=reservationDTO.getUser()%></td>
                 <td><%=reservationDTO.getStartDate()%></td>
                 <td><%=reservationDTO.getStopDate()%></td>
+                <td><label for="<%="reservation"+reservationDTO.getUser()+reservationDTO.getIsbn()%>">First name:</label>
+                    <input type="text" id="<%="reservation"+reservationDTO.getUser()+reservationDTO.getIsbn()%>" name="bookID"><br><br></td>
             <%}%>
 
             <%if(loanDTOIterator.hasNext()){
@@ -81,15 +83,13 @@
             <td>Start Time</td>
             <td>End Time</td>
         </tr>
-        <% int loanIndex=0;
-            while(loanDTOIterator.hasNext() ||reservationDTOIterator.hasNext()){%>
+        <%while(loanDTOIterator.hasNext() ||reservationDTOIterator.hasNext()){%>
         <tr>
             <%if(reservationDTOIterator.hasNext()){
-                ++loanIndex;
                 reservationDTOIterator.next();}%>
             <%if(loanDTOIterator.hasNext()){
                 LoanDTO loanDTO=loanDTOIterator.next();%>
-            <td><input type="checkbox" name = "loan"  value=<%=loanDTO.getIsbn()+";"+loanDTO.getId()+";"+loanDTO.getUser()+";"+loanIndex%> /></td>
+            <td><input type="checkbox" name = "loan"  class="loan_checkbox" value=<%=loanDTO.getIsbn()+";"+loanDTO.getId()+";"+loanDTO.getUser()+";"%> /></td>
             <td><%=loanDTO.getId()%></td>
             <td><%=loanDTO.getIsbn()%></td>
             <td><%=loanDTO.getUser()%></td>
@@ -131,8 +131,11 @@
         let loan = '';
         let sap = '';
         if(formName=="reservation"){
-        $( ".relocation" ).each(function() {
+        $( ".reservation_checkbox" ).each(function() {
             if($( this ).is(':checked')){
+                let listOfParam=[];
+                listOfParam=$(this).val().split(";");
+                $(this).value=$(this).val() + ";" +';'+document.getElementById('reservation'+listOfParam[0]+listOfParam[1]);
                 reservation = reservation+''+sap+''+$( this ).val();
                 sap = ',';
             }
@@ -149,7 +152,7 @@
         }
         else
         {
-            ( ".relocation" ).each(function() {
+            $( '.loan_checkbox' ).each(function() {
                 if($( this ).is(':checked')){
                     loan = loan+''+sap+''+$( this ).val();
                     sap = ',';
