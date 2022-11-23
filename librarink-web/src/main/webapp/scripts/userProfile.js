@@ -77,27 +77,31 @@ function put_carousel(type){
 // This function is in charge of load books image for the carousel type passed as parameter
 async function load_books_image(type) {
     let isbn_list = [];
+    let images_url_array = [];
 
     // Get books for the selected carousel
-    if (type === "reservations")
-        isbn_list = await load_local_reservations();
-    else if (type === "wishlist")
-        isbn_list = await load_local_wishlist();
-    else if (type === "loans"){
-        let lent_books = await load_local_loans();
-        isbn_list = lent_books.map((book) => book.isbn);
-    }
+    try{
+        if (type === "reservations")
+            isbn_list = await load_local_reservations();
+        else if (type === "wishlist")
+            isbn_list = await load_local_wishlist();
+        else if (type === "loans"){
+            let lent_books = await load_local_loans();
+            isbn_list = lent_books.map((book) => book.isbn);
+        }
 
-    // Load image for that books
-    let images_url_array = [];
-    for (const book_isbn of isbn_list){
-        let image_url = await $.post(
-            "request/async",
-            {
-                "request": "load_image_url",
-                "isbn": book_isbn
-            }, "json")
-        images_url_array.push(image_url);
+        // Load image for that books
+        for (const book_isbn of isbn_list){
+            let image_url = await $.post(
+                "request/async",
+                {
+                    "request": "load_image_url",
+                    "isbn": book_isbn
+                }, "json")
+            images_url_array.push(image_url);
+        }
+    }catch(exception){
+        show_message("danger", "Something went wrong");
     }
 
     // Shows images in the carousel
