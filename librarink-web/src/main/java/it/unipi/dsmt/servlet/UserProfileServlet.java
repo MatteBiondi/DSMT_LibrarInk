@@ -33,7 +33,6 @@ public class UserProfileServlet extends HttpServlet {
         request.setAttribute("birthday", user.getBirthday());
         request.setAttribute("email", email);
         request.setAttribute("image", user.getImage());
-        // todo toglierei img da db e metterei semplicemente url in html
 
         // Redirect user to the profile page
         response.setContentType("text/html");
