@@ -6,6 +6,7 @@ import java.util.List;
 @Remote
 public interface LibrarinkRemote {
     public List<Librarink_usersDTO> listUsers(Librarink_usersDTO userFilter);
+    public List<AdminDTO> listAdmins(AdminDTO adminFilter);
     public List<Librarink_booksDTO> listBooks(Librarink_booksDTO booksFilter);
     public List<Librarink_history_loanDTO> listHistoryLoan(Librarink_history_loanDTO history_loanFilter);
     public List<Librarink_wishlistDTO> listWishlist(Librarink_wishlistDTO wishlistFilter);

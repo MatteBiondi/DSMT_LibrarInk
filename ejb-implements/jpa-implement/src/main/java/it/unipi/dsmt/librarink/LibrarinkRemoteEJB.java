@@ -20,7 +20,6 @@
         public List<Librarink_usersDTO> listUsers(Librarink_usersDTO usersFilter) {
             Map<String, Object> parameters = new HashMap<String, Object>();
             StringBuilder jpql = new StringBuilder();
-            //jpql.append("select u, coalesce(size(c.languages),0) from users u where 1 = 1 ");
             jpql.append("select u from Users u where 1 = 1 ");
             if (usersFilter.getEmail() != null && !usersFilter.getEmail().isEmpty()){
                 jpql.append(" and lower(u.email) like concat('%', lower(:email), '%') ");
@@ -36,9 +35,8 @@
             }
             if (usersFilter.getPassword() != null && !usersFilter.getPassword().isEmpty()){
                 jpql.append(" and lower(u.password) like concat('%', lower(:password), '%') ");
-                parameters.put("password", usersFilter.getSurname());
+                parameters.put("password", usersFilter.getPassword());
             }
-            jpql.append(" group by u ");
             Query query = entityManager.createQuery(jpql.toString());
             for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
                 query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
@@ -56,6 +54,36 @@
                     usersdto.setBirthday(user.getBirthday());
                     usersdto.setImage(user.getImage());
                     toReturnList.add(usersdto);
+                }
+            }
+            return toReturnList;
+        }
+
+        @Override
+        public List<AdminDTO> listAdmins(AdminDTO adminFilter) {
+            Map<String, Object> parameters = new HashMap<String, Object>();
+            StringBuilder jpql = new StringBuilder();
+            jpql.append("select a from Admin a where 1 = 1 ");
+            if (adminFilter.getEmail() != null && !adminFilter.getEmail().isEmpty()){
+                jpql.append(" and lower(a.email) like concat('%', lower(:email), '%') ");
+                parameters.put("email", adminFilter.getEmail());
+            }
+            if (adminFilter.getPassword() != null && !adminFilter.getPassword().isEmpty()){
+                jpql.append(" and lower(a.password) like concat('%', lower(:password), '%') ");
+                parameters.put("password", adminFilter.getPassword());
+            }
+            Query query = entityManager.createQuery(jpql.toString());
+            for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
+                query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
+            }
+            List<Admin> adminList = query.getResultList();
+            List<AdminDTO> toReturnList = new ArrayList<AdminDTO>();
+            if (adminList != null && !adminList.isEmpty()) {
+                for(Admin admin : adminList){
+                    AdminDTO adminDto = new AdminDTO();
+                    adminDto.setPassword(admin.getPassword());
+                    adminDto.setEmail(admin.getEmail());
+                    toReturnList.add(adminDto);
                 }
             }
             return toReturnList;

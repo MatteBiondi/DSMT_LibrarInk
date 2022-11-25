@@ -2,6 +2,7 @@ package it.unipi.dsmt.servlet;
 
 import com.google.common.hash.Hashing;
 import it.unipi.dsmt.librarink.LibrarinkRemote;
+import it.unipi.dsmt.librarink.AdminDTO;
 import it.unipi.dsmt.librarink.Librarink_usersDTO;
 
 import javax.ejb.EJB;
@@ -15,12 +16,14 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * This class implement the login behind the user login and login page visualization
  */
 @WebServlet(name = "loginServlet", value = "/login")
 public class LoginServlet extends HttpServlet {
+    private static final Logger LOGGER = Logger.getLogger(HomepageServlet.class.getName());
     @EJB
     private LibrarinkRemote librarinkRemote;
 
@@ -48,25 +51,45 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Post request are handled to let user log-in the system.
 
-        Librarink_usersDTO usersFilter = new Librarink_usersDTO();
         // Get user inserted credentials
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+        // Hash inserted password
+        String hashedPsw = Hashing.sha256()
+                .hashString(password, StandardCharsets.UTF_8)
+                .toString();
+        // Type of access
+        String adminChecked = request.getParameter("adminCheck");
 
-        // Retrieve a user with that email
-        usersFilter.setEmail(email);
-        List<Librarink_usersDTO> usersDTO_list = librarinkRemote.listUsers(usersFilter);
-        if (!usersDTO_list.isEmpty())
-        {
-            // Check password correctness
+        if (adminChecked != null){
+            AdminDTO adminFilter = new AdminDTO();
+            // Retrieve admin by email
+            adminFilter.setEmail(email);
+            adminFilter.setPassword(hashedPsw);
+            List<AdminDTO> adminDTO_list= librarinkRemote.listAdmins(adminFilter);
+            if(!adminDTO_list.isEmpty()){
+                // Credentials match
+                // Create a session
+                HttpSession session = request.getSession(true);
+                // In a session we save the user email
+                session.setAttribute("email", email);
+                session.setAttribute("admin", true);
+                // Set session to expire in 30 mins
+                session.setMaxInactiveInterval(30 * 60);
 
-            Librarink_usersDTO usersDTO = usersDTO_list.get(0);
-            // Hash inserted password
-            String hashedPsw = Hashing.sha256()
-                    .hashString(password, StandardCharsets.UTF_8)
-                    .toString();
-            String savedPsw = usersDTO.getPassword();
-            if(hashedPsw.equals(savedPsw)) {
+                response.setContentType("text/html");
+                response.sendRedirect(request.getContextPath() + "/admin");
+                return;
+            }
+
+        }
+        else{
+            Librarink_usersDTO usersFilter = new Librarink_usersDTO();
+            // Retrieve a user with that email
+            usersFilter.setEmail(email);
+            usersFilter.setPassword(hashedPsw);
+            List<Librarink_usersDTO> usersDTO_list = librarinkRemote.listUsers(usersFilter);
+            if (!usersDTO_list.isEmpty()) {
                 // Credentials match
                 // Create a session
                 HttpSession session = request.getSession(true);
