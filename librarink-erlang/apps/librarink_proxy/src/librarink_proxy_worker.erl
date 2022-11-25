@@ -39,59 +39,59 @@ work(Request, From, Tag, Env) ->
     case Request of
       {Operation, #{isbn := Isbn_}} when is_atom(Operation) and is_binary(Isbn_) -> forward_request(Request, Env);
       {Operation, Args} when is_atom(Operation) and is_map(Args) -> forward_multi_request(Request, Env);
-      _Others -> {error, malformed_request}
+      _ -> {error, malformed_request}
     end,
 
   %% Encode response
   EncodedResponse =
     case Response of
       {Counter, Values} when is_list(Values) ->#{counter=>Counter, values=>Values};
+      Values when is_list(Values) -> #{values=>Values};
       Value when is_atom(Value) -> Value;
       Value when is_number(Value) -> Value;
       Loan when is_map(Loan) -> Loan;
-      _ -> #{error => <<"something went wrong">>}
+      Err ->  Err;
+      _ -> <<"something went wrong">>
     end,
   try
-    From ! {Tag, jsx:encode(#{result => Result, response => EncodedResponse})}
-  catch
-    error: _ ->  From ! {Tag, jsx:encode(#{result => error, response => unexpected_error})}
-  end,
+    %% Send response
+    From ! {Tag, jsx:encode(#{result => Result, response => EncodedResponse})},
 
-  %% Send notification, if needed
-  {_, RequestArgs} = Request,
-  ContainsIsbn = maps:is_key(isbn, RequestArgs),
-  if
-    ContainsIsbn ->
-      {_, #{isbn := Isbn}} = Request,
-      case lookup_server(Isbn, Env) of
-        {true, Node} ->
-          Name = Env#librarink_proxy_env.mnesia_name,
-          %% Check number of copies available
-          try
-           CopiesResponse = gen_server:call(
+    %% Send notification, if needed
+    {_, RequestArgs} = Request,
+    ContainsIsbn = maps:is_key(isbn, RequestArgs),
+    if
+      ContainsIsbn ->
+        {_, #{isbn := Isbn}} = Request,
+        case lookup_server(Isbn, Env) of
+          {true, Node} ->
+            Name = Env#librarink_proxy_env.mnesia_name,
+            %% Check number of copies available
+            CopiesResponse = gen_server:call(
               {Name, Node},
               {read_copies,  #{type => available, operation => count, isbn => Isbn}},
               Env#librarink_proxy_env.request_timeout
             ),
-           case CopiesResponse of
-            {succeed, Copies} ->
-              {Exchange, Notification} = build_notification(Request, Result, Copies),
-              try
-                case Notification of
-                  no_notification -> ok;
-                  _ -> publish_notification(Exchange, Notification, Env)
-                end
-              catch
-                error: Error -> ?LOG_WARNING("Notification publishment failed: ~p",[Error])
-              end;
-            _ -> ok
-            end
-          catch
-              exit:{timeout, _} -> {error, timeout_exceeded}
-          end;
-        false -> {error, server_unavailable}
-      end;
-    true -> ok
+            case CopiesResponse of
+              {succeed, Copies} ->
+                {Exchange, Notification} = build_notification(Request, Result, Copies),
+                try
+                  case Notification of
+                    no_notification -> ok;
+                    _ -> publish_notification(Exchange, Notification, Env)
+                  end
+                catch
+                  error: Error -> ?LOG_WARNING("Notification publishment failed: ~p",[Error])
+                end;
+              _ -> ok
+            end;
+          false -> {error, server_unavailable}
+        end;
+      true -> ok
+    end
+  catch
+    error: _ ->  From ! {Tag, jsx:encode(#{result => error, response => unexpected_error})};
+    exit:{timeout, _} -> From ! {Tag, jsx:encode(#{result => error, response => timeout_exceeded})}
   end.
 
 %%%%%===================================================================
@@ -145,7 +145,7 @@ forward_multi_request(Request, Env) ->
 %% @end
 -spec(lookup_server(Isbn :: binary(), Env :: #librarink_proxy_env{}) -> Node :: node()).
 lookup_server(Isbn,Env) ->
-    GroupId = binary:decode_unsigned(crypto:hash(md5, Isbn)) rem erlang:length(Env#librarink_proxy_env.mnesia_nodes) + 1,
+  GroupId = binary:decode_unsigned(crypto:hash(md5, Isbn)) rem erlang:length(Env#librarink_proxy_env.mnesia_nodes) + 1,
   {Active, Backup} = lists:nth(GroupId, Env#librarink_proxy_env.mnesia_nodes),
   retrieve_active_node(Active, Backup, Env).
 
@@ -157,7 +157,7 @@ lookup_server(Isbn,Env) ->
 retrieve_active_node(Active, Backup, Env) ->
   ConnectedNodes = length(nodes()),
   if (ConnectedNodes == 0) ->
-      {ok, Nodes} = Env#librarink_proxy_env.mnesia_nodes,
+      Nodes = Env#librarink_proxy_env.mnesia_nodes,
       lists:foreach(fun({ActiveNode, BackupNode}) -> net_adm:ping(ActiveNode),net_adm:ping(BackupNode) end, Nodes);
     true -> ok
   end,
