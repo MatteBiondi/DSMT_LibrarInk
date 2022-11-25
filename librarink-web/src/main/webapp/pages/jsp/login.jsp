@@ -36,7 +36,11 @@
                     <input type="password" class="form-control" id="EnterPassword" name="password" autocomplete="on" required>
                     <label for="EnterPassword" class="text-left">Password : </label>
                 </div>
-
+                <!-- Checkbox -->
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="adminCheck" />
+                    <label class="form-check-label admin-check-label" for="adminCheck"> Admin user </label>
+                </div>
                 <button type="submit" class="btn btn-lg btn-primary">Login</button>
                 <button type="reset" class="btn btn-lg btn-primary"> Cancel</button>
 
