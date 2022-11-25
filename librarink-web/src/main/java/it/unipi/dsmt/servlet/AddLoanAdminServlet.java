@@ -37,10 +37,23 @@ public class AddLoanAdminServlet extends HttpServlet{
             user= request.getParameter("User");
             isbn=request.getParameter("ISBN");
             idBook=request.getParameter("IDBook");
-            erlang_client.write_reservation(user,isbn);
-            erlang_client.write_loan(user,isbn,idBook);
+            try {
+                erlang_client.write_reservation(user,isbn);
+            } catch (ErlangClientException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                erlang_client.write_loan(user,isbn,idBook);
+            } catch (ErlangClientException e) {
+                throw new RuntimeException(e);
+            }
             List<ReservationDTO> reservationDTOList=
-                    erlang_client.archive_reservations();
+                    null;
+            try {
+                reservationDTOList = erlang_client.archive_reservations();
+            } catch (ErlangClientException e) {
+                throw new RuntimeException(e);
+            }
             for(ReservationDTO reservationDTO:reservationDTOList) {
                 Librarink_history_reservationDTO history_reservationDTO = new Librarink_history_reservationDTO();
                 history_reservationDTO.setUser_email(reservationDTO.getUser());

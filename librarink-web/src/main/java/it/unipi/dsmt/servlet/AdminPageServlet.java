@@ -37,9 +37,17 @@ public class AdminPageServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         List<LoanDTO> loans;
         List<ReservationDTO> reservationDTOS;
-        loans = erlang_client.read_loans(null,null,null);
+        try {
+            loans = erlang_client.read_loans(null,null,null);
+        } catch (ErlangClientException e) {
+            throw new RuntimeException(e);
+        }
         request.setAttribute("loanList",loans);
-        reservationDTOS= erlang_client.read_reservations(null,null);
+        try {
+            reservationDTOS= erlang_client.read_reservations(null,null);
+        } catch (ErlangClientException e) {
+            throw new RuntimeException(e);
+        }
         request.setAttribute("reservationList",reservationDTOS);
         String TargetJSP ="/pages/jsp/admin_page.jsp";
         RequestDispatcher requestDispatcher=getServletContext().getRequestDispatcher(TargetJSP);
@@ -64,13 +72,23 @@ public class AdminPageServlet extends HttpServlet {
                     for (String reservationsCheckbox : reservations_checkbox) {
 
                         reservation_parameter = reservationsCheckbox.split(";");
-                        LoanDTO newloanDTO=erlang_client.write_loan(reservation_parameter[0], reservation_parameter[1],reservation_parameter[3]);
+                        LoanDTO newloanDTO= null;
+                        try {
+                            newloanDTO = erlang_client.write_loan(reservation_parameter[0], reservation_parameter[1],reservation_parameter[3]);
+                        } catch (ErlangClientException e) {
+                            throw new RuntimeException(e);
+                        }
 
                         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
                         String newloan = ow.writeValueAsString(newloanDTO);
                         JsonObject jsonObject = new Gson().fromJson(newloan,new TypeToken<LoanDTO>(){}.getType());
                         List<ReservationDTO> reservationDTOList=
-                                erlang_client.archive_reservations();
+                                null;
+                        try {
+                            reservationDTOList = erlang_client.archive_reservations();
+                        } catch (ErlangClientException e) {
+                            throw new RuntimeException(e);
+                        }
                         newloanList.add(jsonObject);
                         for(ReservationDTO reservationDTO:reservationDTOList) {
                             Librarink_history_reservationDTO history_reservationDTO = new Librarink_history_reservationDTO();
@@ -91,8 +109,17 @@ public class AdminPageServlet extends HttpServlet {
 
                     for (String reservationsCheckbox : reservations_checkbox) {
                         reservation_parameter = reservationsCheckbox.split(";");
-                        erlang_client.cancel_reservation(reservation_parameter[0], reservation_parameter[1]);
-                        List<ReservationDTO> reservationDTOList= erlang_client.archive_reservations();
+                        try {
+                            erlang_client.cancel_reservation(reservation_parameter[0], reservation_parameter[1]);
+                        } catch (ErlangClientException e) {
+                            throw new RuntimeException(e);
+                        }
+                        List<ReservationDTO> reservationDTOList= null;
+                        try {
+                            reservationDTOList = erlang_client.archive_reservations();
+                        } catch (ErlangClientException e) {
+                            throw new RuntimeException(e);
+                        }
                         for(ReservationDTO reservationDTO:reservationDTOList) {
                             Librarink_history_reservationDTO history_reservationDTO = new Librarink_history_reservationDTO();
                             history_reservationDTO.setUser_email(reservationDTO.getUser());
@@ -114,8 +141,17 @@ public class AdminPageServlet extends HttpServlet {
                     for (String loanCheckbox : loan_checkbox) {
                         loan_parameter = loanCheckbox.split(";");
 
-                        String s = erlang_client.terminate_loan(loan_parameter[0], loan_parameter[1]);
-                        List<LoanDTO> loanDTOList = erlang_client.archive_loans();
+                        try {
+                            String s = erlang_client.terminate_loan(loan_parameter[0], loan_parameter[1]);
+                        } catch (ErlangClientException e) {
+                            throw new RuntimeException(e);
+                        }
+                        List<LoanDTO> loanDTOList = null;
+                        try {
+                            loanDTOList = erlang_client.archive_loans();
+                        } catch (ErlangClientException e) {
+                            throw new RuntimeException(e);
+                        }
                         for(LoanDTO loanDTO:loanDTOList){
                             Librarink_history_loanDTO librarink_history_loanDTO=new Librarink_history_loanDTO();
                             librarink_history_loanDTO.setIsbn(loanDTO.getIsbn());
