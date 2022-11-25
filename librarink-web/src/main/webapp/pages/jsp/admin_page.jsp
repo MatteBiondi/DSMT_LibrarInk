@@ -61,7 +61,10 @@
                 <td><%=reservationDTO.getStartDate()%></td>
                 <td><%=reservationDTO.getStopDate()%></td>
                 <td><label for="<%="reservation"+reservationDTO.getUser()+reservationDTO.getIsbn()%>">First name:</label>
-                    <input type="text" id="<%="reservation"+reservationDTO.getUser()+reservationDTO.getIsbn()%>" name="bookID"><br><br></td>
+                    <input type="text" onclick="menuListId(<%="reservation"+reservationDTO.getUser()+reservationDTO.getIsbn()%>
+                            ,<%="IdList"+reservationDTO.getUser()+reservationDTO.getIsbn()%>,<%=reservationDTO.getIsbn()%>)"
+                           list="<%="IdList"+reservationDTO.getUser()+reservationDTO.getIsbn()%>" id="<%="reservation"+reservationDTO.getUser()+reservationDTO.getIsbn()%>" name="bookID" />
+                    <datalist id="<%="IdList"+reservationDTO.getUser()+reservationDTO.getIsbn()%>"></datalist><br><br></td>
             <%}%>
 
             <%if(loanDTOIterator.hasNext()){
@@ -172,7 +175,37 @@
         myDeleteFunction(tableName,formName,checkboxName);
 
     }
+    async function menuListId(inputField,datalist,Isbn)
+    {
+        let listOfId=requestID(Isbn);
+        populateList(inputField,datalist,listOfId);
 
+    }
+    async function requestID(Isbn) {
+        let idList = await $.post("<%= request.getContextPath()%>/AsyncRequestServlet", {
+            request: "available_copy_ids",
+            isbn: Isbn })
+        let jsonObj = JSON.parse('[' + idList + ']');
+        let listdata=[];
+        for (let i=0;i<jsonObj.length();i++){
+
+            //Adding each element of JSON array into ArrayList
+            listdata.add(jsonObj.get(i).id);//id è il valore?
+        }
+        return listdata;
+    }
+    function populateList(inputField,datalist,bookIdArray)
+    {
+        const bookIDInput=document.getElementById(inputField);
+        const bookIdDataList=document.getElementById(datalist);
+        bookIdArray.forEach(bookIdElement=>{
+            let option = document.createElement("option");
+            option.innerHTML = bookIdElement;
+            bookIdDataList.appendChild(option);
+        }
+        );
+
+    }
     //add a single element at the table
     function myCreateFunctionSingleElement(nameTable,value,typeValue) {
         let table = document.getElementById(nameTable);
