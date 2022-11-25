@@ -183,6 +183,14 @@ public class AsyncRequestServlet extends HttpServlet {
 
                     writer.write(book_and_url_obj.toString());
                     return;
+                case "available_copy_ids"://TODO check if admin
+                    List<BookCopyDTO> copies = erlang_client.read_available_copies(isbn);
+                    JsonArray copies_js = new JsonArray();
+                    for(BookCopyDTO copy: copies){
+                        copies_js.add(copy.getId());
+                    }
+                    writer.write(copies_js.toString());
+                    return;
                 default:
                     writer.write("{\"error\":\"Unexpected request\"}");
             }
