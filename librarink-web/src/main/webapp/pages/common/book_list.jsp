@@ -1,6 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <jsp:useBean id="books" scope="request" type="java.util.List"/>
 
@@ -12,11 +11,10 @@
         <c:forEach items="${books}" var="book">
             <jsp:include page="book.jsp">
                 <jsp:param name="type" value="thumbnail" />
-                <jsp:param name="image" value="${book.getImage_url_m()}" />
-                <jsp:param name="title" value="${book.getBook_title()}" />
-                <jsp:param name="author" value="${book.getBook_author()}" />
+                <jsp:param name="image" value="${book.getImageUrlM()}" />
+                <jsp:param name="title" value="${book.getTitle()}" />
+                <jsp:param name="author" value="${book.getAuthor()}" />
                 <jsp:param name="isbn" value="${book.getIsbn()}" />
-                <jsp:param name="rate" value="${book.getSum_of_stars()}" />
             </jsp:include>
         </c:forEach>
     </div>

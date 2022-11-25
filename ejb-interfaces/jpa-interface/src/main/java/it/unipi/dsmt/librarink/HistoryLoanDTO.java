@@ -3,19 +3,19 @@ package it.unipi.dsmt.librarink;
 import java.io.Serializable;
 import java.sql.Date;
 
-public class Librarink_history_reservationDTO implements Serializable {
-    String user_email;
+public class HistoryLoanDTO implements Serializable {
+    String user;
     String isbn;
+    String id_copy;
     Date start_date;
     Date end_date;
-    boolean deleted;
 
-    public String getUser_email() {
-        return user_email;
+    public String getUser() {
+        return user;
     }
 
-    public void setUser_email(String user_email) {
-        this.user_email = user_email;
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public String getIsbn() {
@@ -24,6 +24,14 @@ public class Librarink_history_reservationDTO implements Serializable {
 
     public void setIsbn(String isbn) {
         this.isbn = isbn;
+    }
+
+    public String getId_copy() {
+        return id_copy;
+    }
+
+    public void setId_copy(String id_copy) {
+        this.id_copy = id_copy;
     }
 
     public Date getStart_date() {
@@ -42,22 +50,14 @@ public class Librarink_history_reservationDTO implements Serializable {
         this.end_date = end_date;
     }
 
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
-
     @Override
     public String toString() {
-        return "libraink_history_reservationDTO{" +
-                "user_email='" + user_email + '\'' +
+        return "libraink_history_loanDTO{" +
+                "user='" + user + '\'' +
                 ", isbn='" + isbn + '\'' +
+                ", id_copy='" + id_copy + '\'' +
                 ", start_date=" + start_date +
                 ", end_date=" + end_date +
-                ", deleted=" + deleted +
                 '}';
     }
 }

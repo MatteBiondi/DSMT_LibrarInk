@@ -1,21 +1,33 @@
-package it.unipi.dsmt.librarink;
+package it.unipi.dsmt.librarink.entities;
 
-import java.io.Serializable;
+import javax.persistence.*;
 import java.sql.Date;
 
-public class Librarink_history_loanDTO implements Serializable {
-    String user_email;
+@Entity
+@Table(name = "history_loan")
+@IdClass(HistoryLoanKey.class)
+public class HistoryLoan {
+    @Id
+    @Column(name="user")
+    String user;
+    @Id
+    @Column(name="isbn")
     String isbn;
+    @Id
+    @Column(name="id_copy")
     String id_copy;
+    @Id
+    @Column(name="start_date")
     Date start_date;
+    @Column(name="end_date")
     Date end_date;
 
-    public String getUser_email() {
-        return user_email;
+    public String getUser() {
+        return user;
     }
 
-    public void setUser_email(String user_email) {
-        this.user_email = user_email;
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public String getIsbn() {
@@ -50,14 +62,8 @@ public class Librarink_history_loanDTO implements Serializable {
         this.end_date = end_date;
     }
 
-    @Override
-    public String toString() {
-        return "libraink_history_loanDTO{" +
-                "user_email='" + user_email + '\'' +
-                ", isbn='" + isbn + '\'' +
-                ", id_copy='" + id_copy + '\'' +
-                ", start_date=" + start_date +
-                ", end_date=" + end_date +
-                '}';
+    public HistoryLoanKey getHistory_loanKey()
+    {
+        return new HistoryLoanKey(user,isbn,id_copy,start_date);
     }
 }

@@ -7,20 +7,20 @@ import javax.persistence.*;
 @IdClass(GradeKey.class)
 public class Grade {
     @Id
-    @Column(name="user_email")
-    String user_email;
+    @Column(name="user")
+    String user;
     @Id
     @Column(name="isbn")
     String isbn;
     @Column(name = "stars")
     Float stars;
 
-    public String getUser_email() {
-        return user_email;
+    public String getUser() {
+        return user;
     }
 
-    public void setUser_email(String user_email) {
-        this.user_email = user_email;
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public String getIsbn() {
@@ -41,6 +41,6 @@ public class Grade {
 
     public GradeKey getKey()
     {
-        return new GradeKey(this.user_email, this.isbn);
+        return new GradeKey(this.user, this.isbn);
     }
 }

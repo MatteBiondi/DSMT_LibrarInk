@@ -2,16 +2,16 @@ package it.unipi.dsmt.librarink;
 
 import java.io.Serializable;
 
-public class Librarink_wishlistDTO implements Serializable {
-    String email_user;
+public class WishlistDTO implements Serializable {
+    String user;
     String isbn;
 
-    public String getEmail_user() {
-        return email_user;
+    public String getUser() {
+        return user;
     }
 
-    public void setEmail_user(String email_user) {
-        this.email_user = email_user;
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public String getIsbn() {
@@ -25,7 +25,7 @@ public class Librarink_wishlistDTO implements Serializable {
     @Override
     public String toString() {
         return "libraink_wishlistDTO{" +
-                "email_user='" + email_user + '\'' +
+                "user='" + user + '\'' +
                 ", isbn='" + isbn + '\'' +
                 '}';
     }

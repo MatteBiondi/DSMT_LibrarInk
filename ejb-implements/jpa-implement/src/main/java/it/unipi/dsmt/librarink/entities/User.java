@@ -8,8 +8,8 @@ import java.io.Serializable;
 import java.sql.Date;
 
 @Entity
-@Table(name="users")
-public class Users implements Serializable {
+@Table(name="user")
+public class User implements Serializable {
     @Id
     @Column(name = "email")
     String email;

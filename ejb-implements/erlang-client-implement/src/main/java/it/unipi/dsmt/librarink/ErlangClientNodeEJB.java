@@ -17,15 +17,17 @@ public class ErlangClientNodeEJB implements ErlangClientNode {
     private OtpNode node;
     private String clientName;
     private String cookie;
+    private Properties properties;
     private static final Logger LOGGER = Logger.getLogger(ErlangClientNodeEJB.class.getName());
 
     @PostConstruct
     public void init(){
         LOGGER.info("Init ErlangClientNode");
 
+        // Load parameters
         InputStream input = null;
         try{
-            Properties properties = new Properties();
+            properties = new Properties();
             input = this.getClass().getClassLoader().getResourceAsStream("erlang-client.properties");
             properties.load(input);
             clientName = properties.getProperty("name", "client");
@@ -46,6 +48,7 @@ public class ErlangClientNodeEJB implements ErlangClientNode {
         }
     }
     private OtpNode getConnection() throws IOException{
+        // Check if node is already present
         if(node == null)
             return new OtpNode(clientName + "-" + this.hashCode(), cookie);
         else
@@ -54,23 +57,25 @@ public class ErlangClientNodeEJB implements ErlangClientNode {
 
     @Override
     public OtpMbox getMbox() throws ErlangClientException {
+        // Create new message box to exchange message with other Erlang nodes
         try{
            return getConnection().createMbox();
         }
         catch (NullPointerException | IOException ex){
             node = null;
-            throw new ErlangClientException("Unavailable server");
+            throw new ErlangClientException(properties.getProperty("unavailable_server"));
         }
     }
 
     @Override
     public OtpErlangRef makeRef() throws ErlangClientException {
+        // Create uniq reference to distinguish requests
         try{
             return getConnection().createRef();
         }
         catch (NullPointerException | IOException ex){
             node = null;
-            throw new ErlangClientException("Unavailable server");
+            throw new ErlangClientException(properties.getProperty("unavailable_server"));
         }
     }
 

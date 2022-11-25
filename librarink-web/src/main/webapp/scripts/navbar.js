@@ -15,7 +15,7 @@ $(document).ready(() => {
     if (notifications == null)
         notifications = [];
 
-    // For each notifications visualize them in notification section on navbar top right corner
+    // For each notification visualize them in notification section on navbar top right corner
     for(const notification of notifications){
         let counter = $("#notification-counter");
         counter.attr("data-counter", parseInt(counter.attr("data-counter")) + 1);

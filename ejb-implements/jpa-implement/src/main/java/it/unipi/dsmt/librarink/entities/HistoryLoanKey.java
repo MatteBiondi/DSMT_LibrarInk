@@ -1,30 +1,28 @@
 package it.unipi.dsmt.librarink.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
 import java.io.Serializable;
 import java.sql.Date;
 
-public class History_loanKey implements Serializable {
+public class HistoryLoanKey implements Serializable {
 
-    private String user_email;
+    private String user;
     private String isbn;
     private String id_copy;
     private Date start_date;
 
-    public History_loanKey(String user_email, String isbn, String id_copy, Date start_date) {
-        this.user_email = user_email;
+    public HistoryLoanKey(String user, String isbn, String id_copy, Date start_date) {
+        this.user = user;
         this.isbn = isbn;
         this.id_copy = id_copy;
         this.start_date = start_date;
     }
 
-    public String getUser_email() {
-        return user_email;
+    public String getUser() {
+        return user;
     }
 
-    public void setUser_email(String user_email) {
-        this.user_email = user_email;
+    public void setUser(String email) {
+        this.user = email;
     }
 
     public String getIsbn() {

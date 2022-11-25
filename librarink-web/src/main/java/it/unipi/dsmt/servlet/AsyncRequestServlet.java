@@ -95,10 +95,10 @@ public class AsyncRequestServlet extends HttpServlet {
                     writer.write(erlang_client.cancel_reservation(user, isbn));
                     return;
                 case "add_wishlist":
-                    Librarink_wishlistDTO new_item = new Librarink_wishlistDTO();
-                    new_item.setEmail_user(user);
+                    WishlistDTO new_item = new WishlistDTO();
+                    new_item.setUser(user);
                     new_item.setIsbn(isbn);
-                    Librarink_wishlistDTO result = remote.saveOrUpdateWishlist(new_item, false); // TODO: Should be boolean
+                    WishlistDTO result = remote.saveOrUpdateWishlist(new_item, false); // TODO: Should be boolean
                     writer.write("{\"result\": \"succeed\", \"response\": \"ok\"}");
                     return;
                 case "remove_wishlist":
@@ -107,16 +107,16 @@ public class AsyncRequestServlet extends HttpServlet {
                         writer.write("{\"result\": \"succeed\", \"response\": \"ok\"}");
                     }
                     else {
-                        writer.write("{\"result\": \"error\"}");
+                        writer.write("{\"result\": \"error\", \"response\": \"something went wrong\"}");
                     }
                     return;
                 case "load_wishlist":
-                    Librarink_wishlistDTO filter_wishlist = new Librarink_wishlistDTO();
-                    filter_wishlist.setEmail_user(user);
-                    List<Librarink_wishlistDTO> wishlist = remote.listWishlist(filter_wishlist);
+                    WishlistDTO filter_wishlist = new WishlistDTO();
+                    filter_wishlist.setUser(user);
+                    List<WishlistDTO> wishlist = remote.listWishlist(filter_wishlist);
 
                     JsonArray wishlist_js = new JsonArray();
-                    for (Librarink_wishlistDTO wishlist_item: wishlist){
+                    for (WishlistDTO wishlist_item: wishlist){
                         wishlist_js.add(wishlist_item.getIsbn());
                     }
                     writer.write(wishlist_js.toString());
@@ -127,29 +127,29 @@ public class AsyncRequestServlet extends HttpServlet {
                         stars = Float.parseFloat(request.getParameter("grade"));
                     }
                     catch (NullPointerException | NumberFormatException ex){
-                        writer.write("{\"error\":\"something went wrong\"}");
+                        writer.write("{\"result\": \"error\", \"response\": \"something went wrong\"}");
                         return;
                     }
 
-                    Librarink_gradesDTO grade = new Librarink_gradesDTO();
-                    grade.setUser_email(user);
+                    GradeDTO grade = new GradeDTO();
+                    grade.setUser(user);
                     grade.setIsbn(isbn);
                     grade.setStars(stars);
 
-                    Librarink_gradesDTO grade_result =  remote.saveOrUpdateGrade(grade);
+                    GradeDTO grade_result =  remote.saveOrUpdateGrade(grade);
                     if(grade_result != null)
                         writer.write("{\"result\": \"succeed\", \"response\": \"ok\"}");
                     else
-                        writer.write("{\"error\":\"something went wrong\"}");
+                        writer.write("{\"result\": \"error\", \"response\": \"something went wrong\"}");
 
                     return;
                 case "load_grades":
-                    Librarink_gradesDTO grade_filter = new Librarink_gradesDTO();
-                    grade_filter.setUser_email(user);
-                    List<Librarink_gradesDTO> grades = remote.listGrades(grade_filter);
+                    GradeDTO grade_filter = new GradeDTO();
+                    grade_filter.setUser(user);
+                    List<GradeDTO> grades = remote.listGrade(grade_filter);
 
                     JsonArray grades_js = new JsonArray();
-                    for (Librarink_gradesDTO grade_item: grades){
+                    for (GradeDTO grade_item: grades){
                         JsonObject grade_obj = new JsonObject();
                         grade_obj.addProperty("isbn", grade_item.getIsbn());
                         grade_obj.addProperty("grade", grade_item.getStars());
@@ -163,36 +163,37 @@ public class AsyncRequestServlet extends HttpServlet {
                         writer.write(String.format("{\"result\": \"succeed\", \"rating\": \"%f\"}", rating));
                     }
                     else {
-                        writer.write("{\"error\":\"something went wrong\"}");
+                        writer.write("{\"result\": \"error\", \"response\": \"something went wrong\"}");
                     }
                     return;
                 case "book_title":
-                    Librarink_booksDTO book_title = remote.findBooksByIsbn(isbn);
+                    BookDTO book_title = remote.findBooksByIsbn(isbn);
                     if(book_title != null)
-                        writer.write(String.format("{\"result\": \"succeed\", \"title\": \"%s\"}", book_title.getBook_title()));
+                        writer.write(String.format("{\"result\": \"succeed\", \"title\": \"%s\"}",
+                                book_title.getTitle()));
                     else
-                        writer.write("{\"error\":\"Book not found\"}");
+                        writer.write("{\"result\": \"error\", \"response\": \"book not found\"}");
                     return;
                 case "load_image_url":
                     // Given an isbn, retrieve the book's cover url
-                    Librarink_booksDTO book = remote.findBooksByIsbn(isbn);
+                    BookDTO book = remote.findBooksByIsbn(isbn);
 
                     JsonObject book_and_url_obj = new JsonObject();
                     book_and_url_obj.addProperty("isbn", book.getIsbn());
-                    book_and_url_obj.addProperty("url", book.getImage_url_l());
+                    book_and_url_obj.addProperty("url", book.getImageUrlL());
 
                     writer.write(book_and_url_obj.toString());
                     return;
                 default:
-                    writer.write("{\"error\":\"Unexpected request\"}");
+                    writer.write("{\"result\": \"error\", \"response\": \"unexpected request\"}");
             }
         }
-        catch (ErlangClientException ex){
-            writer.write(String.format("{\"error\":\"%s\"}", ex.getMessage()));
+        catch (ErlangClientException | RemoteDBException ex){
+            writer.write(String.format("%s", ex.getMessage()));
         }
         catch (EJBException ex){
             LOGGER.warning(String.format("EJB exception %s", ex.getMessage()));
-            writer.write("{\"error\":\"server error\"}");
+            writer.write("{\"result\": \"error\", \"response\": \"server error\"}");
         }
 
     }

@@ -19,8 +19,7 @@
             <div class="info_container card-body h-50">
                 <h3>Title: </h3><p><%= request.getParameter("title")%></p>
                 <h3>Author: </h3><p><%= request.getParameter("author")%></p>
-                <h3>Rate: </h3><p><%= request.getParameter("rate")%>/<%= MAX_RATE %></p>
-            </div>
+                <h3>Rate: </h3></div>
         </div>
     </div>
 <% } else { %>

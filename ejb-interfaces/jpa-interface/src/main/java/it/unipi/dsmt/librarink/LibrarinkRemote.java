@@ -5,31 +5,33 @@ import java.sql.Date;
 import java.util.List;
 @Remote
 public interface LibrarinkRemote {
-    public List<Librarink_usersDTO> listUsers(Librarink_usersDTO userFilter);
-    public List<Librarink_booksDTO> listBooks(Librarink_booksDTO booksFilter);
-    public List<Librarink_history_loanDTO> listHistoryLoan(Librarink_history_loanDTO history_loanFilter);
-    public List<Librarink_wishlistDTO> listWishlist(Librarink_wishlistDTO wishlistFilter);
-    public List<Librarink_gradesDTO> listGrades(Librarink_gradesDTO gradesFilter);
-    public List<Librarink_history_reservationDTO> listHistoryReservation(Librarink_history_reservationDTO history_reservationFilter);
-    public Librarink_usersDTO findUsersByEmail(String email);
-    public Librarink_booksDTO findBooksByIsbn(String isbn);
-    public Librarink_gradesDTO findGradesByKey(String user_email, String isbn);
-    public Librarink_wishlistDTO findWishlistByKey(String user_email, String isbn);
-    public Librarink_history_loanDTO findHistoryLoanByKeys(String user_email, String isbn, String id_copy, Date start_date);
-    public Librarink_history_reservationDTO findHistoryReservationByKeys(String user_email, String isbn, String id_copy, Date start_date);
-    public boolean  deleteUserByEmail(String email);
-    public boolean  deleteBookByIsbn(String isbn);
-    public boolean deleteWishlistByKey(String user_email,String isbn);
-    public boolean deleteGradeByKey(String user_email,String isbn);
-    public boolean deleteHistoryLoanByKeys( String user_email,String isbn,String id_copy,Date start_date);
-    public boolean deleteHistoryReservationByKeys( String user_email,String isbn,String id_copy,Date start_date);
-    public Librarink_usersDTO saveOrUpdateUser(Librarink_usersDTO userDTO, boolean update);
-    public Librarink_booksDTO saveOrUpdateBooks(Librarink_booksDTO bookDTO, boolean update);
-    public Librarink_wishlistDTO saveOrUpdateWishlist(Librarink_wishlistDTO wishlistDTO, boolean update);
-    public Librarink_gradesDTO saveOrUpdateGrade(Librarink_gradesDTO gradesDTO);
-    public Librarink_history_reservationDTO saveOrUpdateHistory_reservation(Librarink_history_reservationDTO history_reservationDTO, boolean update);
-    public Librarink_history_loanDTO saveOrUpdateHistory_loan(Librarink_history_loanDTO history_loanDTO, boolean update);
-    public List<Librarink_booksDTO> listPaginationBook(int offset, int page, Librarink_booksDTO filter);
-    public Long countBooks(Librarink_booksDTO filter);
-    public Double computeRating(String isbn);
+    List<UserDTO> listUser(UserDTO userFilter) throws RemoteDBException;
+    //List<LibrarinkBookDTO> listBook(LibrarinkBookDTO booksFilter) throws RemoteDBException; // TODO: remove
+    List<HistoryLoanDTO> listHistoryLoan(HistoryLoanDTO history_loanFilter) throws RemoteDBException;
+    List<WishlistDTO> listWishlist(WishlistDTO wishlistFilter) throws RemoteDBException;
+    List<GradeDTO> listGrade(GradeDTO gradesFilter) throws RemoteDBException;
+    List<HistoryReservationDTO> listHistoryReservation(HistoryReservationDTO history_reservationFilter) throws RemoteDBException;
+    UserDTO findUsersByEmail(String email) throws RemoteDBException;
+    BookDTO findBooksByIsbn(String isbn) throws RemoteDBException;
+    GradeDTO findGradeByKey(String user_email, String isbn) throws RemoteDBException;
+    WishlistDTO findWishlistByKey(String user_email, String isbn) throws RemoteDBException;
+    HistoryLoanDTO findHistoryLoanByKey(String user_email, String isbn, String id_copy, Date start_date) throws RemoteDBException;
+    HistoryReservationDTO findHistoryReservationByKey(String user_email, String isbn, String id_copy,
+                                                      Date start_date) throws RemoteDBException;
+    boolean  deleteUserByEmail(String email) throws RemoteDBException;
+    boolean  deleteBookByIsbn(String isbn) throws RemoteDBException;
+    boolean deleteWishlistByKey(String user_email,String isbn) throws RemoteDBException;
+    boolean deleteGradeByKey(String user_email,String isbn) throws RemoteDBException;
+    boolean deleteHistoryLoanByKey( String user_email,String isbn,String id_copy,Date start_date) throws RemoteDBException;
+    boolean deleteHistoryReservationByKey( String user_email,String isbn,String id_copy,Date start_date) throws RemoteDBException;
+    UserDTO saveOrUpdateUser(UserDTO userDTO, boolean update) throws RemoteDBException;
+    BookDTO saveOrUpdateBook(BookDTO bookDTO, boolean update) throws RemoteDBException;
+    WishlistDTO saveOrUpdateWishlist(WishlistDTO wishlistDTO, boolean update) throws RemoteDBException;
+    GradeDTO saveOrUpdateGrade(GradeDTO gradesDTO) throws RemoteDBException;
+    HistoryReservationDTO saveOrUpdateHistoryReservation(HistoryReservationDTO history_reservationDTO,
+                                                         boolean update) throws RemoteDBException;
+    HistoryLoanDTO saveOrUpdateHistoryLoan(HistoryLoanDTO history_loanDTO, boolean update) throws RemoteDBException;
+    List<BookDTO> listPaginationBook(int offset, int page, BookDTO filter) throws RemoteDBException;
+    Long countBooks(BookDTO filter) throws RemoteDBException;
+    Double computeRating(String isbn) throws RemoteDBException;
 }

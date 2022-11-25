@@ -3,22 +3,22 @@ package it.unipi.dsmt.librarink.entities;
 import java.io.Serializable;
 
 public class GradeKey implements Serializable {
-    private String user_email;
+    private String user;
     private String isbn;
 
     public GradeKey(){};
 
-    public GradeKey(String user_email, String isbn) {
-        this.user_email = user_email;
+    public GradeKey(String user, String isbn) {
+        this.user = user;
         this.isbn = isbn;
     }
 
-    public String getUser_email() {
-        return user_email;
+    public String getUser() {
+        return user;
     }
 
-    public void setUser_email(String user_email) {
-        this.user_email = user_email;
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public String getIsbn() {

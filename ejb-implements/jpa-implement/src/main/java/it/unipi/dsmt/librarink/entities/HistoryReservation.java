@@ -4,30 +4,30 @@ import javax.persistence.*;
 import java.sql.Date;
 
 @Entity
-@Table(name = "history_loan")
-@IdClass(History_loanKey.class)
-public class History_loan {
+@Table(name = "history_reservation")
+@IdClass(HistoryReservationKey.class)
+public class HistoryReservation {
     @Id
-    @Column(name="user_email")
-    String user_email;
+    @Column(name="user")
+    String user;
     @Id
     @Column(name="isbn")
     String isbn;
-    @Id
-    @Column(name="id_copy")
-    String id_copy;
+
     @Id
     @Column(name="start_date")
     Date start_date;
     @Column(name="end_date")
     Date end_date;
+    @Column(name="deleted")
+    boolean deleted;
 
-    public String getUser_email() {
-        return user_email;
+    public String getUser() {
+        return user;
     }
 
-    public void setUser_email(String user_email) {
-        this.user_email = user_email;
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public String getIsbn() {
@@ -36,14 +36,6 @@ public class History_loan {
 
     public void setIsbn(String isbn) {
         this.isbn = isbn;
-    }
-
-    public String getId_copy() {
-        return id_copy;
-    }
-
-    public void setId_copy(String id_copy) {
-        this.id_copy = id_copy;
     }
 
     public Date getStart_date() {
@@ -62,8 +54,14 @@ public class History_loan {
         this.end_date = end_date;
     }
 
-    public History_loanKey getHistory_loanKey()
-    {
-        return new History_loanKey(user_email,isbn,id_copy,start_date);
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+    public HistoryReservationKey getHistory_reservationKey(){
+        return new HistoryReservationKey(user,isbn, start_date);
     }
 }

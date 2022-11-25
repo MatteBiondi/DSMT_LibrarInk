@@ -1,26 +1,24 @@
 package it.unipi.dsmt.librarink.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
 import java.io.Serializable;
 
 public class WishListKey implements Serializable {
-    private String email_user;
+    private String user;
     private String isbn;
     public WishListKey() {
 
     }
-    public WishListKey(String email_user, String isbn) {
-        this.email_user = email_user;
+    public WishListKey(String user, String isbn) {
+        this.user = user;
         this.isbn = isbn;
     }
 
-    public String getEmail_user() {
-        return email_user;
+    public String getUser() {
+        return user;
     }
 
-    public void setEmail_user(String email_user) {
-        this.email_user = email_user;
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public String getIsbn() {

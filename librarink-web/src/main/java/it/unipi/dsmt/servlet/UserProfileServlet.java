@@ -1,7 +1,8 @@
 package it.unipi.dsmt.servlet;
 
 import it.unipi.dsmt.librarink.LibrarinkRemote;
-import it.unipi.dsmt.librarink.Librarink_usersDTO;
+import it.unipi.dsmt.librarink.UserDTO;
+import it.unipi.dsmt.librarink.RemoteDBException;
 
 import javax.ejb.EJB;
 import javax.servlet.ServletException;
@@ -21,21 +22,23 @@ public class UserProfileServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String email = (String) request.getSession().getAttribute("email");
+        try {
+            String email = (String) request.getSession().getAttribute("email");
 
-        // Retrieve any user information from database
-        Librarink_usersDTO user = remote.findUsersByEmail(email);
+            // Retrieve any user information from database
+            UserDTO user = remote.findUsersByEmail(email);
 
-        // Set any information as parameter for JSP page
-        request.setAttribute("name", user.getName());
-        request.setAttribute("surname", user.getSurname());
-        request.setAttribute("address", user.getAddress());
-        request.setAttribute("birthday", user.getBirthday());
-        request.setAttribute("email", email);
-        request.setAttribute("image", user.getImage());
+            // Set any information as parameter for JSP page
+            request.setAttribute("name", user.getName());
+            request.setAttribute("surname", user.getSurname());
+            request.setAttribute("address", user.getAddress());
+            request.setAttribute("birthday", user.getBirthday());
+            request.setAttribute("email", email);
+            request.setAttribute("image", user.getImage());
 
-        // Redirect user to the profile page
-        response.setContentType("text/html");
-        getServletContext().getRequestDispatcher("/pages/jsp/userProfile.jsp").forward(request, response);
+            // Redirect user to the profile page
+            response.setContentType("text/html");
+            getServletContext().getRequestDispatcher("/pages/jsp/userProfile.jsp").forward(request, response);
+        }catch (RemoteDBException ex){}
     }
 }

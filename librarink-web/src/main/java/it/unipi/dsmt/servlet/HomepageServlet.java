@@ -1,7 +1,8 @@
 package it.unipi.dsmt.servlet;
 
 import it.unipi.dsmt.librarink.LibrarinkRemote;
-import it.unipi.dsmt.librarink.Librarink_booksDTO;
+import it.unipi.dsmt.librarink.BookDTO;
+import it.unipi.dsmt.librarink.RemoteDBException;
 
 import javax.ejb.EJB;
 import javax.ejb.EJBException;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -61,16 +63,16 @@ public class HomepageServlet extends HttpServlet {
         String filter_attribute = request.getParameter("search") == null ? "":request.getParameter("search");
         String filter_keyword = request.getParameter("keyword") == null ? "":request.getParameter("keyword");
 
-        List<Librarink_booksDTO> books;
-        Librarink_booksDTO filter = new Librarink_booksDTO();
+        List<BookDTO> books;
+        BookDTO filter = new BookDTO();
 
         // Set filter parameter
         switch (filter_attribute.toLowerCase(Locale.ROOT)) {
             case "title":
-                filter.setBook_title(filter_keyword);
+                filter.setTitle(filter_keyword);
                 break;
             case "author":
-                filter.setBook_author(filter_keyword);
+                filter.setAuthor(filter_keyword);
                 break;
             case "isbn":
                 filter.setIsbn(filter_keyword);
@@ -119,6 +121,10 @@ public class HomepageServlet extends HttpServlet {
                 getServletContext().getRequestDispatcher("/index.jsp").forward(request, response);
             else
                 getServletContext().getRequestDispatcher("/pages/common/book_list.jsp").forward(request, response);
+        }
+        catch (RemoteDBException ex){
+            PrintWriter writer = response.getWriter();
+            writer.write(String.format("%s", ex.getMessage()));
         }
         catch (EJBException ex){
             LOGGER.warning(String.format("EJB exception %s", ex.getMessage()));

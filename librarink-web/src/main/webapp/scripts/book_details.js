@@ -36,10 +36,10 @@ async function show_detail(event, callbacks){
         grades = await grades_promise;
         loans = await  loans_promise;
 
-        console.log(`[BOOK_DETAILS] Reservations: ${JSON.stringify(reserved_books)}`);
-        console.log(`[BOOK_DETAILS] Wishlist: ${JSON.stringify(wishlist)}`);
-        console.log(`[BOOK_DETAILS] Loans: ${JSON.stringify(loans)}`);
-        console.log(`[BOOK_DETAILS] Grades: ${JSON.stringify(grades)}`);
+        // console.log(`[BOOK_DETAILS] Reservations: ${JSON.stringify(reserved_books)}`);
+        // console.log(`[BOOK_DETAILS] Wishlist: ${JSON.stringify(wishlist)}`);
+        // console.log(`[BOOK_DETAILS] Loans: ${JSON.stringify(loans)}`);
+        // console.log(`[BOOK_DETAILS] Grades: ${JSON.stringify(grades)}`);
 
         clearTimeout(timeout);
 
@@ -59,11 +59,7 @@ async function show_detail(event, callbacks){
     catch (exception) {
         clearTimeout(timeout);
         if(!aborted){
-            if(exception.responseText !== undefined)
-                show_message("danger", "Something went wrong: " +
-                    exception.responseText.charAt(0).toUpperCase());
-            else
-                show_message("danger", "Something went wrong")
+            show_error_message(exception);
         }
     }
 }
@@ -138,6 +134,7 @@ function update_details(detail_page, callbacks){
     let modal_xl =  $(".modal-xl");
     let modal_dialog = $(".modal-dialog");
 
+    // Book detail popup page handling
     modal_close.off("click");
     modal_xl.off("click");
 
@@ -189,7 +186,7 @@ async function reserve(reserve_btn, wishlist_btn){
         }
     }
     catch (exception){
-        show_message("danger", exception);
+        show_error_message(exception);
     }
 }
 
@@ -221,7 +218,7 @@ async function cancel_reservation(reserve_btn, wishlist_btn){
         }
     }
     catch (exception){
-        show_message("danger", exception);
+        show_error_message(exception);
     }
 }
 
@@ -251,7 +248,7 @@ async function add_wishlist(wishlist_btn){
         }
     }
     catch (exception){
-        show_message("danger", exception);
+        show_error_message(exception);
     }
 }
 
@@ -281,7 +278,7 @@ async function remove_wishlist(wishlist_btn, notification){
         }
     }
     catch (exception){
-        show_message("danger", exception);
+        show_error_message(exception);
 
     }
 }
@@ -318,7 +315,7 @@ async function rate_book(grade){
         }
     }
     catch (exception) {
-        show_message("danger", exception);
+        show_error_message(exception);
     }
 }
 
@@ -332,11 +329,6 @@ function update_user_page(callbacks, old_books){
     let wishlist_removed = old_books["wishlist"].filter(isbn => !wishlist.includes(isbn))[0];
     let reservation_added = reserved_books.filter(isbn => !old_books["reserved_books"].includes(isbn))[0];
     let wishlist_added = wishlist.filter(isbn => !old_books["wishlist"].includes(isbn))[0];
-
-    //console.log(reservation_cancelled)
-    //console.log(wishlist_removed)
-    //console.log(reservation_added)
-    //console.log(wishlist_added)
 
     if(callbacks !== undefined){
         if(callbacks["insert_into_res"] !== undefined && reservation_added !== undefined){
@@ -353,4 +345,14 @@ function update_user_page(callbacks, old_books){
         }
     }
 
+}
+
+function show_error_message(exception){
+    if(exception !== undefined && Object.prototype.toString.call(exception) === "[object String]"){
+        show_message("danger", "Something went wrong: " +
+            exception.charAt(0).toUpperCase() + exception.slice(1));
+    }
+    else{
+        show_message("danger", "Something went wrong")
+    }
 }

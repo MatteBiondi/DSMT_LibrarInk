@@ -1,3 +1,4 @@
+// DOM elements manipulations
 
 function build_notification(id, timestamp, text, isbn){
     return`
@@ -86,6 +87,7 @@ function show_message(type, text){
     setTimeout(() => {alert_elem.alert("close"); alert_elem.parent().remove(alert_elem)}, 2000);
 }
 
+// AJAX request: the result is cached in session storage to reduce network traffic
 async function load_reservations(){
     let reserved_books = await $.post(
         "request/async",
@@ -132,14 +134,16 @@ async function load_grades(){
     return grades;
 }
 
+// Read cached items if present, otherwise retrieve them by AJAX request
+
 async function load_local_reservations(){
     // Load reservations
     let reserved_books = JSON.parse(sessionStorage.getItem("reserved_books"))
     if (reserved_books === null){
         reserved_books = await load_reservations();
     }
-    if(reserved_books !== null && reserved_books["error"]  !== undefined)
-        throw reserved_books["error"]
+    if(reserved_books !== null && reserved_books["result"]  === "error")
+        throw reserved_books["response"]
     return reserved_books;
 }
 
@@ -147,10 +151,10 @@ async function load_local_loans() {
     // Load loans
     let lent_books = JSON.parse(sessionStorage.getItem("lent_books"))
     if (lent_books === null){
-        await load_loans();
+        lent_books = await load_loans();
     }
-    if( lent_books !== null && lent_books["error"] !== undefined){
-        throw lent_books["error"]
+    if(lent_books !== null && lent_books["result"] === "error"){
+        throw lent_books["response"]
     }
     return lent_books;
 
@@ -173,6 +177,8 @@ async function load_local_grades(){
     }
     return grades;
 }
+
+// Update cached items
 
 function add_local_reserved_book(newBook){
     let reserved_books = JSON.parse(sessionStorage.getItem("reserved_books"))

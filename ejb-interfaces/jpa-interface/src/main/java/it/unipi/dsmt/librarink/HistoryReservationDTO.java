@@ -1,33 +1,21 @@
-package it.unipi.dsmt.librarink.entities;
+package it.unipi.dsmt.librarink;
 
-import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Date;
 
-@Entity
-@Table(name = "history_reservation")
-@IdClass(History_reservationKey.class)
-public class History_reservation {
-    @Id
-    @Column(name="user_email")
-    String user_email;
-    @Id
-    @Column(name="isbn")
+public class HistoryReservationDTO implements Serializable {
+    String user;
     String isbn;
-
-    @Id
-    @Column(name="start_date")
     Date start_date;
-    @Column(name="end_date")
     Date end_date;
-    @Column(name="deleted")
     boolean deleted;
 
-    public String getUser_email() {
-        return user_email;
+    public String getUser() {
+        return user;
     }
 
-    public void setUser_email(String user_email) {
-        this.user_email = user_email;
+    public void setUser(String user_email) {
+        this.user = user_email;
     }
 
     public String getIsbn() {
@@ -61,7 +49,15 @@ public class History_reservation {
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
-    public History_reservationKey getHistory_reservationKey(){
-        return new History_reservationKey(user_email,isbn, start_date);
+
+    @Override
+    public String toString() {
+        return "libraink_history_reservationDTO{" +
+                "user_email='" + user + '\'' +
+                ", isbn='" + isbn + '\'' +
+                ", start_date=" + start_date +
+                ", end_date=" + end_date +
+                ", deleted=" + deleted +
+                '}';
     }
 }

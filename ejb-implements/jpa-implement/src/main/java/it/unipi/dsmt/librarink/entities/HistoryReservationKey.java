@@ -3,24 +3,24 @@ package it.unipi.dsmt.librarink.entities;
 import java.io.Serializable;
 import java.sql.Date;
 
-public class History_reservationKey implements Serializable {
+public class HistoryReservationKey implements Serializable {
 
-    private String user_email;
+    private String user;
     private String isbn;
     private Date start_date;
 
-    public History_reservationKey(String user_email, String isbn, Date start_date) {
-        this.user_email = user_email;
+    public HistoryReservationKey(String user, String isbn, Date start_date) {
+        this.user = user;
         this.isbn = isbn;
         this.start_date = start_date;
     }
 
-    public String getUser_email() {
-        return user_email;
+    public String getUser() {
+        return user;
     }
 
-    public void setUser_email(String user_email) {
-        this.user_email = user_email;
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public String getIsbn() {

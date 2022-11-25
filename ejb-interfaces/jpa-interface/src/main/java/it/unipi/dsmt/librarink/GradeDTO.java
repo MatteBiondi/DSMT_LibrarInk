@@ -2,17 +2,17 @@ package it.unipi.dsmt.librarink;
 
 import java.io.Serializable;
 
-public class Librarink_gradesDTO implements Serializable {
-    private String user_email;
+public class GradeDTO implements Serializable {
+    private String user;
     private String isbn;
     private float stars;
 
-    public String getUser_email() {
-        return user_email;
+    public String getUser() {
+        return user;
     }
 
-    public void setUser_email(String user_email) {
-        this.user_email = user_email;
+    public void setUser(String user_email) {
+        this.user = user_email;
     }
 
     public String getIsbn() {
@@ -34,7 +34,7 @@ public class Librarink_gradesDTO implements Serializable {
     @Override
     public String toString() {
         return "Librarink_gradesDTO{" +
-                "user_email='" + user_email + '\'' +
+                "user_email='" + user + '\'' +
                 ", isbn='" + isbn + '\'' +
                 ", stars=" + stars +
                 '}';

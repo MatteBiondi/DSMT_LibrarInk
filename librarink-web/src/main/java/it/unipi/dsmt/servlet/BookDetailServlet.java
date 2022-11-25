@@ -4,8 +4,6 @@ import it.unipi.dsmt.librarink.*;
 
 import javax.ejb.EJB;
 import javax.ejb.EJBException;
-import javax.ejb.NoSuchEJBException;
-import javax.ejb.TransactionRolledbackLocalException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -34,7 +32,7 @@ public class BookDetailServlet extends HttpServlet {
         try {
             // Load data from DB
             Integer available_copies = erlang_client.count_available_copies(isbn);
-            Librarink_booksDTO book = remote.findBooksByIsbn(isbn);
+            BookDTO book = remote.findBooksByIsbn(isbn);
             Double rating = remote.computeRating(isbn);
 
             // Prepare data for JSP page
@@ -44,14 +42,14 @@ public class BookDetailServlet extends HttpServlet {
             request.setAttribute("available_copies", available_copies);
             getServletContext().getRequestDispatcher("/pages/jsp/book_detail.jsp").forward(request, response);
         }
-        catch (ErlangClientException ex){
+        catch (ErlangClientException | RemoteDBException ex){
             response.setContentType("application/json");
-            writer.write(String.format("{\"error\":\"%s\"}", ex.getMessage()));
+            writer.write(String.format("%s", ex.getMessage()));
         }
         catch (EJBException ex){
             LOGGER.warning(String.format("EJB exception %s", ex.getMessage()));
             response.setContentType("application/json");
-            writer.write("{\"error\":\"server error\"}");
+            writer.write("{\"result\": \"error\", \"response\": \"server error\"}");
         }
 
     }

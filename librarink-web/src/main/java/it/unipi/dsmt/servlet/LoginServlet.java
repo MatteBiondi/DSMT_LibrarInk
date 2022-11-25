@@ -2,7 +2,8 @@ package it.unipi.dsmt.servlet;
 
 import com.google.common.hash.Hashing;
 import it.unipi.dsmt.librarink.LibrarinkRemote;
-import it.unipi.dsmt.librarink.Librarink_usersDTO;
+import it.unipi.dsmt.librarink.UserDTO;
+import it.unipi.dsmt.librarink.RemoteDBException;
 
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * This class implement the login behind the user login and login page visualization
@@ -48,39 +50,42 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Post request are handled to let user log-in the system.
 
-        Librarink_usersDTO usersFilter = new Librarink_usersDTO();
+        UserDTO usersFilter = new UserDTO();
         // Get user inserted credentials
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
         // Retrieve a user with that email
         usersFilter.setEmail(email);
-        List<Librarink_usersDTO> usersDTO_list = librarinkRemote.listUsers(usersFilter);
-        if (!usersDTO_list.isEmpty())
-        {
-            // Check password correctness
+        try {
+            List<UserDTO> usersDTO_list = librarinkRemote.listUser(usersFilter);
+            if (!usersDTO_list.isEmpty())
+            {
+                // Check password correctness
 
-            Librarink_usersDTO usersDTO = usersDTO_list.get(0);
-            // Hash inserted password
-            String hashedPsw = Hashing.sha256()
-                    .hashString(password, StandardCharsets.UTF_8)
-                    .toString();
-            String savedPsw = usersDTO.getPassword();
-            if(hashedPsw.equals(savedPsw)) {
-                // Credentials match
-                // Create a session
-                HttpSession session = request.getSession(true);
-                // In a session we save the user email
-                session.setAttribute("email", email);
-                // Set session to expire in 30 mins
-                session.setMaxInactiveInterval(30 * 60);
+                UserDTO usersDTO = usersDTO_list.get(0);
+                // Hash inserted password
+                String hashedPsw = Hashing.sha256()
+                        .hashString(password, StandardCharsets.UTF_8)
+                        .toString();
+                String savedPsw = usersDTO.getPassword();
+                if(hashedPsw.equals(savedPsw)) {
+                    // Credentials match
+                    // Create a session
+                    HttpSession session = request.getSession(true);
+                    // In a session we save the user email
+                    session.setAttribute("email", email);
+                    // Set session to expire in 30 mins
+                    session.setMaxInactiveInterval(30 * 60);
 
-                response.setContentType("text/html");
-                response.sendRedirect(request.getContextPath() + "/homepage");
-                return;
+                    response.setContentType("text/html");
+                    response.sendRedirect(request.getContextPath() + "/homepage");
+                    return;
+                }
             }
+        } catch (RemoteDBException ex){
+            Logger.getLogger(this.getClass().getName()).warning(ex.getMessage());
         }
-
         // User not exist or incorrect credentials
         response.setContentType("text/html");
         String TargetJSP ="/pages/jsp/login.jsp";
@@ -88,5 +93,6 @@ public class LoginServlet extends HttpServlet {
         request.setAttribute("messageType","error-message");
         RequestDispatcher requestDispatcher=request.getRequestDispatcher(TargetJSP);
         requestDispatcher.forward(request,response);
+
     }
 }

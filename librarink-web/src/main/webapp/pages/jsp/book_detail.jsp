@@ -12,15 +12,15 @@
                 <!-- Pass parameter to book.jsp that is in charge of book details visualization -->
                 <jsp:include page="../common/book.jsp">
                     <jsp:param name="type" value="detail" />
-                    <jsp:param name="image" value="${book.getImage_url_m()}" />
-                    <jsp:param name="title" value="${book.getBook_title()}" />
-                    <jsp:param name="author" value="${book.getBook_author()}" />
+                    <jsp:param name="image" value="${book.getImageUrlM()}" />
+                    <jsp:param name="title" value="${book.getTitle()}" />
+                    <jsp:param name="author" value="${book.getAuthor()}" />
                     <jsp:param name="isbn" value="${book.getIsbn()}" />
                     <jsp:param name="rating" value="${rating}" />
                     <jsp:param name="category" value="${book.getGenre()}" />
                     <jsp:param name="publisher" value="${book.getPublisher()}" />
-                    <jsp:param name="published_date" value="${book.getYear_of_publication()}" />
-                    <jsp:param name="language" value="English" />
+                    <jsp:param name="published_date" value="${book.getYearOfPublication()}" />
+                    <jsp:param name="language" value="${book.getLanguage()}" />
                     <jsp:param name="description" value="${book.getDescription()}" />
                     <jsp:param name="available_copies" value="${available_copies}" />
                 </jsp:include>

@@ -30,6 +30,7 @@ public class ErlangClientEJB implements ErlangClient {
     public void init() {
         LOGGER.info("Init ErlangClient");
 
+        // Load parameters
         InputStream input = null;
         properties = new Properties();
         try {
@@ -56,7 +57,7 @@ public class ErlangClientEJB implements ErlangClient {
     @Override
     public String write_copy(String isbn, String id) throws ErlangClientException {
         if (isbn == null || id == null)
-            return properties.getProperty("bad_request");
+            throw new ErlangClientException(properties.getProperty("bad_request"));
 
         OtpErlangAtom request = new OtpErlangAtom("write_copy");
         OtpErlangMap args = new OtpErlangMap();
@@ -69,7 +70,7 @@ public class ErlangClientEJB implements ErlangClient {
     @Override
     public LoanDTO write_loan(String user, String isbn, String id) throws ErlangClientException {
         if (user == null || isbn == null || id == null)
-            return null; //properties.getProperty("bad_request");
+            throw new ErlangClientException(properties.getProperty("bad_request"));
 
         OtpErlangAtom request = new OtpErlangAtom("write_loan");
         OtpErlangMap args = new OtpErlangMap();
@@ -352,10 +353,10 @@ public class ErlangClientEJB implements ErlangClient {
                 if (tag.equals(response_objs[0]) && response_objs[1] instanceof OtpErlangBinary)
                     result = OtpErlangString.newString(((OtpErlangBinary)response_objs[1]).binaryValue());
                 else
-                    result = properties.getProperty("unexpected_error");
+                    throw new ErlangClientException("unexpected_error");
             }
             else{
-                result = properties.getProperty("unavailable_server");
+               throw new ErlangClientException("unavailable_server");
             }
         }
         catch (OtpErlangDecodeException | OtpErlangExit ex){

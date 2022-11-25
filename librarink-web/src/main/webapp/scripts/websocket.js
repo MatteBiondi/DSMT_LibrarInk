@@ -1,4 +1,4 @@
-const WS_SERVER = "172.18.0.28";
+const WS_SERVER = "172.18.0.29";
 const WS_PORT = 5000;
 const WS_ENDPOINT = "update";
 const WS_WARNING_MSG = "We are experiencing some troubles, the information may not be updated.\n" +
@@ -30,7 +30,7 @@ function track_books(displayed_books, wishlist){
     console.log(`[WS] Displayed books: [${displayed_books}]`);
     console.log(`[WS] Wishlist: [${wishlist}]`);
 
-    // Track books
+    // Send book isbn to track
     if (UPDATE_WS.readyState === WebSocket.OPEN)
         UPDATE_WS.send(JSON.stringify(Array.prototype.concat(displayed_books, wishlist)));
     else
@@ -38,13 +38,13 @@ function track_books(displayed_books, wishlist){
 }
 
 async function update (event){
-    console.log(event.data)
     let notification = JSON.parse(event.data)
     let wishlist = await load_local_wishlist()
 
     // Book copy update
     if (notification.header === "update") {
         let counter = $("#" + notification.body["isbn"]).find("#copies_counter")
+        // Update book counter if book details page is opened
         if (counter.length){
             counter.text(update_counter(notification.body["operation"], counter.text()))
         }

@@ -2,7 +2,8 @@ package it.unipi.dsmt.servlet;
 
 import com.google.common.hash.Hashing;
 import it.unipi.dsmt.librarink.LibrarinkRemote;
-import it.unipi.dsmt.librarink.Librarink_usersDTO;
+import it.unipi.dsmt.librarink.UserDTO;
+import it.unipi.dsmt.librarink.RemoteDBException;
 
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
@@ -62,7 +63,7 @@ public class SignUpServlet extends HttpServlet {
                 .toString();
 
         // Store the new user information into the database
-        Librarink_usersDTO new_user = new Librarink_usersDTO();
+        UserDTO new_user = new UserDTO();
         new_user.setPassword(hashedPsw);
         new_user.setBirthday(birthday);
         new_user.setEmail(email);
@@ -70,11 +71,16 @@ public class SignUpServlet extends HttpServlet {
         new_user.setName(name);
         new_user.setSurname(surname);
         new_user.setImage("https://cdn.onlinewebfonts.com/svg/img_335286.png");
-        Librarink_usersDTO user= librarinkRemote.saveOrUpdateUser(new_user,false);
-
-        String resourceURL;
-        if (user==null)
-        {
+        try {
+            UserDTO user = librarinkRemote.saveOrUpdateUser(new_user, false);
+            // Saving success. User is redirected to login page
+            request.getSession().setAttribute("message", "User created");
+            request.getSession().setAttribute("messageType", "success-message");
+            response.setContentType("text/html");
+            response.sendRedirect(request.getContextPath() + "/login");
+        }
+        catch (RemoteDBException ex){
+            String resourceURL;
             // Saving failed
             response.setContentType("text/html");
             resourceURL = "/pages/jsp/signUp.jsp";
@@ -82,14 +88,5 @@ public class SignUpServlet extends HttpServlet {
             RequestDispatcher rd = request.getRequestDispatcher(resourceURL);
             rd.forward(request, response);
         }
-        else
-        {
-            // Saving success. User is redirected to login page
-            request.getSession().setAttribute("message", "User created");
-            request.getSession().setAttribute("messageType", "success-message");
-            response.setContentType("text/html");
-            response.sendRedirect(request.getContextPath() + "/login");
-        }
-
     }
 }
