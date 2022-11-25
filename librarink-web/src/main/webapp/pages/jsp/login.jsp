@@ -38,7 +38,7 @@
                 </div>
                 <!-- Checkbox -->
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="adminCheck" />
+                    <input class="form-check-input" type="checkbox" value="adminLogin" id="adminCheck" name="adminCheck"  />
                     <label class="form-check-label admin-check-label" for="adminCheck"> Admin user </label>
                 </div>
                 <button type="submit" class="btn btn-lg btn-primary">Login</button>
