@@ -42,3 +42,7 @@ body {
 .success-message {
     color: green!important;
 }
+
+.admin-check-label{
+    margin-bottom: 10px;
+}
