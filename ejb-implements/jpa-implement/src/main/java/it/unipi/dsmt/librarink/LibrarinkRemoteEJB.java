@@ -19,7 +19,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
     private EntityManager entityManager;
 
     @Override
-    public List<UserDTO> listUser(UserDTO usersFilter) throws RemoteDBException {
+    public List<UserDTO> listUsers(UserDTO usersFilter) throws RemoteDBException {
         try{
             Map<String, Object> parameters = new HashMap<>();
             StringBuilder jpql = new StringBuilder();
@@ -39,7 +39,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
             }
             if (usersFilter.getPassword() != null && !usersFilter.getPassword().isEmpty()){
                 jpql.append(" and lower(u.password) like concat('%', lower(:password), '%') ");
-                parameters.put("password", usersFilter.getSurname());
+                parameters.put("password", usersFilter.getPassword());
             }
 
             Query query = entityManager.createQuery(jpql.toString());
@@ -61,11 +61,42 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
                     toReturnList.add(userDTO);
                 }
             }
+
             return toReturnList;
         }
         catch (Exception ex){
             throw new RemoteDBException(ex.getMessage());
         }
+    }
+
+    @Override
+    public List<AdminDTO> listAdmins(AdminDTO adminFilter) {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        StringBuilder jpql = new StringBuilder();
+        jpql.append("select a from Admin a where 1 = 1 ");
+        if (adminFilter.getEmail() != null && !adminFilter.getEmail().isEmpty()){
+            jpql.append(" and lower(a.email) like concat('%', lower(:email), '%') ");
+            parameters.put("email", adminFilter.getEmail());
+        }
+        if (adminFilter.getPassword() != null && !adminFilter.getPassword().isEmpty()){
+            jpql.append(" and lower(a.password) like concat('%', lower(:password), '%') ");
+            parameters.put("password", adminFilter.getPassword());
+        }
+        Query query = entityManager.createQuery(jpql.toString());
+        for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
+            query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
+        }
+        List<Admin> adminList = query.getResultList();
+        List<AdminDTO> toReturnList = new ArrayList<AdminDTO>();
+        if (adminList != null && !adminList.isEmpty()) {
+            for(Admin admin : adminList){
+                AdminDTO adminDto = new AdminDTO();
+                adminDto.setPassword(admin.getPassword());
+                adminDto.setEmail(admin.getEmail());
+                toReturnList.add(adminDto);
+            }
+        }
+        return toReturnList;
     }
 
     //@Override
@@ -103,7 +134,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
     //}
 
     @Override
-    public List<HistoryLoanDTO> listHistoryLoan(HistoryLoanDTO history_loanFilter)  throws RemoteDBException {
+    public List<HistoryLoanDTO> listHistoryLoans(HistoryLoanDTO history_loanFilter)  throws RemoteDBException {
         try {
             Map<String, Object> parameters = new HashMap<>();
             StringBuilder jpql = new StringBuilder();
@@ -186,7 +217,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
     }
 
     @Override
-    public List<GradeDTO> listGrade(GradeDTO gradesFilter) throws RemoteDBException {
+    public List<GradeDTO> listGrades(GradeDTO gradesFilter) throws RemoteDBException {
         try{
             Map<String, Object> parameters = new HashMap<>();
             StringBuilder jpql = new StringBuilder();
@@ -226,9 +257,9 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
     }
 
     @Override
-    public List<HistoryReservationDTO> listHistoryReservation(HistoryReservationDTO history_reservationFilter) throws RemoteDBException {
+    public List<HistoryReservationDTO> listHistoryReservations(HistoryReservationDTO history_reservationFilter) throws RemoteDBException {
         try{
-            Map<String, Object> parameters = new HashMap<String, Object>();
+            Map<String, Object> parameters = new HashMap<>();
             StringBuilder jpql = new StringBuilder();
 
             jpql.append("select hr from HistoryReservation hr where 1 = 1 ");

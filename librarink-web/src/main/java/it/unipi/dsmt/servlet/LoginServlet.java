@@ -1,6 +1,7 @@
 package it.unipi.dsmt.servlet;
 
 import com.google.common.hash.Hashing;
+import it.unipi.dsmt.librarink.AdminDTO;
 import it.unipi.dsmt.librarink.LibrarinkRemote;
 import it.unipi.dsmt.librarink.UserDTO;
 import it.unipi.dsmt.librarink.RemoteDBException;
@@ -50,26 +51,45 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Post request are handled to let user log-in the system.
 
-        UserDTO usersFilter = new UserDTO();
         // Get user inserted credentials
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+        // Hash inserted password
+        String hashedPsw = Hashing.sha256()
+                .hashString(password, StandardCharsets.UTF_8)
+                .toString();
+        // Type of access
+        String adminChecked = request.getParameter("adminCheck");
 
-        // Retrieve a user with that email
-        usersFilter.setEmail(email);
         try {
-            List<UserDTO> usersDTO_list = librarinkRemote.listUser(usersFilter);
-            if (!usersDTO_list.isEmpty())
-            {
-                // Check password correctness
+            if (adminChecked != null){
+                AdminDTO adminFilter = new AdminDTO();
+                // Retrieve admin by email
+                adminFilter.setEmail(email);
+                adminFilter.setPassword(hashedPsw);
+                List<AdminDTO> adminDTO_list= librarinkRemote.listAdmins(adminFilter);
+                if(!adminDTO_list.isEmpty()){
+                    // Credentials match
+                    // Create a session
+                    HttpSession session = request.getSession(true);
+                    // In a session we save the user email
+                    session.setAttribute("email", email);
+                    session.setAttribute("admin", true);
+                    // Set session to expire in 30 mins
+                    session.setMaxInactiveInterval(30 * 60);
 
-                UserDTO usersDTO = usersDTO_list.get(0);
-                // Hash inserted password
-                String hashedPsw = Hashing.sha256()
-                        .hashString(password, StandardCharsets.UTF_8)
-                        .toString();
-                String savedPsw = usersDTO.getPassword();
-                if(hashedPsw.equals(savedPsw)) {
+                    response.setContentType("text/html");
+                    response.sendRedirect(request.getContextPath() + "/admin");
+                    return;
+                }
+            }
+            else{
+                UserDTO usersFilter = new UserDTO();
+                // Retrieve a user with that email
+                usersFilter.setEmail(email);
+                usersFilter.setPassword(hashedPsw);
+                List<UserDTO> usersDTO_list = librarinkRemote.listUsers(usersFilter);
+                if (!usersDTO_list.isEmpty()) {
                     // Credentials match
                     // Create a session
                     HttpSession session = request.getSession(true);
@@ -83,9 +103,11 @@ public class LoginServlet extends HttpServlet {
                     return;
                 }
             }
-        } catch (RemoteDBException ex){
-            Logger.getLogger(this.getClass().getName()).warning(ex.getMessage());
         }
+        catch(RemoteDBException ex){
+            Logger.getLogger(this.getClass().getName()).warning("Login error: " + ex.getMessage());
+        }
+
         // User not exist or incorrect credentials
         response.setContentType("text/html");
         String TargetJSP ="/pages/jsp/login.jsp";
@@ -93,6 +115,5 @@ public class LoginServlet extends HttpServlet {
         request.setAttribute("messageType","error-message");
         RequestDispatcher requestDispatcher=request.getRequestDispatcher(TargetJSP);
         requestDispatcher.forward(request,response);
-
     }
 }

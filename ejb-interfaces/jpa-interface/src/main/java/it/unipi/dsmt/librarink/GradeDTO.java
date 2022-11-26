@@ -33,7 +33,7 @@ public class GradeDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "Librarink_gradesDTO{" +
+        return "GradeDTO{" +
                 "user_email='" + user + '\'' +
                 ", isbn='" + isbn + '\'' +
                 ", stars=" + stars +
