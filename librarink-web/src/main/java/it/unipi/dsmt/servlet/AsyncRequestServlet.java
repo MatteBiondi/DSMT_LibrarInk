@@ -146,7 +146,7 @@ public class AsyncRequestServlet extends HttpServlet {
                 case "load_grades":
                     GradeDTO grade_filter = new GradeDTO();
                     grade_filter.setUser(user);
-                    List<GradeDTO> grades = remote.listGrade(grade_filter);
+                    List<GradeDTO> grades = remote.listGrades(grade_filter);
 
                     JsonArray grades_js = new JsonArray();
                     for (GradeDTO grade_item: grades){

@@ -6,9 +6,9 @@ import java.sql.Date;
 public class HistoryLoanDTO implements Serializable {
     String user;
     String isbn;
-    String id_copy;
-    Date start_date;
-    Date end_date;
+    String copyId;
+    Date startDate;
+    Date endDate;
 
     public String getUser() {
         return user;
@@ -26,38 +26,38 @@ public class HistoryLoanDTO implements Serializable {
         this.isbn = isbn;
     }
 
-    public String getId_copy() {
-        return id_copy;
+    public String getCopyId() {
+        return copyId;
     }
 
-    public void setId_copy(String id_copy) {
-        this.id_copy = id_copy;
+    public void setCopyId(String copyId) {
+        this.copyId = copyId;
     }
 
-    public Date getStart_date() {
-        return start_date;
+    public Date getStartDate() {
+        return startDate;
     }
 
-    public void setStart_date(Date start_date) {
-        this.start_date = start_date;
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
-    public Date getEnd_date() {
-        return end_date;
+    public Date getEndDate() {
+        return endDate;
     }
 
-    public void setEnd_date(Date end_date) {
-        this.end_date = end_date;
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     @Override
     public String toString() {
-        return "libraink_history_loanDTO{" +
+        return "HistoryLoanDTO{" +
                 "user='" + user + '\'' +
                 ", isbn='" + isbn + '\'' +
-                ", id_copy='" + id_copy + '\'' +
-                ", start_date=" + start_date +
-                ", end_date=" + end_date +
+                ", id_copy='" + copyId + '\'' +
+                ", start_date=" + startDate +
+                ", end_date=" + endDate +
                 '}';
     }
 }

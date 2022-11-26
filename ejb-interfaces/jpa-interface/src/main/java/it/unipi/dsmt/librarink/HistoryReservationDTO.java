@@ -6,16 +6,16 @@ import java.sql.Date;
 public class HistoryReservationDTO implements Serializable {
     String user;
     String isbn;
-    Date start_date;
-    Date end_date;
+    Date startDate;
+    Date endDate;
     boolean deleted;
 
     public String getUser() {
         return user;
     }
 
-    public void setUser(String user_email) {
-        this.user = user_email;
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public String getIsbn() {
@@ -26,20 +26,20 @@ public class HistoryReservationDTO implements Serializable {
         this.isbn = isbn;
     }
 
-    public Date getStart_date() {
-        return start_date;
+    public Date getStartDate() {
+        return startDate;
     }
 
-    public void setStart_date(Date start_date) {
-        this.start_date = start_date;
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
-    public Date getEnd_date() {
-        return end_date;
+    public Date getEndDate() {
+        return endDate;
     }
 
-    public void setEnd_date(Date end_date) {
-        this.end_date = end_date;
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     public boolean isDeleted() {
@@ -52,11 +52,11 @@ public class HistoryReservationDTO implements Serializable {
 
     @Override
     public String toString() {
-        return "libraink_history_reservationDTO{" +
+        return "HistoryReservationDTO{" +
                 "user_email='" + user + '\'' +
                 ", isbn='" + isbn + '\'' +
-                ", start_date=" + start_date +
-                ", end_date=" + end_date +
+                ", start_date=" + startDate +
+                ", end_date=" + endDate +
                 ", deleted=" + deleted +
                 '}';
     }

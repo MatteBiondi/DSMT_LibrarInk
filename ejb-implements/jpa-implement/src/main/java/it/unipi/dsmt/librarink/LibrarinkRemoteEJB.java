@@ -148,7 +148,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
                 jpql.append(" and lower(hl.isbn) like concat('%', lower(:isbn), '%') ");
                 parameters.put("isbn", history_loanFilter.getIsbn());
             }
-            if (history_loanFilter.getId_copy() != null && !history_loanFilter.getId_copy().isEmpty()){
+            if (history_loanFilter.getCopyId() != null && !history_loanFilter.getCopyId().isEmpty()){
                 jpql.append(" and lower(hl.id_copy) like concat('%', lower(:id_copy), '%') ");
                 parameters.put("id_copy", history_loanFilter.getIsbn());
             }
@@ -165,10 +165,10 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
                     HistoryLoan history_loan = (HistoryLoan) history_loanInfo[0];
                     HistoryLoanDTO history_loanDTO = new HistoryLoanDTO();
                     history_loanDTO.setIsbn(history_loan.getIsbn());
-                    history_loanDTO.setEnd_date(history_loan.getEnd_date());
-                    history_loanDTO.setId_copy(history_loan.getId_copy());
+                    history_loanDTO.setEndDate(history_loan.getEnd_date());
+                    history_loanDTO.setCopyId(history_loan.getId_copy());
                     history_loanDTO.setUser(history_loan.getUser());
-                    history_loanDTO.setStart_date(history_loan.getStart_date());
+                    history_loanDTO.setStartDate(history_loan.getStart_date());
                     toReturnList.add(history_loanDTO);
                 }
             }
@@ -282,9 +282,9 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
                     HistoryReservation history_reservation = (HistoryReservation) history_reservationInfo[0];
                     HistoryReservationDTO history_reservationDTO = new HistoryReservationDTO();
                     history_reservationDTO.setIsbn(history_reservation.getIsbn());
-                    history_reservationDTO.setEnd_date(history_reservation.getEnd_date());
+                    history_reservationDTO.setEndDate(history_reservation.getEnd_date());
                     history_reservationDTO.setUser(history_reservation.getUser());
-                    history_reservationDTO.setStart_date(history_reservation.getStart_date());
+                    history_reservationDTO.setStartDate(history_reservation.getStart_date());
                     history_reservationDTO.setDeleted(history_reservation.isDeleted());
                     toReturnList.add(history_reservationDTO);
                 }
@@ -360,10 +360,10 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
             HistoryLoan history_loan = entityManager.find(HistoryLoan.class, history_loanKey);
             HistoryLoanDTO history_loanDTO = new HistoryLoanDTO();
             history_loanDTO.setIsbn(history_loan.getIsbn());
-            history_loanDTO.setEnd_date(history_loan.getEnd_date());
-            history_loanDTO.setId_copy(history_loan.getId_copy());
+            history_loanDTO.setEndDate(history_loan.getEnd_date());
+            history_loanDTO.setCopyId(history_loan.getId_copy());
             history_loanDTO.setUser(history_loan.getUser());
-            history_loanDTO.setStart_date(history_loan.getStart_date());
+            history_loanDTO.setStartDate(history_loan.getStart_date());
             return history_loanDTO;
         }
         catch (Exception ex){
@@ -379,9 +379,9 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
             HistoryReservation history_reservation = entityManager.find(HistoryReservation.class, history_reservationKey);
             HistoryReservationDTO history_reservationDTO = new HistoryReservationDTO();
             history_reservationDTO.setIsbn(history_reservation.getIsbn());
-            history_reservationDTO.setEnd_date(history_reservation.getEnd_date());
+            history_reservationDTO.setEndDate(history_reservation.getEnd_date());
             history_reservationDTO.setUser(history_reservation.getUser());
-            history_reservationDTO.setStart_date(history_reservation.getStart_date());
+            history_reservationDTO.setStartDate(history_reservation.getStart_date());
             history_reservationDTO.setDeleted(history_reservation.isDeleted());
             return history_reservationDTO;
         }
@@ -602,13 +602,13 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
             } else {
                 history_reservation = entityManager.find(HistoryReservation.class, new HistoryReservationKey(
                         history_reservationDTO.getUser(), history_reservationDTO.getIsbn(),
-                        history_reservationDTO.getStart_date()));
+                        history_reservationDTO.getStartDate()));
             }
 
             history_reservation.setIsbn(history_reservationDTO.getIsbn());
-            history_reservation.setEnd_date(history_reservationDTO.getEnd_date());
+            history_reservation.setEnd_date(history_reservationDTO.getEndDate());
             history_reservation.setUser(history_reservationDTO.getUser());
-            history_reservation.setStart_date(history_reservationDTO.getStart_date());
+            history_reservation.setStart_date(history_reservationDTO.getStartDate());
             history_reservation.setDeleted(history_reservationDTO.isDeleted());
             if (!update) {
                 entityManager.persist(history_reservation);
@@ -631,14 +631,14 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
             } else {
                 history_loan = entityManager.find(HistoryLoan.class, new HistoryLoanKey(
                         history_loanDTO.getUser(), history_loanDTO.getIsbn(),
-                        history_loanDTO.getId_copy(), history_loanDTO.getStart_date()));
+                        history_loanDTO.getCopyId(), history_loanDTO.getStartDate()));
             }
 
             history_loan.setIsbn(history_loanDTO.getIsbn());
-            history_loan.setEnd_date(history_loanDTO.getEnd_date());
-            history_loan.setId_copy(history_loanDTO.getId_copy());
+            history_loan.setEnd_date(history_loanDTO.getEndDate());
+            history_loan.setId_copy(history_loanDTO.getCopyId());
             history_loan.setUser(history_loanDTO.getUser());
-            history_loan.setStart_date(history_loanDTO.getStart_date());
+            history_loan.setStart_date(history_loanDTO.getStartDate());
 
             if (!update) {
                 entityManager.persist(history_loan);
