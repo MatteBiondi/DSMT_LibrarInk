@@ -16,10 +16,13 @@
   <input type="text" id="User" name="User"><br>
   <label for="ISBN">ISBN:</label><br>
   <input type="text" id="ISBN" name="ISBN">
+  <input type="text" onclick="menuListId('reservationInputField','IdList',<script>getValue(inputIdField);</script>)"
+         list="IdList" id=reservationInputField" name="bookID" />
+  <datalist id="IdList"></datalist>
     <label for="IDBook">ISBN:</label><br>
     <input type="text" id="IDBook" name="IDBook">
 </form>
 <button type="submit" form="loan_registration" name="button" value="AddLoan">Confirm Reservation</button>
 </body>
-
+<script src="${pageContext.request.contextPath}/scripts/admin_page.js"></script>
 </html>

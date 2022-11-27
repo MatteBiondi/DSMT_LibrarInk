@@ -83,6 +83,10 @@
 }
     return listdata;
 }
+function getValue(inputIdField)
+{
+    return document.getElementById(inputIdField).value;
+}
     function populateList(inputField,datalist,bookIdArray)
     {
         const bookIDInput=document.getElementById(inputField);
