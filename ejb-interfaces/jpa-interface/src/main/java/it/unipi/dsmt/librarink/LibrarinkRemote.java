@@ -7,11 +7,11 @@ import java.util.List;
 public interface LibrarinkRemote {
     List<UserDTO> listUsers(UserDTO userFilter) throws RemoteDBException;
     public List<AdminDTO> listAdmins(AdminDTO adminFilter);
-    //List<LibrarinkBookDTO> listBook(LibrarinkBookDTO booksFilter) throws RemoteDBException; // TODO: remove
-    List<HistoryLoanDTO> listHistoryLoans(HistoryLoanDTO history_loanFilter) throws RemoteDBException;
+    List<BookDTO> listBook(BookDTO booksFilter) throws RemoteDBException;
+    List<HistoryLoanDTO> listHistoryLoans(HistoryLoanDTO historyLoanFilter) throws RemoteDBException;
     List<WishlistDTO> listWishlist(WishlistDTO wishlistFilter) throws RemoteDBException;
     List<GradeDTO> listGrades(GradeDTO gradesFilter) throws RemoteDBException;
-    List<HistoryReservationDTO> listHistoryReservations(HistoryReservationDTO history_reservationFilter) throws RemoteDBException;
+    List<HistoryReservationDTO> listHistoryReservations(HistoryReservationDTO historyReservationFilter) throws RemoteDBException;
     UserDTO findUsersByEmail(String email) throws RemoteDBException;
     BookDTO findBooksByIsbn(String isbn) throws RemoteDBException;
     GradeDTO findGradeByKey(String user_email, String isbn) throws RemoteDBException;

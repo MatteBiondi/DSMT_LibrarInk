@@ -16,9 +16,6 @@ import java.util.List;
 @WebServlet(name = "AddLoanAdminServlet", value = "/adminAddLoan", loadOnStartup = 0)
 public class AddLoanAdminServlet extends HttpServlet{
 
-
-        //private static final Logger LOGGER = Logger.getLogger(AsyncRequestServlet.class.getName());
-
         @EJB
         private ErlangClient erlang_client;
         @EJB
@@ -41,21 +38,19 @@ public class AddLoanAdminServlet extends HttpServlet{
                 idBook = request.getParameter("IDBook");
                 erlang_client.write_reservation(user, isbn);
                 erlang_client.write_loan(user, isbn, idBook);
-                List<ReservationDTO> reservationDTOList =
-                        erlang_client.archive_reservations();
+                List<ReservationDTO> reservationDTOList = erlang_client.archive_reservations();
                 for (ReservationDTO reservationDTO : reservationDTOList) {
-                    Librarink_history_reservationDTO history_reservationDTO = new Librarink_history_reservationDTO();
-                    history_reservationDTO.setUser_email(reservationDTO.getUser());
+                    HistoryReservationDTO history_reservationDTO = new HistoryReservationDTO();
+                    history_reservationDTO.setUser(reservationDTO.getUser());
                     history_reservationDTO.setIsbn(reservationDTO.getIsbn());
-                    history_reservationDTO.setStart_date((Date) reservationDTO.getStartDate());
-                    history_reservationDTO.setEnd_date((Date) reservationDTO.getStopDate());
+                    history_reservationDTO.setStartDate((Date) reservationDTO.getStartDate());
+                    history_reservationDTO.setEndDate((Date) reservationDTO.getStopDate());
                     history_reservationDTO.setDeleted(false);
-                    remoteEJB.saveOrUpdateHistory_reservation(history_reservationDTO, false);
+                    remoteEJB.saveOrUpdateHistoryReservation(history_reservationDTO, false);
                 }
-            } catch (ErlangClientException ex) {
-                writer.write(String.format("{\"error\":\"%s\"}", ex.getMessage()));
+            } catch (ErlangClientException | RemoteDBException ex) {
+                writer.write(String.format("%s", ex.getMessage()));
             }
-
         }
 
 }

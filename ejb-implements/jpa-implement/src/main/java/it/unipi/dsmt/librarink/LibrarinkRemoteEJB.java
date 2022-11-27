@@ -87,7 +87,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
             query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
         }
         List<Admin> adminList = query.getResultList();
-        List<AdminDTO> toReturnList = new ArrayList<AdminDTO>();
+        List<AdminDTO> toReturnList = new ArrayList<>();
         if (adminList != null && !adminList.isEmpty()) {
             for(Admin admin : adminList){
                 AdminDTO adminDto = new AdminDTO();
@@ -99,58 +99,56 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
         return toReturnList;
     }
 
-    //@Override
-    //public List<LibrarinkBookDTO> listBook(LibrarinkBookDTO booksFilter) throws RemoteDBException{
-    //    Map<String, Object> parameters = new HashMap<String, Object>();
-    //    StringBuilder jpql = new StringBuilder();
-    //    //jpql.append("select b, coalesce(size(b.languages),0) from books b where 1 = 1 ");
-    //    jpql.append("select b from Book b where 1 = 1 ");
-    //    if (booksFilter.getTitle() != null && !booksFilter.getTitle().isEmpty()){
-    //        jpql.append(" and lower(b.book_title) like concat('%', lower(:book_title), '%') ");
-    //        parameters.put("book", booksFilter.getTitle());
-    //    }
-    //    if (booksFilter.getPublisher() != null && !booksFilter.getPublisher().isEmpty()){
-    //        jpql.append(" and lower(b.publisher) like concat('%', lower(:publisher), '%') ");
-    //        parameters.put("publisher", booksFilter.getPublisher());
-    //    }
-    //    if (booksFilter.getAuthor() != null && !booksFilter.getAuthor().isEmpty()){
-    //        jpql.append(" and lower(b.book_author) like concat('%', lower(:book_author), '%') ");
-    //        parameters.put("book_author", booksFilter.getAuthor());
-    //    }
-    //    Query query = entityManager.createQuery(jpql.toString());
-    //    for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
-    //        query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
-    //    }
-    //    List<Object[]> booksList = query.getResultList();
-    //    List<LibrarinkBookDTO> toReturnList = new ArrayList<LibrarinkBookDTO>();
-    //    if (booksList != null && !booksList.isEmpty()) {
-    //        for(Object[] booksInfo : booksList){
-    //            Book book = (Book) booksInfo[0];
-    //            LibrarinkBookDTO bookDTO = buildBookDTO(book);
-    //            toReturnList.add(bookDTO);
-    //        }
-    //    }
-    //    return toReturnList;
-    //}
+    @Override
+    public List<BookDTO> listBook(BookDTO bookFilter) throws RemoteDBException{
+        Map<String, Object> parameters = new HashMap<>();
+        StringBuilder jpql = new StringBuilder();
+        jpql.append("select b from Book b where 1 = 1 ");
+        if (bookFilter.getTitle() != null && !bookFilter.getTitle().isEmpty()){
+            jpql.append(" and lower(b.book_title) like concat('%', lower(:book_title), '%') ");
+            parameters.put("book", bookFilter.getTitle());
+        }
+        if (bookFilter.getPublisher() != null && !bookFilter.getPublisher().isEmpty()){
+            jpql.append(" and lower(b.publisher) like concat('%', lower(:publisher), '%') ");
+            parameters.put("publisher", bookFilter.getPublisher());
+        }
+        if (bookFilter.getAuthor() != null && !bookFilter.getAuthor().isEmpty()){
+            jpql.append(" and lower(b.book_author) like concat('%', lower(:book_author), '%') ");
+            parameters.put("book_author", bookFilter.getAuthor());
+        }
+        Query query = entityManager.createQuery(jpql.toString());
+        for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
+            query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
+        }
+        List<Book> booksList = query.getResultList();
+        List<BookDTO> toReturnList = new ArrayList<BookDTO>();
+        if (booksList != null && !booksList.isEmpty()) {
+            for(Book book : booksList){
+                BookDTO bookDTO = buildBookDTO(book);
+                toReturnList.add(bookDTO);
+            }
+        }
+        return toReturnList;
+    }
 
     @Override
-    public List<HistoryLoanDTO> listHistoryLoans(HistoryLoanDTO history_loanFilter)  throws RemoteDBException {
+    public List<HistoryLoanDTO> listHistoryLoans(HistoryLoanDTO historyLoanFilter)  throws RemoteDBException {
         try {
             Map<String, Object> parameters = new HashMap<>();
             StringBuilder jpql = new StringBuilder();
 
             jpql.append("select hl from HistoryLoan hl where 1 = 1 ");
-            if (history_loanFilter.getUser() != null && !history_loanFilter.getUser().isEmpty()){
+            if (historyLoanFilter.getUser() != null && !historyLoanFilter.getUser().isEmpty()){
                 jpql.append(" and lower(hl.user) like concat('%', lower(:user), '%') ");
-                parameters.put("user", history_loanFilter.getUser());
+                parameters.put("user", historyLoanFilter.getUser());
             }
-            if (history_loanFilter.getIsbn() != null && !history_loanFilter.getIsbn().isEmpty()){
+            if (historyLoanFilter.getIsbn() != null && !historyLoanFilter.getIsbn().isEmpty()){
                 jpql.append(" and lower(hl.isbn) like concat('%', lower(:isbn), '%') ");
-                parameters.put("isbn", history_loanFilter.getIsbn());
+                parameters.put("isbn", historyLoanFilter.getIsbn());
             }
-            if (history_loanFilter.getCopyId() != null && !history_loanFilter.getCopyId().isEmpty()){
+            if (historyLoanFilter.getCopyId() != null && !historyLoanFilter.getCopyId().isEmpty()){
                 jpql.append(" and lower(hl.id_copy) like concat('%', lower(:id_copy), '%') ");
-                parameters.put("id_copy", history_loanFilter.getIsbn());
+                parameters.put("id_copy", historyLoanFilter.getCopyId());
             }
 
             Query query = entityManager.createQuery(jpql.toString());
@@ -158,18 +156,17 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
                 query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
             }
 
-            List<Object[]> history_loanList = query.getResultList();
+            List<HistoryLoan> history_loanList = query.getResultList();
             List<HistoryLoanDTO> toReturnList = new ArrayList<>();
             if (history_loanList != null && !history_loanList.isEmpty()) {
-                for(Object[] history_loanInfo: history_loanList){
-                    HistoryLoan history_loan = (HistoryLoan) history_loanInfo[0];
-                    HistoryLoanDTO history_loanDTO = new HistoryLoanDTO();
-                    history_loanDTO.setIsbn(history_loan.getIsbn());
-                    history_loanDTO.setEndDate(history_loan.getEnd_date());
-                    history_loanDTO.setCopyId(history_loan.getId_copy());
-                    history_loanDTO.setUser(history_loan.getUser());
-                    history_loanDTO.setStartDate(history_loan.getStart_date());
-                    toReturnList.add(history_loanDTO);
+                for(HistoryLoan historyLoan: history_loanList){
+                    HistoryLoanDTO historyLoanDTO = new HistoryLoanDTO();
+                    historyLoanDTO.setIsbn(historyLoan.getIsbn());
+                    historyLoanDTO.setEndDate(historyLoan.getEnd_date());
+                    historyLoanDTO.setCopyId(historyLoan.getId_copy());
+                    historyLoanDTO.setUser(historyLoan.getUser());
+                    historyLoanDTO.setStartDate(historyLoan.getStart_date());
+                    toReturnList.add(historyLoanDTO);
                 }
             }
             return toReturnList;
@@ -257,36 +254,35 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
     }
 
     @Override
-    public List<HistoryReservationDTO> listHistoryReservations(HistoryReservationDTO history_reservationFilter) throws RemoteDBException {
+    public List<HistoryReservationDTO> listHistoryReservations(HistoryReservationDTO historyReservationFilter) throws RemoteDBException {
         try{
             Map<String, Object> parameters = new HashMap<>();
             StringBuilder jpql = new StringBuilder();
 
             jpql.append("select hr from HistoryReservation hr where 1 = 1 ");
-            if (history_reservationFilter.getUser() != null && !history_reservationFilter.getUser().isEmpty()) {
+            if (historyReservationFilter.getUser() != null && !historyReservationFilter.getUser().isEmpty()) {
                 jpql.append(" and lower(hr.user) like concat('%', lower(:user), '%') ");
-                parameters.put("user", history_reservationFilter.getUser());
+                parameters.put("user", historyReservationFilter.getUser());
             }
-            if (history_reservationFilter.getIsbn() != null && !history_reservationFilter.getIsbn().isEmpty()) {
+            if (historyReservationFilter.getIsbn() != null && !historyReservationFilter.getIsbn().isEmpty()) {
                 jpql.append(" and lower(hr.isbn) like concat('%', lower(:isbn), '%') ");
-                parameters.put("isbn", history_reservationFilter.getIsbn());
+                parameters.put("isbn", historyReservationFilter.getIsbn());
             }
             Query query = entityManager.createQuery(jpql.toString());
             for (Map.Entry<String, Object> paramKeyValue : parameters.entrySet()) {
                 query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
             }
-            List<Object[]> history_reservationList = query.getResultList();
+            List<HistoryReservation> historyReservationList = query.getResultList();
             List<HistoryReservationDTO> toReturnList = new ArrayList<>();
-            if (history_reservationList != null && !history_reservationList.isEmpty()) {
-                for (Object[] history_reservationInfo : history_reservationList) {
-                    HistoryReservation history_reservation = (HistoryReservation) history_reservationInfo[0];
-                    HistoryReservationDTO history_reservationDTO = new HistoryReservationDTO();
-                    history_reservationDTO.setIsbn(history_reservation.getIsbn());
-                    history_reservationDTO.setEndDate(history_reservation.getEnd_date());
-                    history_reservationDTO.setUser(history_reservation.getUser());
-                    history_reservationDTO.setStartDate(history_reservation.getStart_date());
-                    history_reservationDTO.setDeleted(history_reservation.isDeleted());
-                    toReturnList.add(history_reservationDTO);
+            if (historyReservationList != null && !historyReservationList.isEmpty()) {
+                for (HistoryReservation historyReservation : historyReservationList) {
+                    HistoryReservationDTO historyReservationDTO = new HistoryReservationDTO();
+                    historyReservationDTO.setIsbn(historyReservation.getIsbn());
+                    historyReservationDTO.setEndDate(historyReservation.getEnd_date());
+                    historyReservationDTO.setUser(historyReservation.getUser());
+                    historyReservationDTO.setStartDate(historyReservation.getStart_date());
+                    historyReservationDTO.setDeleted(historyReservation.isDeleted());
+                    toReturnList.add(historyReservationDTO);
                 }
             }
             return toReturnList;
@@ -720,7 +716,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
         }
     }
 
-    private void applyBookFilter(StringBuilder jpql, BookDTO filter, Map<String, Object> parameters) throws RemoteDBException {
+    private void applyBookFilter(StringBuilder jpql, BookDTO filter, Map<String, Object> parameters) {
         if (filter.getTitle() != null && !filter.getTitle().isEmpty()){
             jpql.append(" and lower(b.book_title) like concat('%', lower(:book_title), '%')");
             parameters.put("book_title", filter.getTitle());
@@ -739,7 +735,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
         }
     }
     
-    private BookDTO buildBookDTO(Book book) throws RemoteDBException {
+    private BookDTO buildBookDTO(Book book) {
         BookDTO bookDTO = new BookDTO();
         bookDTO.setIsbn(book.getIsbn());
         bookDTO.setTitle(book.getTitle());
@@ -754,7 +750,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
         return bookDTO;
     }
 
-    private UserDTO buildUserDTO(User user) throws RemoteDBException {
+    private UserDTO buildUserDTO(User user) {
         UserDTO userDTO = new UserDTO();
         userDTO.setEmail(user.getEmail());
         userDTO.setAddress(user.getAddress());

@@ -81,13 +81,13 @@ public class AdminPageServlet extends HttpServlet {
                                     erlang_client.archive_reservations();
                             newloanList.add(jsonObject);
                             for (ReservationDTO reservationDTO : reservationDTOList) {
-                                Librarink_history_reservationDTO history_reservationDTO = new Librarink_history_reservationDTO();
-                                history_reservationDTO.setUser_email(reservationDTO.getUser());
+                                HistoryReservationDTO history_reservationDTO = new HistoryReservationDTO();
+                                history_reservationDTO.setUser(reservationDTO.getUser());
                                 history_reservationDTO.setIsbn(reservationDTO.getIsbn());
-                                history_reservationDTO.setStart_date((Date) reservationDTO.getStartDate());
-                                history_reservationDTO.setEnd_date((Date) reservationDTO.getStopDate());
+                                history_reservationDTO.setStartDate((Date) reservationDTO.getStartDate());
+                                history_reservationDTO.setEndDate((Date) reservationDTO.getStopDate());
                                 history_reservationDTO.setDeleted(false);
-                                remoteEJB.saveOrUpdateHistory_reservation(history_reservationDTO, false);
+                                remoteEJB.saveOrUpdateHistoryReservation(history_reservationDTO, false);
                             }
                         }
                         writer.write(newloanList.toString());
@@ -102,13 +102,13 @@ public class AdminPageServlet extends HttpServlet {
                             erlang_client.cancel_reservation(reservation_parameter[0], reservation_parameter[1]);
                             List<ReservationDTO> reservationDTOList = erlang_client.archive_reservations();
                             for (ReservationDTO reservationDTO : reservationDTOList) {
-                                Librarink_history_reservationDTO history_reservationDTO = new Librarink_history_reservationDTO();
-                                history_reservationDTO.setUser_email(reservationDTO.getUser());
+                                HistoryReservationDTO history_reservationDTO = new HistoryReservationDTO();
+                                history_reservationDTO.setUser(reservationDTO.getUser());
                                 history_reservationDTO.setIsbn(reservationDTO.getIsbn());
-                                history_reservationDTO.setStart_date((Date) reservationDTO.getStartDate());
-                                history_reservationDTO.setEnd_date((Date) reservationDTO.getStopDate());
+                                history_reservationDTO.setStartDate((Date) reservationDTO.getStartDate());
+                                history_reservationDTO.setEndDate((Date) reservationDTO.getStopDate());
                                 history_reservationDTO.setDeleted(true);
-                                remoteEJB.saveOrUpdateHistory_reservation(history_reservationDTO, false);
+                                remoteEJB.saveOrUpdateHistoryReservation(history_reservationDTO, false);
                             }
 
                         }
@@ -125,13 +125,13 @@ public class AdminPageServlet extends HttpServlet {
                             String s = erlang_client.terminate_loan(loan_parameter[0], loan_parameter[1]);
                             List<LoanDTO> loanDTOList = erlang_client.archive_loans();
                             for (LoanDTO loanDTO : loanDTOList) {
-                                Librarink_history_loanDTO librarink_history_loanDTO = new Librarink_history_loanDTO();
+                                HistoryLoanDTO librarink_history_loanDTO = new HistoryLoanDTO();
                                 librarink_history_loanDTO.setIsbn(loanDTO.getIsbn());
-                                librarink_history_loanDTO.setStart_date((Date) loanDTO.getStartDate());
-                                librarink_history_loanDTO.setUser_email(loanDTO.getUser());
-                                librarink_history_loanDTO.setId_copy(loanDTO.getId());
-                                librarink_history_loanDTO.setEnd_date((Date) loanDTO.getStopDate());
-                                remoteEJB.saveOrUpdateHistory_loan(librarink_history_loanDTO, false);
+                                librarink_history_loanDTO.setStartDate((Date) loanDTO.getStartDate());
+                                librarink_history_loanDTO.setUser(loanDTO.getUser());
+                                librarink_history_loanDTO.setCopyId(loanDTO.getCopyId());
+                                librarink_history_loanDTO.setEndDate((Date) loanDTO.getStopDate());
+                                remoteEJB.saveOrUpdateHistoryLoan(librarink_history_loanDTO, false);
                             }
 
                         }
@@ -141,10 +141,9 @@ public class AdminPageServlet extends HttpServlet {
                 default:
                     break;
             }
-        } catch (ErlangClientException e) {
-            writer.write(String.format("{\"error\":\"%s\"}", e.getMessage()));
+        } catch (ErlangClientException | RemoteDBException ex) {
+            writer.write(String.format("%s", ex.getMessage()));
         }
-
     }
 }
 

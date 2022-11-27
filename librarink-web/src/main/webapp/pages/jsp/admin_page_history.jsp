@@ -1,7 +1,9 @@
-<%@ page import="it.unipi.dsmt.librarink.Librarink_history_loanDTO" %>
+<%@ page import="it.unipi.dsmt.librarink.LoanDTO" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Iterator" %>
-<%@ page import="it.unipi.dsmt.librarink.Librarink_history_reservationDTO" %><%--
+<%@ page import="it.unipi.dsmt.librarink.HistoryReservationDTO" %>
+<%@ page import="it.unipi.dsmt.librarink.HistoryLoanDTO" %>
+<%--
   Created by IntelliJ IDEA.
   User: tummi
   Date: 03/11/2022
@@ -14,11 +16,11 @@
     <title>Title</title>
 </head>
 <%
-    List<Librarink_history_loanDTO> listLoan = (List<Librarink_history_loanDTO>) request.getAttribute("loanHistoryList");
-    Iterator<Librarink_history_loanDTO> loanDTOIterator=listLoan.iterator();
-
-    List<Librarink_history_reservationDTO> listReservation = (List<Librarink_history_reservationDTO>) request.getAttribute("reservationHistoryLis");
-    Iterator<Librarink_history_reservationDTO> reservationDTOIterator=listReservation.iterator();
+    List<HistoryLoanDTO> listLoan = (List<HistoryLoanDTO>) request.getAttribute("loanHistoryList");
+    Iterator<HistoryLoanDTO> loanDTOIterator = listLoan.iterator();
+    List<HistoryReservationDTO> listReservation = (List<HistoryReservationDTO>)
+            request.getAttribute("reservationHistoryList");
+    Iterator<HistoryReservationDTO> reservationDTOIterator=listReservation.iterator();
 %>
 <body>
 <table style="width:100%" >
@@ -34,15 +36,15 @@
         <td>End Time</td>
 
     </tr>
-    <%  while(loanDTOIterator.hasNext() ||reservationDTOIterator.hasNext()){%>
+    <%  while(loanDTOIterator.hasNext() || reservationDTOIterator.hasNext()){%>
     <tr>
-        <%if(reservationDTOIterator.hasNext()){
+        <%if (reservationDTOIterator.hasNext()){
 
-            Librarink_history_reservationDTO reservationDTO=reservationDTOIterator.next();%>
+            HistoryReservationDTO reservationDTO=reservationDTOIterator.next();%>
         <td><%=reservationDTO.getIsbn()%></td>
-        <td><%=reservationDTO.getUser_email()%></td>
-        <td><%=reservationDTO.getStart_date()%></td>
-        <td><%=reservationDTO.getEnd_date()%></td>
+        <td><%=reservationDTO.getUser()%></td>
+        <td><%=reservationDTO.getStartDate()%></td>
+        <td><%=reservationDTO.getEndDate()%></td>
         <%}
         else{%>
         <td></td>
@@ -61,26 +63,25 @@
         <th colspan="5">History Loan</th>
     </tr>
     <tr>
-
         <td>Book ID</td>
         <td>ISBN</td>
         <td>User ID</td>
         <td>Start Time</td>
         <td>End Time</td>
     </tr>
-    <%  while(loanDTOIterator.hasNext() ||reservationDTOIterator.hasNext()){%>
+    <%  while(loanDTOIterator.hasNext() || reservationDTOIterator.hasNext()){%>
     <tr>
         <%if(reservationDTOIterator.hasNext()){
 
             reservationDTOIterator.next();}%>
         <%if(loanDTOIterator.hasNext()){
-            Librarink_history_loanDTO loanDTO=loanDTOIterator.next();%>
+            HistoryLoanDTO loanDTO = loanDTOIterator.next();%>
 
-        <td><%=loanDTO.getId_copy()%></td>
+        <td><%=loanDTO.getCopyId()%></td>
         <td><%=loanDTO.getIsbn()%></td>
-        <td><%=loanDTO.getUser_email()%></td>
-        <td><%=loanDTO.getStart_date()%></td>
-        <td><%=loanDTO.getEnd_date()%></td>
+        <td><%=loanDTO.getUser()%></td>
+        <td><%=loanDTO.getStartDate()%></td>
+        <td><%=loanDTO.getEndDate()%></td>
         <%}
         else{%>
         <td></td>
