@@ -6,7 +6,7 @@ import java.util.List;
 @Remote
 public interface LibrarinkRemote {
     List<UserDTO> listUsers(UserDTO userFilter) throws RemoteDBException;
-    public List<AdminDTO> listAdmins(AdminDTO adminFilter);
+    List<AdminDTO> listAdmins(AdminDTO adminFilter) throws RemoteDBException;
     List<BookDTO> listBook(BookDTO booksFilter) throws RemoteDBException;
     List<HistoryLoanDTO> listHistoryLoans(HistoryLoanDTO historyLoanFilter) throws RemoteDBException;
     List<WishlistDTO> listWishlist(WishlistDTO wishlistFilter) throws RemoteDBException;
