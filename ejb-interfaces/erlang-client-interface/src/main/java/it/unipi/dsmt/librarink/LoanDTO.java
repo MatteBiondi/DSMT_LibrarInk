@@ -8,9 +8,9 @@ import java.util.Date;
 public class LoanDTO extends DTO implements Serializable {
     String user; 
     String isbn; 
-    String copyId;
-    Date startDate;
-    Date stopDate;
+    String id;
+    Date start_date;
+    Date stop_date;
 
     public String getUser() {
         return user;
@@ -29,32 +29,32 @@ public class LoanDTO extends DTO implements Serializable {
     }
 
     public String getCopyId() {
-        return copyId;
+        return id;
     }
 
     public void setCopyId(String copyId) {
-        this.copyId = copyId;
+        this.id = copyId;
     }
 
     public Date getStartDate() {
-        return startDate;
+        return start_date;
     }
 
     public void setStartDate(String startDate) {
         try {
-            this.startDate =  new SimpleDateFormat("yyyy/MM/ddTHH:mm:ssZ").parse(startDate);
+            this.start_date =  new SimpleDateFormat("yyyy/MM/ddTHH:mm:ssZ").parse(startDate);
         } catch (ParseException e) {
             e.printStackTrace();
         }
     }
 
     public Date getStopDate() {
-        return stopDate;
+        return stop_date;
     }
 
     public void setStopDate(String stopDate) {
         try {
-            this.stopDate = new SimpleDateFormat("yyyy/MM/ddTHH:mm:ssZ").parse(stopDate);
+            this.stop_date = new SimpleDateFormat("yyyy/MM/ddTHH:mm:ssZ").parse(stopDate);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -64,7 +64,7 @@ public class LoanDTO extends DTO implements Serializable {
     public String toString(){
         return String.format(
                 "{\"user\":\"%s\",\"isbn\":\"%s\",\"id\":\"%s\",\"start_date\":\"%s\",\"stop_date\":\"%s\"}",
-                user, isbn, copyId, startDate, stopDate
+                user, isbn, id, start_date, start_date
         );
     }
 }
