@@ -70,65 +70,75 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
     }
 
     @Override
-    public List<AdminDTO> listAdmins(AdminDTO adminFilter) {
-        Map<String, Object> parameters = new HashMap<String, Object>();
-        StringBuilder jpql = new StringBuilder();
-        jpql.append("select a from Admin a where 1 = 1 ");
-        if (adminFilter.getEmail() != null && !adminFilter.getEmail().isEmpty()){
-            jpql.append(" and lower(a.email) like concat('%', lower(:email), '%') ");
-            parameters.put("email", adminFilter.getEmail());
-        }
-        if (adminFilter.getPassword() != null && !adminFilter.getPassword().isEmpty()){
-            jpql.append(" and lower(a.password) like concat('%', lower(:password), '%') ");
-            parameters.put("password", adminFilter.getPassword());
-        }
-        Query query = entityManager.createQuery(jpql.toString());
-        for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
-            query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
-        }
-        List<Admin> adminList = query.getResultList();
-        List<AdminDTO> toReturnList = new ArrayList<>();
-        if (adminList != null && !adminList.isEmpty()) {
-            for(Admin admin : adminList){
-                AdminDTO adminDto = new AdminDTO();
-                adminDto.setPassword(admin.getPassword());
-                adminDto.setEmail(admin.getEmail());
-                toReturnList.add(adminDto);
+    public List<AdminDTO> listAdmins(AdminDTO adminFilter) throws RemoteDBException {
+        try{
+            Map<String, Object> parameters = new HashMap<>();
+            StringBuilder jpql = new StringBuilder();
+            jpql.append("select a from Admin a where 1 = 1 ");
+            if (adminFilter.getEmail() != null && !adminFilter.getEmail().isEmpty()){
+                jpql.append(" and lower(a.email) like concat('%', lower(:email), '%') ");
+                parameters.put("email", adminFilter.getEmail());
             }
+            if (adminFilter.getPassword() != null && !adminFilter.getPassword().isEmpty()){
+                jpql.append(" and lower(a.password) like concat('%', lower(:password), '%') ");
+                parameters.put("password", adminFilter.getPassword());
+            }
+            Query query = entityManager.createQuery(jpql.toString());
+            for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
+                query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
+            }
+            List<Admin> adminList = query.getResultList();
+            List<AdminDTO> toReturnList = new ArrayList<>();
+            if (adminList != null && !adminList.isEmpty()) {
+                for(Admin admin : adminList){
+                    AdminDTO adminDto = new AdminDTO();
+                    adminDto.setPassword(admin.getPassword());
+                    adminDto.setEmail(admin.getEmail());
+                    toReturnList.add(adminDto);
+                }
+            }
+            return toReturnList;
         }
-        return toReturnList;
+        catch (Exception ex){
+            throw new RemoteDBException(ex.getMessage());
+        }
     }
 
     @Override
     public List<BookDTO> listBook(BookDTO bookFilter) throws RemoteDBException{
-        Map<String, Object> parameters = new HashMap<>();
-        StringBuilder jpql = new StringBuilder();
-        jpql.append("select b from Book b where 1 = 1 ");
-        if (bookFilter.getTitle() != null && !bookFilter.getTitle().isEmpty()){
-            jpql.append(" and lower(b.book_title) like concat('%', lower(:book_title), '%') ");
-            parameters.put("book", bookFilter.getTitle());
-        }
-        if (bookFilter.getPublisher() != null && !bookFilter.getPublisher().isEmpty()){
-            jpql.append(" and lower(b.publisher) like concat('%', lower(:publisher), '%') ");
-            parameters.put("publisher", bookFilter.getPublisher());
-        }
-        if (bookFilter.getAuthor() != null && !bookFilter.getAuthor().isEmpty()){
-            jpql.append(" and lower(b.book_author) like concat('%', lower(:book_author), '%') ");
-            parameters.put("book_author", bookFilter.getAuthor());
-        }
-        Query query = entityManager.createQuery(jpql.toString());
-        for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
-            query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
-        }
-        List<Book> booksList = query.getResultList();
-        List<BookDTO> toReturnList = new ArrayList<BookDTO>();
-        if (booksList != null && !booksList.isEmpty()) {
-            for(Book book : booksList){
-                BookDTO bookDTO = buildBookDTO(book);
-                toReturnList.add(bookDTO);
+        try {
+            Map<String, Object> parameters = new HashMap<>();
+            StringBuilder jpql = new StringBuilder();
+            jpql.append("select b from Book b where 1 = 1 ");
+            if (bookFilter.getTitle() != null && !bookFilter.getTitle().isEmpty()){
+                jpql.append(" and lower(b.title) like concat('%', lower(:book_title), '%') ");
+                parameters.put("book_title", bookFilter.getTitle());
             }
+            if (bookFilter.getPublisher() != null && !bookFilter.getPublisher().isEmpty()){
+                jpql.append(" and lower(b.publisher) like concat('%', lower(:publisher), '%') ");
+                parameters.put("publisher", bookFilter.getPublisher());
+            }
+            if (bookFilter.getAuthor() != null && !bookFilter.getAuthor().isEmpty()){
+                jpql.append(" and lower(b.author) like concat('%', lower(:book_author), '%') ");
+                parameters.put("book_author", bookFilter.getAuthor());
+            }
+            Query query = entityManager.createQuery(jpql.toString());
+            for (Map.Entry<String, Object> paramKeyValue: parameters.entrySet()){
+                query.setParameter(paramKeyValue.getKey(), paramKeyValue.getValue());
+            }
+            List<Book> booksList = query.getResultList();
+            List<BookDTO> toReturnList = new ArrayList<>();
+            if (booksList != null && !booksList.isEmpty()) {
+                for(Book book : booksList){
+                    BookDTO bookDTO = buildBookDTO(book);
+                    toReturnList.add(bookDTO);
+                }
+            }
+            return toReturnList;
         }
-        return toReturnList;
+        catch (Exception ex){
+            throw new RemoteDBException(ex.getMessage());
+        }
     }
 
     @Override
@@ -718,11 +728,11 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
 
     private void applyBookFilter(StringBuilder jpql, BookDTO filter, Map<String, Object> parameters) {
         if (filter.getTitle() != null && !filter.getTitle().isEmpty()){
-            jpql.append(" and lower(b.book_title) like concat('%', lower(:book_title), '%')");
+            jpql.append(" and lower(b.title) like concat('%', lower(:book_title), '%')");
             parameters.put("book_title", filter.getTitle());
         }
         if (filter.getAuthor() != null && !filter.getAuthor().isEmpty()){
-            jpql.append(" and lower(b.book_author) like concat('%', lower(:book_author), '%') ");
+            jpql.append(" and lower(b.author) like concat('%', lower(:book_author), '%') ");
             parameters.put("book_author", filter.getAuthor());
         }
         if (filter.getGenre() != null && !filter.getGenre().isEmpty()){
