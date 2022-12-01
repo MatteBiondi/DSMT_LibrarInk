@@ -52,18 +52,22 @@ init(_Args) ->
     intensity => MaxRestarts,
     period => MaxSecondsBetweenRestarts},
 
-  ChildSpecs = [#{id => 'mnesiaDB_server',
-    start => {'librarink_mnesiaDB', start_link, []},
-    restart => permanent,
-    shutdown => infinity,
-    type => worker,
-    modules => ['librarink_mnesiaDB']},
+  ChildSpecs = [
+    #{id => 'mnesiaDB_server',
+      start => {'librarink_mnesiaDB', start_link, []},
+      restart => permanent,
+      shutdown => infinity,
+      type => worker,
+      modules => ['librarink_mnesiaDB']
+    },
     #{id => 'mnesiaDB_worker_sup',
       start => {'librarink_mnesiaDB_worker_sup', start_link, []},
       restart => permanent,
       shutdown => infinity,
       type => supervisor,
-      modules => ['librarink_mnesiaDB_worker_sup']}],
+      modules => ['librarink_mnesiaDB_worker_sup']
+    }
+  ],
 
   {ok, {SupFlags, ChildSpecs}}.
 

@@ -99,7 +99,7 @@ work(Request, From, Tag, Env) ->
 %%%%%===================================================================
 %% @private
 %% @doc
-%% Forward the request just to one isbn if the operation involves only ine isbn
+%% Forward the request just to one isbn if the operation involves only one isbn
 %% @end
 -spec(forward_request(Request :: term(), Env :: #librarink_proxy_env{}) -> {succeed, Response :: term()} | {error,
   Reason :: term()}).
