@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -55,9 +56,20 @@ public class ErlangClientEJB implements ErlangClient {
     }
 
     @Override
-    public String write_copy(String isbn, String id) throws ErlangClientException {
-        if (isbn == null || id == null)
+    public String write_copy(String isbn) throws ErlangClientException {
+        if (isbn == null)
             throw new ErlangClientException(properties.getProperty("bad_request"));
+        List<BookCopyDTO> copies = read_all_copies(isbn);
+        List<Integer> ids = copies
+                .stream()
+                .map(id -> Integer.parseInt(id.getId().split("-")[1]))
+                .collect(Collectors.toList());
+
+        String id_number = String.valueOf(Collections.max(ids) + 1);
+        String[] paddingArray = new String[Integer.parseInt(properties.getProperty("id_length", "3"))];
+        Arrays.fill(paddingArray, "0");
+        String padding = String.join("", paddingArray);
+        String id = "ID-" + padding.substring(id_number.length()) + id_number;
 
         OtpErlangAtom request = new OtpErlangAtom("write_copy");
         OtpErlangMap args = new OtpErlangMap();
