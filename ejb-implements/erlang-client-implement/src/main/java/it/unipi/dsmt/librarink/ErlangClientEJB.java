@@ -64,12 +64,13 @@ public class ErlangClientEJB implements ErlangClient {
                 .stream()
                 .map(id -> Integer.parseInt(id.getId().split("-")[1]))
                 .collect(Collectors.toList());
-
-        String id_number = String.valueOf(Collections.max(ids) + 1);
+        String idNumber = "0";
+        if(ids.size() > 0)
+            idNumber = String.valueOf(Collections.max(ids) + 1);
         String[] paddingArray = new String[Integer.parseInt(properties.getProperty("id_length", "3"))];
         Arrays.fill(paddingArray, "0");
         String padding = String.join("", paddingArray);
-        String id = "ID-" + padding.substring(id_number.length()) + id_number;
+        String id = "ID-" + padding.substring(idNumber.length()) + idNumber;
 
         OtpErlangAtom request = new OtpErlangAtom("write_copy");
         OtpErlangMap args = new OtpErlangMap();
