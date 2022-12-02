@@ -14,6 +14,17 @@
 <html>
 <head>
     <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+          rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css"
+          integrity="sha384-xeJqLiuOvjUBq3iGOjvSQSIlwrpqjSHXpduPd6rQpuiM3f5/ijby8pCsnbu5S81n"
+          crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.1.js"
+            integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI="
+            crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <%
     List<HistoryLoanDTO> listLoan = (List<HistoryLoanDTO>) request.getAttribute("loanHistoryList");
@@ -36,7 +47,7 @@
         <td>End Time</td>
 
     </tr>
-    <%  while(loanDTOIterator.hasNext() || reservationDTOIterator.hasNext()){%>
+    <%  while( reservationDTOIterator.hasNext()){%>
     <tr>
         <%if (reservationDTOIterator.hasNext()){
 
@@ -53,8 +64,7 @@
         <td></td>
         <td></td>
         <%}%>
-        <%if(loanDTOIterator.hasNext()){
-            loanDTOIterator.next();}%>
+
     </tr>
     <%}%>
 </table>
@@ -69,11 +79,8 @@
         <td>Start Time</td>
         <td>End Time</td>
     </tr>
-    <%  while(loanDTOIterator.hasNext() || reservationDTOIterator.hasNext()){%>
+    <%  while(loanDTOIterator.hasNext()){%>
     <tr>
-        <%if(reservationDTOIterator.hasNext()){
-
-            reservationDTOIterator.next();}%>
         <%if(loanDTOIterator.hasNext()){
             HistoryLoanDTO loanDTO = loanDTOIterator.next();%>
 

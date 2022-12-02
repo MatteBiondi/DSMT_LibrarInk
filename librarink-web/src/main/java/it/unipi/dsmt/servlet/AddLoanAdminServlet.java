@@ -22,8 +22,10 @@ public class AddLoanAdminServlet extends HttpServlet{
         private LibrarinkRemote remoteEJB;
 
         @Override
-        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+            String TargetJSP = "/pages/jsp/admin_page_add_loan.jsp";
+            RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher(TargetJSP);
+            requestDispatcher.forward(request, response);
         }
         @Override
         protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
