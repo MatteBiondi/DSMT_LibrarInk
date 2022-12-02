@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * In that case user will be redirected to homepage.
  * Pay attention:
  * 1)This filter bases its logic on the existence of another filter that checks the user login execution
- * 2)Any URI that the admin needs to access include "admin" after the last '/' (except AsyncRequestServlet)
+ * 2)Any URI that the admin needs to access include "admin" after the last '/' (except AsyncRequestServlet and logout)
  * 3)Any URI that the user needs to access not include "admin" after the last '/'
  */
 
@@ -43,7 +43,7 @@ public class UnauthorizedAccessFilter implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
 
         // Get current session
-        HttpSession session = req.getSession(false);
+        HttpSession session = req.getSession(true);
 
         // Check if the user is logged
         boolean logged = session.getAttribute("email") != null;
@@ -64,7 +64,8 @@ public class UnauthorizedAccessFilter implements Filter {
             // Not admin user is trying to access to admin page
             res.sendRedirect(req.getContextPath() + "/homepage");
         }
-        else if(isAdmin && !servletReq.toLowerCase().contains("admin") && !servletReq.equals("async")){
+        else if(isAdmin && !servletReq.toLowerCase().contains("admin") && !servletReq.equals("async") &&
+                !servletReq.equals("logout")){
             // Admin user is trying to access to non-admin page
             res.sendRedirect(req.getContextPath() + "/admin");
         }
