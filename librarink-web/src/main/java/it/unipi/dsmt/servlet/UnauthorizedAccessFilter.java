@@ -15,7 +15,8 @@ import java.util.logging.Logger;
  * In that case user will be redirected to homepage.
  * Pay attention:
  * 1)This filter bases its logic on the existence of another filter that checks the user login execution
- * 2)Any files that the admin needs to access include "admin" in their name
+ * 2)Any URI that the admin needs to access include "admin" after the last '/' (except AsyncRequestServlet)
+ * 3)Any URI that the user needs to access not include "admin" after the last '/'
  */
 
 @WebFilter(
