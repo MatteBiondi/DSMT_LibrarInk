@@ -35,7 +35,6 @@ public class AsyncRequestServlet extends HttpServlet {
         //Get each parameter and session attributes
         String user = (String) request.getSession().getAttribute("email");
         String isbn = request.getParameter("isbn");
-        String id = request.getParameter("id");
 
         PrintWriter writer = response.getWriter();
         response.setContentType("application/json");
@@ -46,24 +45,8 @@ public class AsyncRequestServlet extends HttpServlet {
         try {
             // Identify the requested action, forward it to erlang client and send back a response to client
             switch (request.getParameter("request")){
-                case "write_copy":
-                    writer.write(erlang_client.write_copy(isbn, id));
-                    return;
-                //case "write_loan"://TODO: remove
-                //    LoanDTO loan = erlang_client.write_loan(user, isbn, id);
-                //    if (loan!=null)
-                //        writer.write(String.format("{\"id\":\"%s\"}",loan.getId()));
-                //    else
-                //        writer.write("{\"error\":\"Unexpected error\"}");
-                //    return;
                 case "write_reservation":
                     writer.write(erlang_client.write_reservation(user, isbn));
-                    return;
-                //case "delete_copy"://TODO: remove
-                //    writer.write(erlang_client.delete_copy(isbn, id));
-                //    return;
-                case "delete_loan":
-                    writer.write(erlang_client.delete_loan(user, isbn, id));
                     return;
                 case "delete_reservation":
                     writer.write(erlang_client.delete_reservation(user, isbn));
@@ -72,7 +55,7 @@ public class AsyncRequestServlet extends HttpServlet {
                     writer.write(erlang_client.count_available_copies(isbn));
                     return;
                 case "read_loans":
-                    loans = erlang_client.read_loans(user, isbn, id);
+                    loans = erlang_client.read_loans(user, null, null);
                     if (loans != null){
                         writer.write(loans.toString());
                         return;
@@ -85,12 +68,6 @@ public class AsyncRequestServlet extends HttpServlet {
                         return;
                     }
                     break;
-                //case "terminate_loan"://TODO: remove
-                //    writer.write(erlang_client.terminate_loan(isbn, id));
-                //    return;
-                //case "renew_loan"://TODO: remove
-                //    writer.write(erlang_client.renew_loan(isbn, id));
-                //    return;
                 case "cancel_reservation":
                     writer.write(erlang_client.cancel_reservation(user, isbn));
                     return;
@@ -98,7 +75,7 @@ public class AsyncRequestServlet extends HttpServlet {
                     WishlistDTO new_item = new WishlistDTO();
                     new_item.setUser(user);
                     new_item.setIsbn(isbn);
-                    WishlistDTO result = remote.saveOrUpdateWishlist(new_item, false); // TODO: Should be boolean
+                    WishlistDTO result = remote.saveOrUpdateWishlist(new_item, false);
                     writer.write("{\"result\": \"succeed\", \"response\": \"ok\"}");
                     return;
                 case "remove_wishlist":
@@ -184,17 +161,47 @@ public class AsyncRequestServlet extends HttpServlet {
 
                     writer.write(book_and_url_obj.toString());
                     return;
-                case "available_copy_ids"://TODO check if admin
-                    List<BookCopyDTO> copies = erlang_client.read_available_copies(isbn);
-                    JsonArray copies_js = new JsonArray();
-                    for(BookCopyDTO copy: copies){
-                        copies_js.add(copy.getId());
-                    }
-                    writer.write(copies_js.toString());
-                    return;
-                default:
-                    writer.write("{\"result\": \"error\", \"response\": \"unexpected request\"}");
             }
+
+            // Admin only requests
+            if(request.getSession().getAttribute("admin") != null){
+                switch (request.getParameter("request")){
+                    case "available_copy_ids":
+                        List<BookCopyDTO> copies = erlang_client.read_available_copies(isbn);
+                        JsonArray copies_js = new JsonArray();
+                        for(BookCopyDTO copy: copies){
+                            copies_js.add(copy.getId());
+                        }
+                        writer.write(copies_js.toString());
+                        return;
+                    case "write_copy"://TODO: Remove
+                        writer.write(erlang_client.write_copy(isbn));
+                        return;
+                    case "delete_copy"://TODO: remove
+                        writer.write(erlang_client.delete_copy(isbn, request.getParameter("id")));
+                        return;
+                    case "write_loan"://TODO: remove
+                        LoanDTO loan = erlang_client.write_loan(user, isbn, request.getParameter("id"));
+                        if (loan!=null)
+                            writer.write(String.format("{\"id\":\"%s\"}",loan.getCopyId()));
+                        else
+                            writer.write("{\"error\":\"Unexpected error\"}");
+                        return;
+                    case "delete_reservation"://TODO: remove
+                        writer.write(erlang_client.delete_reservation(user, isbn));
+                        return;
+                    case "delete_loan":
+                        writer.write(erlang_client.delete_loan(user, isbn, request.getParameter("id"))); //TODO: remove
+                        return;
+                    case "terminate_loan"://TODO: remove
+                        writer.write(erlang_client.terminate_loan(isbn, request.getParameter("id")));
+                        return;
+                    case "renew_loan"://TODO: remove
+                        writer.write(erlang_client.renew_loan(isbn, request.getParameter("id")));
+                        return;
+                }
+            }
+            writer.write("{\"result\": \"error\", \"response\": \"unexpected request\"}");
         }
         catch (ErlangClientException | RemoteDBException ex){
             writer.write(String.format("%s", ex.getMessage()));
@@ -203,6 +210,5 @@ public class AsyncRequestServlet extends HttpServlet {
             LOGGER.warning(String.format("EJB exception %s", ex.getMessage()));
             writer.write("{\"result\": \"error\", \"response\": \"server error\"}");
         }
-
     }
 }
