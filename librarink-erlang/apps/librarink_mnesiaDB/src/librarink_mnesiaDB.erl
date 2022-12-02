@@ -1,6 +1,6 @@
 %%%-------------------------------------------------------------------
 %%% @doc
-%%% Module implementing librarink_mnesia gen_server that receive all the
+%%% Module implementing librarink_mnesia gen_server that receives all the
 %%% requests from the proxy and asks the worker supervisor to fetch a
 %%% new process to handle them
 %%% @end

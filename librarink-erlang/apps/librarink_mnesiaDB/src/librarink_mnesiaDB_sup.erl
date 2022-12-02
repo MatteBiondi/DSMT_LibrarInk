@@ -32,13 +32,13 @@ start_link() ->
 
 %% @private
 %% @doc Whenever a supervisor is started using supervisor:start_link/[2,3],
-%% this function is called by the new process to find out about
+%% this function is called by the new process to find out about the
 %% restart strategy, maximum restart frequency and child
 %% specifications. Initialization of supervisor process. The initial
-%% configuration include two children spawned:
-%% 1) the mnesiaDB server to handle incoming request
-%% 2) the supervisor that handle the worker processes.
-%% In case of crash of supervised process they will replaced with others,
+%% configuration includes two children spawned:
+%% 1) the mnesiaDB gen_server to handle incoming request
+%% 2) the supervisor that handles the worker processes.
+%% In case of a crash of supervised processes, they will be replaced with others,
 %% following the one-for-one semantic.
 -spec(init(_Args :: term()) ->
   {ok, {SupFlags :: {RestartStrategy :: supervisor:strategy(),

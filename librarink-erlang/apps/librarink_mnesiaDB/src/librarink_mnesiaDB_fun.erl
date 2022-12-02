@@ -1,6 +1,6 @@
 %%%-------------------------------------------------------------------
 %% @doc
-%% librarink_mnesiaDB_fun contains all the allowed operation on Mnesia DB.
+%% librarink_mnesiaDB_fun contains all the allowed operations on Mnesia DB.
 %% @end
 %%%-------------------------------------------------------------------
 -module(librarink_mnesiaDB_fun).

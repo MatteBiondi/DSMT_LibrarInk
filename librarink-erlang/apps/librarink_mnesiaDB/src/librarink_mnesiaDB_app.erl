@@ -2,7 +2,7 @@
 %%% @doc
 %%% librarink_mnesiaDB entry point. The application starts a supervisor
 %%% that will manage gen_server and processes dynamically spawned
-%%% to handle operation on MnesiaDB.
+%%% to handle operations on MnesiaDB.
 %%% @end
 %%% Created : 05. set 2022 16:03
 %%%-------------------------------------------------------------------
@@ -27,7 +27,7 @@
 %% application. If the application is structured according to the OTP
 %% design principles as a supervision tree, this means starting the
 %% top supervisor of the tree. The only operations needed are to
-%% install Mnesia DB creating schema and tables, then to launch the
+%% activate Mnesia DB, create schema and tables, then launch the
 %% MnesiaDB supervisor.
 %% This is used also in case of takeover of the active node.
 %% Taking over is the act of a dead node coming back from the dead,

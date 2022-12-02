@@ -1,8 +1,8 @@
 %%%-------------------------------------------------------------------
 %%% @doc
 %%% Module implementing librarink_mnesia higher worker level supervisor.
-%%% Launched by the top level supervisor, it has no default child
-%%% supervised.
+%%% Launched by the top-level supervisor, it has no default supervised
+%%% child.
 %%% @end
 %%% Created : 06. set 2022 09:47
 %%%-------------------------------------------------------------------
@@ -54,8 +54,8 @@ init(_Args) ->
 
 
 %% @private
-%% @doc Start new supervised child, i.e. the librarink supervisor bridge associated
-%% to a master process. The supervisor bridge will be used to supervise a worker.
+%% @doc Start a new supervised child, i.e. the librarink supervisor bridge associated
+%% with a master process. The supervisor bridge will be used to supervise a worker.
 -spec(start_worker(Function::atom(), Args::map(), BridgeSupId::string(), From::tuple()) -> {ok, Pid :: pid()}).
 start_worker(Function, Args, BridgeSupId, From) ->
   ChildSpec = #{id => BridgeSupId,
