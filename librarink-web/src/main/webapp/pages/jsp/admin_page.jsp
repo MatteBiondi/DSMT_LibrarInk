@@ -99,7 +99,7 @@
         <tr>
             <%if(loanDTOIterator.hasNext()){
                 LoanDTO loanDTO=loanDTOIterator.next();%>
-            <td><input type="checkbox" name = "loan"  class="loan_checkbox" value=<%=loanDTO.getIsbn()+";"+loanDTO.getCopyId()+";"+loanDTO.getUser()+";"%> /></td>
+            <td><input type="checkbox" name = "loan"  class="loan_checkbox" value=<%=loanDTO.getIsbn()+";"+loanDTO.getCopyId()+";"+loanDTO.getUser()%> /></td>
             <td><%=loanDTO.getCopyId()%></td>
             <td><%=loanDTO.getIsbn()%></td>
             <td><%=loanDTO.getUser()%></td>
@@ -111,9 +111,9 @@
         <%}%>
     </table>
 </form>
-<button type="button" form="reservation" name="button" value="ConfirmReservation"onclick="submitRequest('reservationTable','ConfirmReservation','reservation_table','reservation')">Confirm Reservation</button>
-<button type="button" form="reservation" name="button" value="DeleteReservation" onclick="submitRequest('reservationTable','DeleteReservation','reservation_table','reservation')">Delete Reservation</button>
-<button type="button" form="loan" name="button" value="EndLoan" onclick="submitRequest('loanTable','EndLoan','loan_table','loan')">End Loan</button>
+<button type="button" form="reservation" name="button" value="ConfirmReservation"onclick="submitRequest('reservation','ConfirmReservation','reservation_table','reservation_checkbox')">Confirm Reservation</button>
+<button type="button" form="reservation" name="button" value="DeleteReservation" onclick="submitRequest('reservation','DeleteReservation','reservation_table','reservation_checkbox')">Delete Reservation</button>
+<button type="button" form="loan" name="button" value="EndLoan" onclick="submitRequest('loan','EndLoan','loan_table','loan_checkbox')">End Loan</button>
 <a href="<%= request.getContextPath()%>/adminHistory">History table</a>
 <a href="<%= request.getContextPath()%>/adminAddLoan">New Loan</a>
 <script src="${pageContext.request.contextPath}/scripts/admin_page.js"></script>

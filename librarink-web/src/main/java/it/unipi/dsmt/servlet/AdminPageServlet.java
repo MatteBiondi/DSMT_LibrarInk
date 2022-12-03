@@ -83,6 +83,7 @@ public class AdminPageServlet extends HttpServlet {
                             LoanDTO newloanDTO = erlang_client.write_loan(reservation_parameter[0], reservation_parameter[1], reservation_parameter[2]);
                             LOGGER.info("new LOAN:"+ newloanDTO.toString());
                             String newloan = ow.writeValueAsString(newloanDTO);
+                            LOGGER.info("the new loan is"+newloanDTO.toString());
                             LOGGER.info("loan:"+newloan);
                             List<ReservationDTO> reservationDTOList =
                                     erlang_client.archive_reservations();
@@ -147,10 +148,10 @@ public class AdminPageServlet extends HttpServlet {
                             for (LoanDTO loanDTO : loanDTOList) {
                                 HistoryLoanDTO librarink_history_loanDTO = new HistoryLoanDTO();
                                 librarink_history_loanDTO.setIsbn(loanDTO.getIsbn());
-                                librarink_history_loanDTO.setStartDate((Date) loanDTO.getStartDate());
+                                librarink_history_loanDTO.setStartDate(new java.sql.Date(loanDTO.getStartDate().getTime()));
                                 librarink_history_loanDTO.setUser(loanDTO.getUser());
                                 librarink_history_loanDTO.setCopyId(loanDTO.getCopyId());
-                                librarink_history_loanDTO.setEndDate((Date) loanDTO.getStopDate());
+                                librarink_history_loanDTO.setEndDate(new java.sql.Date(loanDTO.getStopDate().getTime()));
                                 remoteEJB.saveOrUpdateHistoryLoan(librarink_history_loanDTO, false);
 
                             }

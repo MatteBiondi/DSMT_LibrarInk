@@ -45,13 +45,14 @@ public class AddLoanAdminServlet extends HttpServlet{
                     HistoryReservationDTO history_reservationDTO = new HistoryReservationDTO();
                     history_reservationDTO.setUser(reservationDTO.getUser());
                     history_reservationDTO.setIsbn(reservationDTO.getIsbn());
-                    history_reservationDTO.setStartDate((Date) reservationDTO.getStartDate());
-                    history_reservationDTO.setEndDate((Date) reservationDTO.getStopDate());
+                    history_reservationDTO.setStartDate(new java.sql.Date(reservationDTO.getStartDate().getTime()));
+                    history_reservationDTO.setEndDate(new java.sql.Date(reservationDTO.getStopDate().getTime()));
                     history_reservationDTO.setDeleted(false);
                     remoteEJB.saveOrUpdateHistoryReservation(history_reservationDTO, false);
+                    writer.write("{\"result\": \"correct\", \"response\": \"Loan added correctly\"}");
                 }
             } catch (ErlangClientException | RemoteDBException ex) {
-                writer.write(String.format("%s", ex.getMessage()));
+                writer.write("{\"result\": \"error\", \"response\": \"server error\"}");
             }
         }
 

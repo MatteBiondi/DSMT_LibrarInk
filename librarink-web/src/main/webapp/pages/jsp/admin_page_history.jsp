@@ -100,6 +100,6 @@
     </tr>
     <%}%>
 </table>
-
+<a href="<%= request.getContextPath()%>/admin">Home</a>
 </body>
 </html>

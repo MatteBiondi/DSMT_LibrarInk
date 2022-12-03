@@ -22,19 +22,20 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-<%--@declare id="loan_registration"--%><form ACTION="admin",id="loan_registration">
+<%--@declare id="loan_registration"--%><form ACTION="/adminAddLoan",id="loan_registration">
   <label for="User">User email:</label><br>
   <input type="text" id="User" name="User"><br>
   <label for="ISBN">ISBN:</label><br>
   <input type="text" id="ISBN" name="ISBN"><br>
   <label for="IDBook">IDBook:</label><br>
-  <input type="text" id="IDBook" name="IDBook" onclick="menuListId('reservationInputField','IdList',<script>getValue(inputIdField);</script>)"
-         list="IdList" id=reservationInputField" name="bookID" />
+  <input type="text" id="IDBook" name="IDBook" onclick="menuListId('reservationInputField','IdList',getValue('ISBN'))"
+         list="IdList" id="reservationInputField" name="bookID" />
   <datalist id="IdList"></datalist>
 
 
 </form>
-<button form="loan_registration" name="button" value="AddLoan">Confirm Reservation</button>
+<button type="button" onclick="submitAddLoanPage('ISBN','User','IDBook','loan_registration')" form="loan_registration" name="buttonConfirm" value="AddLoan">Confirm Loan</button>
+<a href="<%= request.getContextPath()%>/admin">Home</a>
 </body>
 <script src="${pageContext.request.contextPath}/scripts/admin_page.js"></script>
 </html>
