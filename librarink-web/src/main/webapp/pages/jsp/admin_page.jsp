@@ -116,6 +116,7 @@
 <button type="button" form="loan" name="button" value="EndLoan" onclick="submitRequest('loan','EndLoan','loan_table','loan_checkbox')">End Loan</button>
 <a href="<%= request.getContextPath()%>/adminHistory">History table</a>
 <a href="<%= request.getContextPath()%>/adminAddLoan">New Loan</a>
+<a href="<%= request.getContextPath()%>/admin">Refresh</a>
 <script src="${pageContext.request.contextPath}/scripts/admin_page.js"></script>
 </body>
 </html>
