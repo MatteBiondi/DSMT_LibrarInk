@@ -1,48 +1,57 @@
 
 
-    function myDeleteFunctionLegacy(tableName,formName,checkBoxName)
+function myDeleteFunction(tableName,formName,checkBoxName)
+{
+    if(tableName=="reservation_table")
     {
-        let formElementHTMLCollectionOfElement=document.forms[formName];
-        let allOption=formElementHTMLCollectionOfElement.elements[checkBoxName];
-        let selectedOptions=[];
-        allOption.forEach((element)=>
-        {
-            if (element.checked) {
-                selectedOptions.push(element.value);
-                element.parentNode.parentNode.parentNode.removeChild(element.parentNode.parentNode);
-
-                }
-
+        $( ".reservation_checkbox" ).each(function(){
+            if($( this ).is(':checked'))
+            {
+                $(this).closest('tr').remove();
+            }
+     });
+    }
+    else if(tableName=="loan_table")
+    {
+        $( ".loan_checkbox" ).each(function(){
+            if($( this ).is(':checked'))
+            {
+                $(this).closest('tr').remove();
+            }
         });
-
     }
-    function myDeleteFunction(tableName,formName,checkBoxName)
-    {
-        if(tableName=="reservation_table")
-        {
-            $( ".reservation_checkbox" ).each(function(){
-                if($( this ).is(':checked'))
-                {
-                    $(this).closest('tr').remove();
-                }
-         });
-        }
-        else if(tableName=="loan_table")
-        {
-            $( ".loan_checkbox" ).each(function(){
-                if($( this ).is(':checked'))
-                {
-                    $(this).closest('tr').remove();
-                }
-            });
-        }
 
 
-    }
+}
     function resetFormField(idForm)
     {
         console.log(idForm);
         document.getElementById(idForm).reset();
+    }
+    async function submitAddCopyBookPage(isbn_ID)
+    {
+        let isbn=document.getElementById(isbn_ID).value;
+        let message = await $.post("request/async", {
+            request: "write_copy",
+            isbn: isbn },"json"
+        );
+        console.log(message);
+        //TODO add a message
+        document.getElementById(isbn_ID).value='';
+        if(message.hasOwnProperty("response"))
+        {
+            if(message.response=='ok')
+            {
+                alert("the copy is added correctly");
+            }
+            else
+            {
+                alert("there is a problem with the request");
+            }
+        }
+
+
+
     }
     async function submitAddLoanPage(isbn_ID,userEmail_ID,bookID_ID,idForm)
     {
