@@ -40,7 +40,7 @@ init(Req, _State) ->
   {[], #librarink_websocket_state{}, hibernate} |
   {stop, State::#librarink_websocket_state{}}).
 websocket_init(State) ->
-  ?LOG_INFO("Websocket connection established"),
+  ?LOG_NOTICE("Websocket connection established"),
   %% Register to MQS
   case librarink_common_mqs_client:register(self()) of
     {ok, _} -> {[], #librarink_websocket_state{}, hibernate};
@@ -121,7 +121,7 @@ websocket_info(_Msg, State) ->
 %% @end
 -spec(terminate(Reason :: any(), Request :: any() ,State::#librarink_websocket_state{}) -> ok).
 terminate(Reason, _Request, #librarink_websocket_state{mqs_pid = MqsPid}) ->
-  ?LOG_INFO("Websocket connection closed: ~p",[Reason]),
+  ?LOG_NOTICE("Websocket connection closed: ~p",[Reason]),
   librarink_common_mqs_client:unregister(MqsPid),
   ok.
 

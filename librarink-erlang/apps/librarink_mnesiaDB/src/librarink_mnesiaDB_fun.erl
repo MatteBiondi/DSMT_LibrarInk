@@ -47,7 +47,7 @@
 install(ActiveNodes, BackupNodes) ->
   %Create schema for all nodes received as parameter
   Nodes = ActiveNodes ++ BackupNodes,
-  ?LOG_INFO("Active, Backup: ~p~n",[{ActiveNodes, BackupNodes}]),
+  ?LOG_NOTICE("Active, Backup: ~p~n",[{ActiveNodes, BackupNodes}]),
   Active = lists:member(node(), ActiveNodes),
   case Active of
     true ->   %Activate Mnesia in all nodes

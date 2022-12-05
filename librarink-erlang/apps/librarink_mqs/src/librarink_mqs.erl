@@ -76,7 +76,7 @@ init(MasterPid) ->
   {reply, Reply :: term(), NewState :: #librarink_mqs_state{}} |
   {noreply, NewState :: #librarink_mqs_state{}}).
 handle_call(Request, {From,_}, State = #librarink_mqs_state{master_pid = MasterPid}) ->
-  ?LOG_INFO("Request: ~p", [Request]),
+  ?LOG_NOTICE("Request: ~p", [Request]),
   case From == MasterPid of % The request is executed only if sent by master process
     true ->
       handle(Request, State); % Utility function to handler request
@@ -127,7 +127,7 @@ handle_info(Info, State = #librarink_mqs_state{}) -> % Catch all clause
 -spec(terminate(Reason :: (normal | shutdown | {shutdown, term()} | term()),
     State :: #librarink_mqs_state{}) -> term()).
 terminate(Reason,State = #librarink_mqs_state{connection = Connection, channel = Channel}) ->
-  ?LOG_INFO("MQS terminating: ~p~nState: ~p~n", [Reason, State]),
+  ?LOG_NOTICE("MQS terminating: ~p~nState: ~p~n", [Reason, State]),
   librarink_common_amqp:close_connection(Connection, Channel).
 
 %% @private

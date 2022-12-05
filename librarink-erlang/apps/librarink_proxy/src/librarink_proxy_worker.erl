@@ -50,8 +50,7 @@ work(Request, From, Tag, Env) ->
       Value when is_atom(Value) -> Value;
       Value when is_number(Value) -> Value;
       Loan when is_map(Loan) -> Loan;
-      Err ->  Err;
-      _ -> <<"something went wrong">>
+      Err ->  Err
     end,
   try
     %% Send response
@@ -199,7 +198,7 @@ join_responses(Responses) ->
            [ok] -> {succeed, ok};
            _ -> {succeed, lists:foldl(FoldResponses, {0, []}, MappedResponses)}
          end;
-    _Error -> {errors, lists:foldl(FoldErrors, [], ErrorList)}
+    _Error -> {error, lists:foldl(FoldErrors, [], ErrorList)}
   end.
 
 %% @private

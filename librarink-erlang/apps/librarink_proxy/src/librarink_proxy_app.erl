@@ -30,4 +30,4 @@ start(_StartType, _StartArgs) ->
 %% @end
 -spec(stop(State :: term()) -> ok).
 stop(_State) ->
-    gen_server:stop(?GET_ENV(proxy_name), shutdown, 180000). %% TODO: handle worker stop
+    gen_server:stop(?GET_ENV(proxy_name), shutdown, 180000).

@@ -92,7 +92,7 @@ handle_info(Info, State = #librarink_mnesiaDB_state{}) ->
 -spec(terminate(Reason :: (normal | shutdown | {shutdown, term()} | term()),
     State :: #librarink_mnesiaDB_state{}) -> term()).
 terminate(Reason, _State = #librarink_mnesiaDB_state{}) ->
-  ?LOG_INFO("[~p] Termination: ~p~n", [self(), Reason]),
+  ?LOG_NOTICE("[~p] Termination: ~p~n", [self(), Reason]),
   ok.
 
 %%%===================================================================

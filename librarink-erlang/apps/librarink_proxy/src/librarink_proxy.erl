@@ -60,7 +60,7 @@ init([]) ->
   {reply, Reply :: term(), NewState :: #librarink_proxy_env{}} |
   {stop, Reason :: term(), NewState :: #librarink_proxy_env{}}).
 handle_call(Request, {From, Tag}, Env) ->
-  ?LOG_INFO("Request: ~p",[{From, Tag, Request}]),
+  ?LOG_NOTICE("Request: ~p",[{From, Tag, Request}]),
   case librarink_proxy_worker_sup:start_worker(From, Tag, Request, Env) of
     {ok, _Pid} -> {noreply, Env}; %% The response will be sent by the worker process
     {error, {already_started, _Pid}}-> {noreply, Env}; %% The worker process is already handling such request,
@@ -81,7 +81,7 @@ handle_cast(_Request, Env) ->
 -spec(handle_info({From :: pid(), Tag :: reference(), Request :: term()}, Env :: #librarink_proxy_env{}) ->
   {noreply, NewState :: #librarink_proxy_env{}}).
 handle_info({From, Tag, Request}, Env) when is_pid(From) ->
-  ?LOG_INFO("Request: ~p",[{From, Tag, Request}]),
+  ?LOG_NOTICE("Request: ~p",[{From, Tag, Request}]),
   case librarink_proxy_worker_sup:start_worker(From, Tag, Request, Env) of
     {ok, _Pid} -> {noreply, Env}; %% The response will be sent by the worker process
     {error, {already_started, _Pid}}-> {noreply, Env}; %% The worker process is already handling such request,
