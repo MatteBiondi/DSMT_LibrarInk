@@ -10,7 +10,6 @@
 %% API
 -export([register/1, declare_queue/2, bind_queue/5, unbind_queue/4, start_consumer/2, unregister/1]).
 
-%% TODO: check no proc and error return
 %%% @doc
 %%% Request to the MQS supervisor to start a MQS process that will interact with the Message Queuing Systems adopting
 %%% AMQP protocol, establishing a connection with the system.

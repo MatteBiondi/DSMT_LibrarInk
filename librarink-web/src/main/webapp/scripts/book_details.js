@@ -349,8 +349,7 @@ function update_user_page(callbacks, old_books){
 
 function show_error_message(exception){
     if(exception !== undefined && Object.prototype.toString.call(exception) === "[object String]"){
-        show_message("danger", "Something went wrong: " +
-            exception.charAt(0).toUpperCase() + exception.slice(1));
+        show_message("danger", "Something went wrong: " + exception);
     }
     else{
         show_message("danger", "Something went wrong")

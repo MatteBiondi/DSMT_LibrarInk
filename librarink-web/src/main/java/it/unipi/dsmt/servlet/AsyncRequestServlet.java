@@ -16,9 +16,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * This class is in charge of forward the received requests to the erlang client,
- * that allows manipulation of mnesia db.
- */
+ * This class takes care of asynchronous operations requested by web client to retrieve/update data from databases
+ **/
 @WebServlet(name = "AsyncRequestServlet", value = "/request/async", loadOnStartup = 0)
 public class AsyncRequestServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(AsyncRequestServlet.class.getName());
@@ -75,7 +74,7 @@ public class AsyncRequestServlet extends HttpServlet {
                     WishlistDTO new_item = new WishlistDTO();
                     new_item.setUser(user);
                     new_item.setIsbn(isbn);
-                    WishlistDTO result = remote.saveOrUpdateWishlist(new_item, false);
+                    remote.saveOrUpdateWishlist(new_item, false);
                     writer.write("{\"result\": \"succeed\", \"response\": \"ok\"}");
                     return;
                 case "remove_wishlist":
@@ -174,29 +173,29 @@ public class AsyncRequestServlet extends HttpServlet {
                         }
                         writer.write(copies_js.toString());
                         return;
-                    case "write_copy"://TODO: Remove
+                    case "write_copy":
                         writer.write(erlang_client.write_copy(isbn));
                         return;
-                    case "delete_copy"://TODO: remove
+                    case "delete_copy":
                         writer.write(erlang_client.delete_copy(isbn, request.getParameter("id")));
                         return;
-                    case "write_loan"://TODO: remove
+                    case "write_loan":
                         LoanDTO loan = erlang_client.write_loan(user, isbn, request.getParameter("id"));
                         if (loan!=null)
                             writer.write(String.format("{\"id\":\"%s\"}",loan.getCopyId()));
                         else
                             writer.write("{\"error\":\"Unexpected error\"}");
                         return;
-                    case "delete_reservation"://TODO: remove
+                    case "delete_reservation":
                         writer.write(erlang_client.delete_reservation(user, isbn));
                         return;
                     case "delete_loan":
-                        writer.write(erlang_client.delete_loan(user, isbn, request.getParameter("id"))); //TODO: remove
+                        writer.write(erlang_client.delete_loan(user, isbn, request.getParameter("id")));
                         return;
-                    case "terminate_loan"://TODO: remove
+                    case "terminate_loan":
                         writer.write(erlang_client.terminate_loan(isbn, request.getParameter("id")));
                         return;
-                    case "renew_loan"://TODO: remove
+                    case "renew_loan":
                         writer.write(erlang_client.renew_loan(isbn, request.getParameter("id")));
                         return;
                 }
