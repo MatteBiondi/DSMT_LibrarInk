@@ -28,9 +28,9 @@
   <label for="ISBN">ISBN:</label><br>
   <input type="text" id="ISBN" name="ISBN"><br>
   <label for="IDBook">IDBook:</label><br>
-  <input type="text" id="IDBook" name="IDBook" onclick="menuListId('reservationInputField','IdList',getValue('ISBN'))"
-         list="IdList" id="reservationInputField" name="bookID" />
-  <datalist id="IdList"></datalist>
+  <select name="IDList" id="idBook" onfocus="menuSelectListId('idBook',getValue('ISBN'))">
+
+  </select>
 
 
 </form>

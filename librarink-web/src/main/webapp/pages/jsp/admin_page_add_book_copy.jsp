@@ -25,8 +25,18 @@
 <%--@declare id="loan_registration"--%><form ACTION="/adminAddLoan",id="loan_registration">
     <label for="ISBN">ISBN:</label><br>
     <input type="text" id="ISBN" name="ISBN"><br>
+    <label for="add">add copy</label><br>
+    <input type="radio" checked id="add" name="option_submit" value="add"><br>
+    <input type="radio" id="remove" name="option_submit" value="remove">
+    <label for="remove">remove copy</label><br>
+    <select name="IDList" id="idList" onfocus="menuSelectListId('idList',getValue('ISBN'))">
+
+    </select>
+
+
+
 </form>
-<button type="button" onclick="submitAddCopyBookPage('ISBN')" form="loan_registration" name="buttonConfirm" value="AddLoan">Add Loan</button>
+<button type="button" onclick="submitAddDeleteCopyBookPage('ISBN','idList','option_submit')" form="loan_registration" name="buttonConfirm" value="AddLoan">Add Loan</button>
 <a href="<%= request.getContextPath()%>/admin">Home</a>
 </body>
 <script src="${pageContext.request.contextPath}/scripts/admin_page.js"></script>

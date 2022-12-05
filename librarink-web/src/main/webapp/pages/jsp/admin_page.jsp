@@ -72,9 +72,9 @@
                 <td><%=reservationDTO.getStartDate()%></td>
                 <td><%=reservationDTO.getStopDate()%></td>
                 <td><label for="<%="reservation"+reservationDTO.getUser()+reservationDTO.getIsbn()%>"></label>
-                    <input type="text" onclick="menuListId('<%="reservation"+reservationDTO.getUser()+reservationDTO.getIsbn()%>','<%="IdList"+reservationDTO.getUser()+reservationDTO.getIsbn()%>','<%=reservationDTO.getIsbn()%>')"
-                           list="<%="IdList"+reservationDTO.getUser()+reservationDTO.getIsbn()%>" id="<%="reservation"+reservationDTO.getUser()+reservationDTO.getIsbn()%>" name="bookID"/>
-                    <datalist id="<%="IdList"+reservationDTO.getUser()+reservationDTO.getIsbn()%>"></datalist><br><br></td>
+                    <select name="IDList"  id="<%="reservation"+reservationDTO.getUser()+reservationDTO.getIsbn()%>" onfocus="menuSelectListId('<%="reservation"+reservationDTO.getUser()+reservationDTO.getIsbn()%>','<%=reservationDTO.getIsbn()%>')">
+
+                    </select>
             <%}%>
 
 
