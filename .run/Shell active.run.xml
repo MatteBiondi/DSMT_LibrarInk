@@ -1,9 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Shell backup" type="RebarRunConfigurationType" factoryName="Erlang Rebar">
-    <module name="librarink-erlang" />
-    <option name="command" value="shell --setcookie abcd --sname backup --config config/backup.config" />
-    <option name="skipDependencies" value="false" />
-    <envs />
-    <method v="2" />
-  </configuration>
-</component>

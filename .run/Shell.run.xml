@@ -1,14 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Shell active" type="RebarRunConfigurationType" factoryName="Erlang Rebar">
-    <module name="librarink-erlang" />
-    <option name="command" value="shell --setcookie abcd --sname active --config config/active.config" />
-    <option name="skipDependencies" value="false" />
-    <envs />
-    <method v="2" />
-  </configuration>
   <configuration default="false" name="Shell" type="RebarRunConfigurationType" factoryName="Erlang Rebar">
     <module name="librarink-erlang" />
-    <option name="command" value="shell --setcookie abcd --name active@127.0.0.1  --config config/sys.config" />
+    <option name="command" value="shell --setcookie librarink_secret_cookie --name proxy@127.0.0.1  --config config/sys.config" />
     <option name="skipDependencies" value="false" />
     <envs />
     <method v="2" />
