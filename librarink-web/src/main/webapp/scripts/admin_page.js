@@ -121,7 +121,6 @@ async function submitRequest(formName,button,tableName,checkboxName)
     let reservation = '';
     let loan = '';
     let sap = '';
-    console.log(formName);
     if(formName=="reservation"){
         console.log("reservation path");
         $( ".reservation_checkbox" ).each(function() {
@@ -130,6 +129,11 @@ async function submitRequest(formName,button,tableName,checkboxName)
             let listOfParam=[];
             listOfParam=$(this).val().split(";");
             console.log(document.getElementById('reservation'+listOfParam[0]+listOfParam[1]).value);
+            if(document.getElementById('reservation'+listOfParam[0]+listOfParam[1]).value=='')
+            {
+                alert("idBook not selected");
+                return;
+            }
             //$(this).value=$(this).val() + ";" +document.getElementById('reservation'+listOfParam[0]+listOfParam[1]).value;
             reservation = reservation+''+sap+''+$( this ).val()+";"+document.getElementById('reservation'+listOfParam[0]+listOfParam[1]).value;
             console.log(reservation);
@@ -278,7 +282,8 @@ function myCreateFunctionSingleElement(nameTable,value,typeValue) {
         let UserID = row.insertCell(3);
         let StartTime = row.insertCell(4);
         let EndTime = row.insertCell(5);
-        checkbox.innerHTML="<input type='checkbox' name = 'loan' value="+element.isbn+"+';'+"+element.id+"+';'+"+element.user+"+'; />"
+
+        checkbox.innerHTML="<input type='checkbox' name = 'loan' class= 'loan_checkbox' value="+element.isbn+"+';'+"+element.copyId+"+';'+"+element.user+"/>"
         ISBN.innerHTML = element.isbn;
         UserID.innerHTML = element.user;
         Id.innerHTML = element.copyId;
