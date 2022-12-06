@@ -232,8 +232,8 @@ build_notification(Request, Result, Copies) ->
       {update_reservation, #{isbn := Isbn}} when Copies =/= 1 -> ?ADD_NOTIFICATION(Isbn, false);
       {update_loan, #{isbn := Isbn}} when Copies =/= 1 -> ?ADD_NOTIFICATION(Isbn, false);
       {write_reservation, #{isbn := Isbn}} -> ?REMOVE_NOTIFICATION(Isbn);
-      {delete_copy, #{isbn := Isbn, id := _}} -> ?SET_NOTIFICATION(Isbn);
-      {delete_copy, #{isbn := Isbn}} -> ?REMOVE_NOTIFICATION(Isbn);
+      {delete_copy, #{isbn := Isbn, id := _}} -> ?REMOVE_NOTIFICATION(Isbn);
+      {delete_copy, #{isbn := Isbn}} -> ?SET_NOTIFICATION(Isbn);
       _ -> {"", no_notification}
     end;
     true ->
