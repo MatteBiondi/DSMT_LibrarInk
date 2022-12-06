@@ -1,0 +1,2 @@
+@echo off
+erl -name shutdown@127.0.0.1 -setcookie librarink_secret_cookie -noshell -eval "rpc:multicall(['proxy@172.18.0.29', 'mnesia_active1@172.18.0.31','mnesia_active2@172.18.0.32','mnesia_active3@172.18.0.33','mnesia_backup1@172.18.0.32','mnesia_backup2@172.18.0.33','mnesia_backup3@172.18.0.31'], init, stop,[]), rpc:call('websocket@172.18.0.30',application, stop, [ranch]), rpc:call('websocket@172.18.0.30', init, stop, []), init:stop()"

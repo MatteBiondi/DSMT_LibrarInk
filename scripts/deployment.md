@@ -6,7 +6,7 @@ The Librarink application is composed by several components:
 * Erlang server
   * Proxy server
   * Mnesia database
-  * Web(socket) server
+  * Cowboy websocket server
 * MySQL DB server
 * RabbitMQ server
 
@@ -54,7 +54,7 @@ physical machine, so in case of hardware failure of a physical node data will be
 | Glassfish AS            | 172.18.0.28 | -               |
 | MySQL DB server         | 172.18.0.29 | -               |
 | Proxy server            | 172.18.0.29 | Proxy           |
-| Web server              | 172.18.0.30 | Cowboy          |
+| Cowboy websocket server | 172.18.0.30 | Cowboy          |
 | RabbitMQ server         | 172.18.0.30 | RabbitMQ        |
 | Mnesia replica 1        | 172.18.0.31 | Mnesia active 1 |
 | Mnesia replica 2        | 172.18.0.32 | Mnesia active 2 |

@@ -17,7 +17,7 @@ do
 
     cd DSMT_Librarink/scripts
 
-    ## build and build
+    ## build
     
     # Proxy
     ssh -i keys/dsmt.pem root@"$ip" "bash Librarink/build/proxy.sh"
@@ -37,6 +37,3 @@ do
     ssh -i keys/dsmt.pem root@"$ip" "bash Librarink/build/mnesia.sh active 3"
     ssh -i keys/dsmt.pem root@"$ip" "bash Librarink/build/mnesia.sh backup 3"
 done
-
-# Glassfish
-mvn -f  ../pom.xml clean deploy
