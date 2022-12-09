@@ -1,14 +1,14 @@
 package it.unipi.dsmt.librarink;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class HistoryLoanDTO implements Serializable {
     String user;
     String isbn;
     String copyId;
-    Date startDate;
-    Date endDate;
+    Timestamp startDate;
+    Timestamp endDate;
 
     public String getUser() {
         return user;
@@ -34,19 +34,19 @@ public class HistoryLoanDTO implements Serializable {
         this.copyId = copyId;
     }
 
-    public Date getStartDate() {
+    public Timestamp getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(Timestamp startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public Timestamp getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(Timestamp endDate) {
         this.endDate = endDate;
     }
 

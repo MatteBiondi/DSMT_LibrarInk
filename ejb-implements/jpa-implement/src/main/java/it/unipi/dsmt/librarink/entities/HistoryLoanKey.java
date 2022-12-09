@@ -1,16 +1,16 @@
 package it.unipi.dsmt.librarink.entities;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class HistoryLoanKey implements Serializable {
 
     private String user;
     private String isbn;
     private String id_copy;
-    private Date start_date;
+    private Timestamp start_date;
 
-    public HistoryLoanKey(String user, String isbn, String id_copy, Date start_date) {
+    public HistoryLoanKey(String user, String isbn, String id_copy, Timestamp start_date) {
         this.user = user;
         this.isbn = isbn;
         this.id_copy = id_copy;
@@ -41,11 +41,11 @@ public class HistoryLoanKey implements Serializable {
         this.id_copy = id_copy;
     }
 
-    public Date getStart_date() {
+    public Timestamp getStart_date() {
         return start_date;
     }
 
-    public void setStart_date(Date start_date) {
+    public void setStart_date(Timestamp start_date) {
         this.start_date = start_date;
     }
 }

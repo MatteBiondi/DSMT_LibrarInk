@@ -8,6 +8,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -360,7 +361,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
     }
 
     @Override
-    public HistoryLoanDTO findHistoryLoanByKey(String user, String isbn, String id_copy, Date start_date) throws RemoteDBException {
+    public HistoryLoanDTO findHistoryLoanByKey(String user, String isbn, String id_copy, Timestamp start_date) throws RemoteDBException {
         try {
             HistoryLoanKey history_loanKey = new HistoryLoanKey(user, isbn, id_copy, start_date);
             HistoryLoan history_loan = entityManager.find(HistoryLoan.class, history_loanKey);
@@ -379,7 +380,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
 
     @Override
     public HistoryReservationDTO findHistoryReservationByKey(String user, String isbn, String id_copy,
-                                                             Date start_date) throws RemoteDBException {
+                                                             Timestamp start_date) throws RemoteDBException {
         try {
             HistoryReservationKey history_reservationKey = new HistoryReservationKey(user, isbn, start_date);
             HistoryReservation history_reservation = entityManager.find(HistoryReservation.class, history_reservationKey);
@@ -459,7 +460,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
     }
 
     @Override
-    public boolean deleteHistoryLoanByKey(String user, String isbn, String id_copy, Date start_date) throws RemoteDBException {
+    public boolean deleteHistoryLoanByKey(String user, String isbn, String id_copy, Timestamp start_date) throws RemoteDBException {
         try {
             HistoryLoanKey history_loanKey = new HistoryLoanKey(user, isbn, id_copy, start_date);
             HistoryLoan history_loan = entityManager.find(HistoryLoan.class, history_loanKey);
@@ -475,7 +476,7 @@ public class LibrarinkRemoteEJB implements LibrarinkRemote {
     }
 
     @Override
-    public boolean deleteHistoryReservationByKey(String user, String isbn, String id_copy, Date start_date) throws RemoteDBException {
+    public boolean deleteHistoryReservationByKey(String user, String isbn, String id_copy, Timestamp start_date) throws RemoteDBException {
         try {
             HistoryReservationKey history_reservationKey = new HistoryReservationKey(user, isbn, start_date);
             HistoryReservation history_reservation = entityManager.find(HistoryReservation.class, history_reservationKey);

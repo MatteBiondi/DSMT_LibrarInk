@@ -1,7 +1,7 @@
 package it.unipi.dsmt.librarink.entities;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "history_loan")
@@ -18,9 +18,9 @@ public class HistoryLoan {
     String id_copy;
     @Id
     @Column(name="start_date")
-    Date start_date;
+    Timestamp start_date;
     @Column(name="end_date")
-    Date end_date;
+    Timestamp end_date;
 
     public String getUser() {
         return user;
@@ -46,19 +46,19 @@ public class HistoryLoan {
         this.id_copy = id_copy;
     }
 
-    public Date getStart_date() {
+    public Timestamp getStart_date() {
         return start_date;
     }
 
-    public void setStart_date(Date start_date) {
+    public void setStart_date(Timestamp start_date) {
         this.start_date = start_date;
     }
 
-    public Date getEnd_date() {
+    public Timestamp getEnd_date() {
         return end_date;
     }
 
-    public void setEnd_date(Date end_date) {
+    public void setEnd_date(Timestamp end_date) {
         this.end_date = end_date;
     }
 
