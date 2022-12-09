@@ -1,13 +1,14 @@
 import json
 from random import randrange
+import random
 import mysql.connector
 import requests as r
 
 USER='librarink'
 PASSWORD='root'
 DATABASE='librarink'
-DATABASE_HOST='172.18.0.28'
-SERVER_HOST='localhost'
+DATABASE_HOST='172.18.0.29'
+SERVER_HOST='172.18.0.28'
 ADMIN='admin@librarink.it'
 ADMIN_PASSWORD='root'
 
@@ -99,8 +100,45 @@ def upload_book_copies_mnesia():
                     print(e)         
             print(f'{index} -> <{isbn}, {ids}>')
 
+def generate_reservations():
+    db = connect_db()
+    cursor = db.cursor()
+    cursor.execute("select email from user")
+    users = list(map(lambda x: x[0],cursor.fetchall()))
+    books = cursor.execute("select isbn from book")
+    books = list(map(lambda x: x[0],cursor.fetchall()))
+    
+    for user in users:
+        session = r.Session()
+        login = session.post(f"http://{SERVER_HOST}:8080/librarink-web/login", data={"email": user,"password":"root"}).status_code
+        #random.shuffle(books)
+        if login != 200:
+            print("Login failed")
+            return
+        n_reservations = randrange(100)
+        for i,isbn in zip(range(0, n_reservations), books):
+            try:
+                response = session.post(URL, data={'request': 'write_reservation', 'isbn': isbn}).text
+                print(response)
+            except Exception as e:
+                print(e)
 
 if __name__ == '__main__':
-    upload_books_mysql()
-    upload_book_copies_mnesia()
-
+    print("".join([
+        "What do you want to do ?\n",
+        "\t1 - Upload books on MySql\n",
+        "\t2 - Generate book copies on Mnesia\n"
+        "\t3 - Generate users\n",
+        "\t4 - Generate reservations"
+    ]))
+    cmd = input()
+    if cmd == '1':
+        upload_books_mysql()
+    if cmd == '2':
+        upload_book_copies_mnesia()
+    if cmd == '3':
+        print("Not implemented !")
+    if cmd == '4':
+        generate_reservations()
+    else:
+        print("exit")
