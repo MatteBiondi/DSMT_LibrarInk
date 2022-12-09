@@ -1,300 +1,174 @@
 
+$(document).ready(() => {
 
-function myDeleteFunction(tableName,formName,checkBoxName)
-{
-    if(tableName=="reservation_table")
-    {
-        $( ".reservation_checkbox" ).each(function(){
-            if($( this ).is(':checked'))
-            {
-                $(this).closest('tr').remove();
-            }
-     });
-    }
-    else if(tableName=="loan_table")
-    {
-        $( ".loan_checkbox" ).each(function(){
-            if($( this ).is(':checked'))
-            {
-                $(this).closest('tr').remove();
-            }
-        });
+    let current_page = sessionStorage.getItem("page");
+    let nav_reservation_tab_btn = $("#nav-reservation-tab");
+    let nav_loan_tab_btn = $("#nav-loan-tab");
+
+    const nav_loan_tab = new bootstrap.Tab('#nav-loan-tab');
+
+    // Select which buttons to show
+    showButtons(current_page);
+
+    // Load book IDs
+    preloadId()
+
+    // Select active tab
+    if(current_page != null && current_page === "loan"){
+        nav_loan_tab.show();
+        nav_loan_tab_btn.blur()
     }
 
-
-}
-function resetFormField(idForm)
-{
-    console.log(idForm);
-    document.getElementById(idForm).reset();
-}
-async function submitAddCopyBookPage(isbn_ID)
-{
-    let isbn=document.getElementById(isbn_ID).value;
-    let message = await $.post("request/async", {
-        request: "write_copy",
-        isbn: isbn },"json"
+    //Adjust columns size
+    $('button[data-bs-toggle="tab"]').on('shown.bs.tab', () =>
+        $($.fn.dataTable.tables(true)).DataTable().columns.adjust()
     );
-    console.log(message);
-    //TODO add a message
-    document.getElementById(isbn_ID).value='';
-    if(message.hasOwnProperty("response"))
-    {
-        if(message.response=='ok')
-        {
-            alert("the copy is added correctly");
-        }
-        else
-        {
-            alert("there is a problem with the request");
-        }
-    }
 
+    // Set handlers
+    nav_reservation_tab_btn.on("click",() => {
+        sessionStorage.setItem("page", "reservation")
+        showButtons("reservation")
+    });
 
+    nav_loan_tab_btn.on("click",() => {
+        sessionStorage.setItem("page", "loan")
+        showButtons("loan")
+    });
 
+    $('#reservation_table').DataTable({
+        scrollY: '75%',
+        scrollCollapse: true,
+        paging: false,
+        fixedHeader: true,
+        ordering: false
+    });
+
+    $('#loan_table').DataTable({
+        scrollY: '75%',
+        scrollCollapse: true,
+        paging: false,
+        fixedHeader: true,
+        ordering:false
+    });
+
+    $(".paginate_button").on("click", preloadId)
+})
+
+function preloadId(){
+    $(".book-id-selection").each((pos, elem) => menuSelectListId(elem.id, elem.dataset.isbn));
 }
-async function submitAddDeleteCopyBookPage(isbn_ID,bookID_ID,radioBox_ID)
-{
-    let radioBoxValue=document.querySelector('input[name="'+radioBox_ID+'"]:checked').value;
-    if(radioBoxValue=="add")
-    {
-        await submitAddCopyBookPage(isbn_ID);
-    }
-    else if(radioBoxValue=="remove")
-    {
-        await submitDeleteCopyBookPage(isbn_ID, bookID_ID);
-    }
-    else
-    {
-        alert("request not implemented");
-    }
-}
-async function submitDeleteCopyBookPage(isbn_ID,bookID_ID) {
-    let isbn = document.getElementById(isbn_ID).value;
-    let bookID = document.getElementById(bookID_ID).value;
-    if (isbn == '' || bookID == '') {
-        alert("one or more fields are empty, please fill them all");
-    } else {
-        let message = await $.post("request/async", {
-                request: "delete_copy",
-                isbn: isbn,
-                id: bookID
-            }, "json"
-        );
-        if (message.hasOwnProperty('result')) {
-            alert("result: " + message.result, +" response: " + message.response);
-            document.getElementById(isbn_ID).value = '';
-            document.getElementById(bookID_ID).value = '';
-        }
-    }
-}
-async function submitAddLoanPage(isbn_ID,userEmail_ID,bookID_ID,idForm)
-{
-    let isbn=document.getElementById(isbn_ID).value;
-    let userEmail=document.getElementById(userEmail_ID).value;
-    let bookID=document.getElementById(bookID_ID).value;
-    if(isbn==''||userEmail==''||bookID=='')
-    {
-        alert("one or more fields are empty, please fill them all");
-    }
-    else
-    {
-        let result= await $.post("/librarink-web/adminAddLoan", {
-            User: userEmail,
-            ISBN: isbn,
-            IDBook:bookID
-        },"json");
-        let jsonResult=JSON.parse(result);
-        if(jsonResult.hasOwnProperty('result')){
-            alert("result: " +jsonResult.result,+" response: "+ jsonResult.response);
-            document.getElementById(isbn_ID).value='';
-            document.getElementById(userEmail_ID).value='';
-            document.getElementById(bookID_ID).value='';
-        }
-    }
 
-}
-//submit a request and update a table
-async function submitRequest(formName,button,tableName,checkboxName)
-{
-
+// Confirm reservation\End loan
+async function submitRequest(formName, button, tableName, checkboxName) {
     let reservation = '';
     let loan = '';
-    let sap = '';
-    if(formName=="reservation"){
-        console.log("reservation path");
-        $( ".reservation_checkbox" ).each(function() {
-        if($( this ).is(':checked'))
-        {
-            let listOfParam=[];
-            listOfParam=$(this).val().split(";");
-            console.log(document.getElementById('reservation'+listOfParam[0]+listOfParam[1]).value);
-            if(document.getElementById('reservation'+listOfParam[0]+listOfParam[1]).value=='')
-            {
-                alert("idBook not selected");
-                return;
-            }
-            //$(this).value=$(this).val() + ";" +document.getElementById('reservation'+listOfParam[0]+listOfParam[1]).value;
-            reservation = reservation+''+sap+''+$( this ).val()+";"+document.getElementById('reservation'+listOfParam[0]+listOfParam[1]).value;
-            console.log(reservation);
-            sap = ',';
-        }
+    let sep = '';
+    let response;
 
-    });
-        console.log("request:"+{
-            button: button,
-            reservation: reservation,
-            separator:sap
-        });
-        let loanList = await $.post("/librarink-web/admin", {
-        button: button,
-        reservation: reservation,
-        separator:sap
-    },"json");
-        if(button=="ConfirmReservation")
-        {
-            let loanListJson = JSON.parse(loanList);
-            for (let i = 0; i < loanListJson.length; i++)
-            {
-                console.log("element to add:"+loanListJson[i]);
-                myCreateFunctionSingleElement("loan_table",loanListJson[i],"loan");
-            }
-            if(loanListJson.hasOwnProperty('result')){
-                alert("result:"+loanListJson.result,+"/n"+"response: "+ loanListJson.response);
-            }
-
-
-        }
-
-}
-    else
-    {
-        console.log("loan path");
-        $( '.loan_checkbox' ).each(function()
-        {
-            if($( this ).is(':checked'))
-            {
-                loan = loan+''+sap+''+$( this ).val();
-                sap = ',';
+    if(formName === "reservation"){// Confirm/Delete reservation
+        $(".reservation_checkbox").each(function() {
+            if($(this).is(':checked')) {
+                let listOfParam;
+                listOfParam=$(this).val().split(";");
+                if(document.getElementById('reservation' + listOfParam[0] + listOfParam[1]).value === '') {
+                    show_message("danger","Select book ID");
+                    return;
+                }
+                reservation = reservation + sep +
+                    $( this ).val() + ";" +
+                    document.getElementById('reservation'+listOfParam[0]+listOfParam[1]).value;
+                sep = ',';
             }
         });
-        let loanMessage = await $.post("/librarink-web/admin", {
-            button: button,
-            loan: loan,
-            separator: sap},"json");
-        let loanMessageJson = JSON.parse(loanMessage);
-        alert("result:"+loanMessageJson.result,+"/n"+"response: "+ loanMessageJson.response);
-    /*let loanListJson = JSON.parse(loanList);
-
-    for (let i = 0; i < loanListJson.length; i++)
-        myCreateFunctionSingleElement("loan_table",loanListJson[i],"loan");*/
-}
-    //Delete the row updated.
-    myDeleteFunction(tableName,formName,checkboxName);
-
-}
-async function menuSelectListId(selectID,Isbn)
-{
-    let listOfId= await requestID(Isbn);
-    deleteAllChildOfAnElement(selectID);
-    populateOptionListId(selectID,listOfId);
-
-}
-function populateOptionListId(selectID,listOfId)
-{
-    let menuElement=document.getElementById(selectID);
-    for(let i=0;i<listOfId.length;i++) {
-        let option = document.createElement("option");
-        option.text = listOfId[i];
-        menuElement.add(option);
+        if(reservation === ''){
+            show_message("danger", "No reservation selected");
+            return;
+        }
+        // Send async request
+        response = await $.post("/librarink-web/admin",
+            {
+                button: button,
+                reservation: reservation,
+                separator:sep
+            },
+            "json"
+        );
+        //Update tables if necessary
+        if(button === "ConfirmReservation") {
+            if (response["result"] === "success"){
+                for (loan of response["loans"] ){
+                    myCreateFunctionSingleElement("loan_table", loan);
+                }
+            }
+        }
     }
-}
-async function menuListId(inputField,datalist,Isbn)
-{
-    let listOfId= await requestID(Isbn);
-    deleteAllChildOfAnElement(datalist);
-    populateList(inputField,datalist,listOfId);
+    else { // End loan
+        $('.loan_checkbox').each(function() {
+            if($( this ).is(':checked')) {
+                loan = loan + sep + $(this).val();
+                sep = ',';
+            }
+        });
 
+        if(loan === ''){
+            show_message("danger", "No loan selected");
+            return;
+        }
+
+        response = await $.post("/librarink-web/admin",
+            {
+                button: button,
+                loan: loan,
+                separator: sep
+            },
+            "json"
+        );
+
+    }
+    if(response["result"] === "success"){  // Update target table
+        myDeleteFunction(tableName, formName, checkboxName);
+    }
+
+    // Show message
+    show_message(response["result"] === "success" ? "success":"danger", response["response"]);
 }
-async function requestID(Isbn) {
-let idList = await $.post("request/async", {
-    request: "available_copy_ids",
-    isbn: Isbn },"json"
-    )
-    console.log(typeof idList);
-    console.log(idList);
-    return idList;
-}
-function getValue(inputIdField)
-{
-    console.log("ISBN: ");
-    console.log("ISBN: "+document.getElementById(inputIdField).value);
+
+// Utilities
+function getValue(inputIdField){
     return document.getElementById(inputIdField).value;
 }
-function populateList(inputField,datalist,bookIdArray)
-{
-    const bookIDInput=document.getElementById(inputField);
-    const bookIdDataList=document.getElementById(datalist);
-    bookIdArray.forEach(bookIdElement=>{
-        let option = document.createElement("option");
-        option.innerHTML = bookIdElement;
-        bookIdDataList.appendChild(option);
 
-    });
+function showButtons(page){
+    let confirm_reservation = $("#confirm-reservation-btn")
+    let delete_reservation = $("#delete-reservation-btn")
+    let end_loan = $("#end-loan-btn")
+
+    if(page != null && page === "loan"){
+        confirm_reservation.attr("hidden","true")
+        delete_reservation.attr("hidden","true")
+        end_loan.removeAttr("hidden")
+    }
+    else {
+        confirm_reservation.removeAttr("hidden")
+        delete_reservation.removeAttr("hidden")
+        end_loan.attr("hidden","true")
+    }
 }
-function deleteAllChildOfAnElement(idElement)
-{
 
-    const myNode = document.getElementById(idElement);
-    while (myNode.firstChild)
-    {
-        myNode.removeChild(myNode.lastChild);
-    }
+function buildDate(date){
+    let mm = date.getMonth() + 1; // getMonth() is zero-based
+    let dd = date.getDate();
+    let hh = date.getHours();
+    let MM = date.getMinutes();
+    let ss = date.getSeconds();
 
-}
-        //add a single element at the table
-function myCreateFunctionSingleElement(nameTable,value,typeValue) {
-    let table = document.getElementById(nameTable);
-    let element = value;
-
-    if(typeValue=="reservation")
-    {
-
-        let row = table.insertRow(0);
-        let checkbox = row.insertCell(0);
-        let ISBN = row.insertCell(1);
-        let UserID = row.insertCell(2);
-        let StartTime = row.insertCell(3);
-        let EndTime = row.insertCell(4);
-        checkbox.innerHTML="<input type='checkbox' name = 'reservation' value="+element.user+"+';'+"+element.isbn+"+';'+"+element.startDate+"+';'/>"
-        ISBN.innerHTML = element.isbn;
-        ISBN.innerHTML = element.isbn;
-        UserID.innerHTML = element.user;
-        StartTime.innerHTML = element.startDate;
-        EndTime.innerHTML = element.stopDate;
-    }
-    else
-    {
-        let row = table.insertRow(2);
-        let checkbox = row.insertCell(0);
-        let Id = row.insertCell(1);
-        let ISBN = row.insertCell(2);
-        let UserID = row.insertCell(3);
-        let StartTime = row.insertCell(4);
-        let EndTime = row.insertCell(5);
-
-        checkbox.innerHTML="<input type='checkbox' name = 'loan' class= 'loan_checkbox' value="+element.isbn+"+';'+"+element.copyId+"+';'+"+element.user+"/>"
-        ISBN.innerHTML = element.isbn;
-        UserID.innerHTML = element.user;
-        Id.innerHTML = element.copyId;
-        StartTime.innerHTML = new Date(element.startDate).toLocaleString();
-        if(element.stopDate!=null) {
-            EndTime.innerHTML = new Date(element.stopDate);
-        }
-        else
-        {
-            EndTime.innerHTML="null";
-        }
-    }
-
+    return [
+        date.getFullYear() + ' ',
+        (mm>9 ? '' : '0') + mm + '-',
+        (dd>9 ? '' : '0') + dd,
+        ' ',
+        (hh>9 ? '':'0') + hh + ':',
+        (MM>9 ? '':'0') + MM + ':',
+        (ss>9 ? '':'0') + ss
+    ].join('');
 }

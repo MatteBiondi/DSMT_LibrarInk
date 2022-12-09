@@ -1,0 +1,74 @@
+body{
+    overflow: hidden;
+}
+
+.wrapper{
+    display: flex;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+#menu{
+    display: flex;
+    width: 15%;
+    margin: 0;
+    padding: 0;
+}
+
+#commands{
+    align-items: baseline;
+}
+
+#commands button{
+    border: none;
+    margin: 5px;
+}
+
+#content {
+    width: 85%;
+}
+
+#nav-tabs{
+    background: white;
+}
+
+#nav-tab{
+    display: flex;
+    justify-content: space-between;
+}
+
+.button-tab{
+    display: flex
+}
+
+#active-commands{
+    display: flex;
+}
+
+#active-commands button{
+    margin: 10px;
+}
+
+select{
+    width: 100px;
+}
+
+.alert{
+    position: fixed;
+    left: 30%;
+    top: 10%;
+    width: 40%;
+    max-height: 25%;
+    text-align: center;
+    z-index: 2000;
+}
+
+.bootstrap-autocomplete li:hover {
+    background-color: lightgray;
+}
+.bootstrap-autocomplete a{
+    text-decoration: none;
+    color: darkslategrey;
+    padding: 1px;
+}
