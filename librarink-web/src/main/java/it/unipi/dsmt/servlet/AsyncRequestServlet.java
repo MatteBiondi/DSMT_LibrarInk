@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -28,6 +29,40 @@ public class AsyncRequestServlet extends HttpServlet {
     @EJB
     private LibrarinkRemote remote;
 
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        Writer writer= response.getWriter();
+        try {
+            if(request.getSession().getAttribute("admin") != null){
+                JsonArray hints = new JsonArray();
+                switch (request.getParameter("filter")){
+                    case "isbn":
+                        BookDTO bookFilter = new BookDTO();
+                        bookFilter.setIsbn(request.getParameter("q"));
+                        List<BookDTO> books = remote.listPaginationBook(0, 15, bookFilter);
+                        for(BookDTO book: books){
+                            hints.add(book.getIsbn());
+                        }
+                        break;
+                    case "user":
+                        UserDTO userFilter = new UserDTO();
+                        userFilter.setEmail(request.getParameter("q"));
+                        List<UserDTO> users = remote.listUsers(userFilter);
+                        for(UserDTO user: users){
+                            hints.add(user.getEmail());
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                writer.write(hints.toString());
+            }
+        } catch (RemoteDBException e) {
+            writer.write("[]");
+        }
+
+    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
