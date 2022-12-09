@@ -1,9 +1,9 @@
 package it.unipi.dsmt.servlet;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import it.unipi.dsmt.librarink.*;
-
 
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
@@ -14,7 +14,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Date;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -22,7 +24,6 @@ import java.util.logging.Logger;
 @WebServlet(name = "AdminPageServlet", value = "/admin", loadOnStartup = 0)
 public class AdminPageServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(AsyncRequestServlet.class.getName());
-    private ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 
     @EJB
     private ErlangClient erlang_client;
@@ -31,90 +32,91 @@ public class AdminPageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        PrintWriter writer = response.getWriter();
         try {
             List<LoanDTO> loans;
-            List<ReservationDTO> reservationDTOS;
+            List<ReservationDTO> reservations;
             loans = erlang_client.read_loans(null, null, null);
+            reservations = erlang_client.read_reservations(null, null);
+            request.setAttribute("reservationList", reservations);
             request.setAttribute("loanList", loans);
-            reservationDTOS = erlang_client.read_reservations(null, null);
-            request.setAttribute("reservationList", reservationDTOS);
+            request.setAttribute("table", "active");
+
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            request.setAttribute("df", df );
+
             String TargetJSP = "/pages/jsp/admin_page.jsp";
             RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher(TargetJSP);
             requestDispatcher.forward(request, response);
         } catch (ErlangClientException ex) {
             LOGGER.warning(String.format("EJB exception %s", ex.getMessage()));
+            PrintWriter writer = response.getWriter();
+            response.setContentType("application/json");
             writer.write("{\"result\": \"error\", \"response\": \"server error\"}");
         }
-
     }
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws  IOException {
         PrintWriter writer = response.getWriter();
 
-        String reservationResponse;
+        String reservationParam;
         String separator=request.getParameter("separator");;
         String[] reservation_parameter;
         String[] reservations_checkbox;
-        String loanResponse;
+        String loanParam;
         String[] loan_parameter;
         String[] loan_checkbox;
+        String type_request = request.getParameter("button");
 
-        String type_request= (String) request.getParameter("button");
-        if(type_request==null)
-        {
-            LOGGER.info("request is null");
-        }
-        LOGGER.info("type request:"+type_request);
+        response.setContentType("application/json");
         try {
             switch (type_request) {
                 case "ConfirmReservation":
-                    String sep ="";
-                    reservationResponse = request.getParameter("reservation");
-                    LOGGER.info("reservation value: "+reservationResponse);
-                    LOGGER.info("separator value: "+separator);
-                    reservations_checkbox=reservationResponse.split(separator);
-                    if (reservations_checkbox != null && reservations_checkbox.length != 0) {
-                        LOGGER.info("reservation list is not null");
-                        String newloanList = "[";
+                    reservationParam = request.getParameter("reservation");
+                    reservations_checkbox=reservationParam.split(separator);
+                    if (reservations_checkbox.length != 0 && !reservationParam.equals("")) {
+                        ArrayList<LoanDTO> loans = new ArrayList<>();
+                        LoanDTO newLoanDTO;
+                        // Confirm reservations
                         for (String reservationsCheckbox : reservations_checkbox) {
-                            LOGGER.info("reservation parameter checkbox:"+reservationsCheckbox);
                             reservation_parameter = reservationsCheckbox.split(";");
-                            LoanDTO newloanDTO = erlang_client.write_loan(reservation_parameter[0], reservation_parameter[1], reservation_parameter[2]);
-                            LOGGER.info("new LOAN:"+ newloanDTO.toString());
-                            String newloan = ow.writeValueAsString(newloanDTO);
-                            LOGGER.info("the new loan is"+newloanDTO.toString());
-                            LOGGER.info("loan:"+newloan);
-                            List<ReservationDTO> reservationDTOList =
-                                    erlang_client.archive_reservations();
-                            newloanList+= sep +newloan;
-                            sep =",";
-                            for (ReservationDTO reservationDTO : reservationDTOList) {
-                                HistoryReservationDTO history_reservationDTO = new HistoryReservationDTO();
-                                history_reservationDTO.setUser(reservationDTO.getUser());
-                                history_reservationDTO.setIsbn(reservationDTO.getIsbn());
-                                history_reservationDTO.setStartDate(new java.sql.Date(reservationDTO.getStartDate().getTime()));
-                                history_reservationDTO.setEndDate(new java.sql.Date(reservationDTO.getStopDate().getTime()));
-                                history_reservationDTO.setDeleted(false);
-                                remoteEJB.saveOrUpdateHistoryReservation(history_reservationDTO, false);
-                            }
+                            newLoanDTO = erlang_client.write_loan(
+                                    reservation_parameter[0],
+                                    reservation_parameter[1],
+                                    reservation_parameter[2]
+                            );
+                            loans.add(newLoanDTO);
                         }
-                        newloanList+="]";
-                        LOGGER.info("new loan list: "+newloanList.toString());
-                        writer.write(newloanList.toString());
+
+                        // Archive reservations
+                        List<ReservationDTO> reservationDTOList = erlang_client.archive_reservations();
+                        for (ReservationDTO reservationDTO : reservationDTOList) {
+                            HistoryReservationDTO history_reservationDTO = new HistoryReservationDTO();
+                            history_reservationDTO.setUser(reservationDTO.getUser());
+                            history_reservationDTO.setIsbn(reservationDTO.getIsbn());
+                            history_reservationDTO.setStartDate(new Timestamp(reservationDTO.getStartDate().getTime()));
+                            history_reservationDTO.setEndDate(new Timestamp(reservationDTO.getStopDate().getTime()));
+                            history_reservationDTO.setDeleted(false);
+                            remoteEJB.saveOrUpdateHistoryReservation(history_reservationDTO, false);
+                        }
+                        JsonObject jsonResponse = new JsonObject();
+                        JsonArray loansJS = new JsonArray();
+                        for(LoanDTO loan: loans){
+                            loansJS.add(new Gson().toJsonTree(loan));
+                        }
+                        jsonResponse.addProperty("result", "success");
+                        jsonResponse.addProperty("response", "Reservation(s) confirmed");
+                        jsonResponse.add("loans", loansJS);
+                        writer.write(jsonResponse.toString());
                     }
                     else{
-                        writer.write("{\"result\": \"error\", \"response\": \"no row selected\"}");
+                        writer.write("{\"result\": \"error\", \"response\": \"No reservation selected\"}");
                     }
-
                     break;
                 case "DeleteReservation":
-                    reservationResponse = (String) request.getParameter("reservation");
-                    reservations_checkbox=reservationResponse.split(separator);
-                    if (reservations_checkbox != null && reservations_checkbox.length != 0) {
-                        LOGGER.info("reservation list is not null");
+                    reservationParam = request.getParameter("reservation");
+                    reservations_checkbox=reservationParam.split(separator);
+                    if (reservations_checkbox.length != 0 && !reservationParam.equals("")) {
                         for (String reservationsCheckbox : reservations_checkbox) {
-                            LOGGER.info("reservation parameter:"+reservationsCheckbox);
                             reservation_parameter = reservationsCheckbox.split(";");
                             erlang_client.cancel_reservation(reservation_parameter[0], reservation_parameter[1]);
                             List<ReservationDTO> reservationDTOList = erlang_client.archive_reservations();
@@ -122,48 +124,41 @@ public class AdminPageServlet extends HttpServlet {
                                 HistoryReservationDTO history_reservationDTO = new HistoryReservationDTO();
                                 history_reservationDTO.setUser(reservationDTO.getUser());
                                 history_reservationDTO.setIsbn(reservationDTO.getIsbn());
-                                history_reservationDTO.setStartDate(new java.sql.Date( reservationDTO.getStartDate().getTime()));
-                                history_reservationDTO.setEndDate(new java.sql.Date(reservationDTO.getStopDate().getTime()));
+                                history_reservationDTO.setStartDate(new Timestamp( reservationDTO.getStartDate().getTime()));
+                                history_reservationDTO.setEndDate(new Timestamp(reservationDTO.getStopDate().getTime()));
                                 history_reservationDTO.setDeleted(true);
                                 remoteEJB.saveOrUpdateHistoryReservation(history_reservationDTO, false);
                             }
-
                         }
-                        writer.write("{\"result\": \"correct\", \"response\": \"Delete reservation is executed correctly\"}");
+                        writer.write("{\"result\": \"success\", \"response\": \"Reservation(s) deleted\"}");
                     }
                     else{
-                        writer.write("{\"result\": \"error\", \"response\": \"no row selected\"}");
+                        writer.write("{\"result\": \"error\", \"response\": \"No reservation selected\"}");
                     }
                     break;
                 case "EndLoan":
-                    loanResponse = (String) request.getParameter("loan");
-                    loan_checkbox = loanResponse.split(separator);
-                    if (loan_checkbox != null && loan_checkbox.length != 0) {
-                        LOGGER.info("loan list is not null");
+                    loanParam = request.getParameter("loan");
+                    loan_checkbox = loanParam.split(separator);
+                    if (loan_checkbox.length != 0 && !loanParam.equals("")) {
                         for (String loanCheckbox : loan_checkbox) {
-                            LOGGER.info("reservation parameter:"+loanCheckbox);
                             loan_parameter = loanCheckbox.split(";");
-                            String s = erlang_client.terminate_loan(loan_parameter[0], loan_parameter[1]);
+                            erlang_client.terminate_loan(loan_parameter[0], loan_parameter[1]);
                             List<LoanDTO> loanDTOList = erlang_client.archive_loans();
                             for (LoanDTO loanDTO : loanDTOList) {
                                 HistoryLoanDTO librarink_history_loanDTO = new HistoryLoanDTO();
                                 librarink_history_loanDTO.setIsbn(loanDTO.getIsbn());
-                                librarink_history_loanDTO.setStartDate(new java.sql.Date(loanDTO.getStartDate().getTime()));
+                                librarink_history_loanDTO.setStartDate(new Timestamp(loanDTO.getStartDate().getTime()));
                                 librarink_history_loanDTO.setUser(loanDTO.getUser());
                                 librarink_history_loanDTO.setCopyId(loanDTO.getCopyId());
-                                librarink_history_loanDTO.setEndDate(new java.sql.Date(loanDTO.getStopDate().getTime()));
+                                librarink_history_loanDTO.setEndDate(new Timestamp(loanDTO.getStopDate().getTime()));
                                 remoteEJB.saveOrUpdateHistoryLoan(librarink_history_loanDTO, false);
-
                             }
-
                         }
-                        writer.write("{\"result\": \"correct\", \"response\": \"EndLoan is executed correctly\"}");
+                        writer.write("{\"result\": \"success\", \"response\": \"Loan(s) terminated\"}");
                     }
                     else{
-                        writer.write("{\"result\": \"error\", \"response\": \"no row selected\"}");
+                        writer.write("{\"result\": \"error\", \"response\": \"No loan selected\"}");
                     }
-
-                    //end loan
                     break;
                 default:
                     break;

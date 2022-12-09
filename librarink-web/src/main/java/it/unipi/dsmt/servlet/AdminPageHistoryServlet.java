@@ -11,13 +11,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Date;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.List;
-
 
 @WebServlet(name = "AdminPageHistoryServlet", value = "/adminHistory", loadOnStartup = 0)
 public class AdminPageHistoryServlet extends HttpServlet {
-    //private static final Logger LOGGER = Logger.getLogger(AsyncRequestServlet.class.getName());
 
     @EJB
     private LibrarinkRemote remoteEJB;
@@ -26,12 +25,15 @@ public class AdminPageHistoryServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         try {
             List<HistoryLoanDTO> history_loans;
-            List<HistoryReservationDTO> historyReservationDTOS;
+            List<HistoryReservationDTO> history_reservations;
             history_loans = remoteEJB.listHistoryLoans(new HistoryLoanDTO());
-            request.setAttribute("loanHistoryList", history_loans);
-            historyReservationDTOS= remoteEJB.listHistoryReservations(new HistoryReservationDTO());
-            request.setAttribute("reservationHistoryList",historyReservationDTOS);
-            String TargetJSP ="/pages/jsp/admin_page_history.jsp";
+            history_reservations= remoteEJB.listHistoryReservations(new HistoryReservationDTO());
+            request.setAttribute("reservationList",history_reservations);
+            request.setAttribute("loanList", history_loans);
+            request.setAttribute("table", "history");
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            request.setAttribute("df", df );
+            String TargetJSP ="/pages/jsp/admin_page.jsp";
             RequestDispatcher requestDispatcher = request.getRequestDispatcher(TargetJSP);
             requestDispatcher.forward(request,response);
         }
@@ -41,4 +43,3 @@ public class AdminPageHistoryServlet extends HttpServlet {
         }
     }
 }
-
