@@ -48,7 +48,7 @@
                         onclick="submitRequest('loan','EndLoan','loan_table','loan_checkbox')">
                     End Loan
                 </button>
-                <button class="btn btn-outline-dark" id="add-book-copy">Add book copy</button>
+                <button class="btn btn-outline-dark" id="add-book-copy">Modify book copy</button>
                 <button class="btn btn-outline-dark" id="add-new-loan">New Loan</button>
             </c:if>
         </div>

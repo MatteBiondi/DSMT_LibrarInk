@@ -49,9 +49,7 @@ public class AdminPageServlet extends HttpServlet {
             requestDispatcher.forward(request, response);
         } catch (ErlangClientException ex) {
             LOGGER.warning(String.format("EJB exception %s", ex.getMessage()));
-            PrintWriter writer = response.getWriter();
-            response.setContentType("application/json");
-            writer.write("{\"result\": \"error\", \"response\": \"server error\"}");
+            throw new ServletException();
         }
     }
     @Override
