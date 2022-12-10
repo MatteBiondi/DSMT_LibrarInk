@@ -1,4 +1,4 @@
-const WS_SERVER = "172.18.0.28";
+const WS_SERVER = "172.18.0.30";
 const WS_PORT = 5000;
 const WS_ENDPOINT = "update";
 const WS_WARNING_MSG = "We are experiencing some troubles, the information may not be updated.\n" +

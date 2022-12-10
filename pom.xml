@@ -23,7 +23,7 @@
     <glassfishHome>C:\glassfish5\glassfish</glassfishHome>
     <glassfishPassword>admin</glassfishPassword>
     <glassfishUser>admin</glassfishUser>
-    <glassfishHost>localhost</glassfishHost>
+    <glassfishHost>172.18.0.28</glassfishHost>
   </properties>
 
   <build>
