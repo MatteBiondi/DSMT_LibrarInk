@@ -102,14 +102,12 @@ async function submitAddCopyBookPage(isbn_ID) {
             request: "write_copy",
             isbn: isbn },"json"
         );
-        document.getElementById(isbn_ID).value='';
-        if(message.hasOwnProperty("response")) {
-            if(message.response==='ok') {
-                show_message("success","New copy added");
-            }
-            else {
-                show_message("danger", "Something went wrong");
-            }
+
+        if(message.hasOwnProperty("response") && message.response==='ok') {
+            show_message("success","New copy added");
+        }
+        else{
+            show_message("danger", "Something went wrong");
         }
         popup_page.hide();
     }
@@ -127,11 +125,13 @@ async function submitDeleteCopyBookPage(isbn_ID,bookID_ID) {
                 id: bookID
             }, "json"
         );
-        if (message.hasOwnProperty('result')) {
-            show_message("primary","result: " + message.result + ", response: " + message.response);
-            document.getElementById(isbn_ID).value = '';
-            document.getElementById(bookID_ID).value = '';
+        if(message.hasOwnProperty("response") && message.response==='ok') {
+            show_message("success","Copy removed");
         }
+        else{
+            show_message("danger", "Something went wrong");
+        }
+        popup_page.hide();
     }
 }
 

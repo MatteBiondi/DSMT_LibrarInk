@@ -19,7 +19,7 @@
             <div class="info_container card-body h-50">
                 <h3>Title: </h3><p><%= request.getParameter("title")%></p>
                 <h3>Author: </h3><p><%= request.getParameter("author")%></p>
-                <h3>Rate: </h3></div>
+            </div>
         </div>
     </div>
 <% } else { %>
@@ -71,9 +71,11 @@
                 <!-- Rating section -->
                 <h3>Users rate the book:
                     <span id="avg_rate">
+                        <jsp:useBean id="df" scope="request" type="java.text.DecimalFormat"/>
+                        <jsp:useBean id="rating" scope="request" type="java.lang.Double"/>
                         <c:choose>
                             <c:when test="${rating != null}">
-                                <span id="user-rating">${rating}</span>/<%= MAX_RATE %>
+                                <span id="user-rating">${df.format(rating)}</span>/<%= MAX_RATE %>
                             </c:when>
                             <c:otherwise><span id="user-rating">-</span>/<%= MAX_RATE %></c:otherwise>
                         </c:choose>
@@ -83,11 +85,11 @@
                     <span id="copies_counter"><%= request.getParameter("available_copies")%></span>
                 </h3>
                 <div class="stars_div">
-                    <a data-grade="5" href="#" class="star s5">&#x2605;</a>
-                    <a data-grade="4" href="#" class="star s4">&#x2605;</a>
-                    <a data-grade="3" href="#" class="star s3">&#x2605;</a>
-                    <a data-grade="2" href="#" class="star s2">&#x2605;</a>
-                    <a data-grade="1" href="#" class="star s1">&#x2605;</a>
+                    <span data-grade="5" class="star s5">&#x2605;</span>
+                    <span data-grade="4" class="star s4">&#x2605;</span>
+                    <span data-grade="3" class="star s3">&#x2605;</span>
+                    <span data-grade="2" class="star s2">&#x2605;</span>
+                    <span data-grade="1" class="star s1">&#x2605;</span>
                 </div>
             </div>
 

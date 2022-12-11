@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.logging.Logger;
 
 /**
@@ -40,6 +41,7 @@ public class BookDetailServlet extends HttpServlet {
             request.setAttribute("book", book);
             request.setAttribute("rating", rating);
             request.setAttribute("available_copies", available_copies);
+            request.setAttribute("df", new DecimalFormat("0.0"));
             getServletContext().getRequestDispatcher("/pages/jsp/book_detail.jsp").forward(request, response);
         }
         catch (ErlangClientException | RemoteDBException ex){

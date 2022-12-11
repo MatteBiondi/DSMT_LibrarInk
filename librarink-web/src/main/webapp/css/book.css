@@ -120,13 +120,14 @@
 
 .star:hover {
     color: gold;
+    cursor: pointer;
 }
 
-.s1:hover ~ a,
-.s2:hover ~ a,
-.s3:hover ~ a,
-.s4:hover ~ a,
-.s5:hover ~ a {
+.s1:hover ~ span,
+.s2:hover ~ span,
+.s3:hover ~ span,
+.s4:hover ~ span,
+.s5:hover ~ span {
     color: gold;
 }
 
