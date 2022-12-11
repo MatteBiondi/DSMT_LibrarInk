@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  */
 
 @WebFilter(
-        filterName = "UnauthorizedAccessFilter.java",
+        filterName = "UnauthorizedAccessFilter",
         urlPatterns = {"/*"},
         description = "Check if the logged user is trying to access " +
                 "pages for which they do not have authorisation. " +

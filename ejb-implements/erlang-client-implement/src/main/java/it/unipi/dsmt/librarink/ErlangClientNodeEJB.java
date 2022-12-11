@@ -32,7 +32,7 @@ public class ErlangClientNodeEJB implements ErlangClientNode {
             properties.load(input);
             clientName = properties.getProperty("name", "client");
             cookie =  properties.getProperty("cookie", "no-cookie");
-            node = getConnection();
+            node = getNode();
         }
         catch (IOException ex){
             node = null;
@@ -47,7 +47,7 @@ public class ErlangClientNodeEJB implements ErlangClientNode {
             }
         }
     }
-    private OtpNode getConnection() throws IOException{
+    private OtpNode getNode() throws IOException{
         // Check if node is already present
         if(node == null)
             return new OtpNode(clientName + "-" + this.hashCode(), cookie);
@@ -59,7 +59,7 @@ public class ErlangClientNodeEJB implements ErlangClientNode {
     public OtpMbox getMbox() throws ErlangClientException {
         // Create new message box to exchange message with other Erlang nodes
         try{
-           return getConnection().createMbox();
+           return getNode().createMbox();
         }
         catch (NullPointerException | IOException ex){
             node = null;
@@ -71,7 +71,7 @@ public class ErlangClientNodeEJB implements ErlangClientNode {
     public OtpErlangRef makeRef() throws ErlangClientException {
         // Create uniq reference to distinguish requests
         try{
-            return getConnection().createRef();
+            return getNode().createRef();
         }
         catch (NullPointerException | IOException ex){
             node = null;
