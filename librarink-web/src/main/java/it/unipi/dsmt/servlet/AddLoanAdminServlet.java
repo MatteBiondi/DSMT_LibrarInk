@@ -49,7 +49,7 @@ public class AddLoanAdminServlet extends HttpServlet{
                     history_reservationDTO.setIsbn(reservationDTO.getIsbn());
                     history_reservationDTO.setStartDate(new Timestamp(reservationDTO.getStartDate().getTime()));
                     history_reservationDTO.setEndDate(new Timestamp(reservationDTO.getStopDate().getTime()));
-                    history_reservationDTO.setDeleted(false);
+                    history_reservationDTO.setDeleted(reservationDTO.getCancelled());
                     remoteEJB.saveOrUpdateHistoryReservation(history_reservationDTO, false);
                 }
                 JsonObject jsonResponse = new JsonObject();
