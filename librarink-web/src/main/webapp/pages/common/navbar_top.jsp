@@ -1,7 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <!-- Code in charge of show the navbar section including homepage link, searchbar and
-user utilitis (notification, user page, logout) -->
+user utilities (notification, user page, logout) -->
 
 <script src="${pageContext.request.contextPath}/scripts/navbar.js"></script>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/navbar_top.css" type="text/css" media="screen">

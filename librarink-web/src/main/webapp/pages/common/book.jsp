@@ -27,7 +27,7 @@
     <!--
     Image + Vote your self
     Title + Author + Category + Publisher + Published Date + Language + Description + Rate +
-    Reserve button + Whishlist button
+    Reserve button + Wishlist button
     -->
 
     <html>
