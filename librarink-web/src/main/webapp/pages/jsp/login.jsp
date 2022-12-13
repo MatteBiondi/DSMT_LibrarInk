@@ -50,7 +50,7 @@
                     String messageType =(String) request.getSession().getAttribute("messageType");;
                     if(message != null) {
                         request.getSession().removeAttribute("message");
-                        request.getSession().removeAttribute("message");
+                        request.getSession().removeAttribute("messageType");
                     }
                     else {
                         message = (String) request.getAttribute("message");
