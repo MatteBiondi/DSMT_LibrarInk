@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 /**
  * This class implements a Servlet Filter to check in advance if user is logged
  * in and if it is needed to be like so to access the requested URI.
- * In that case user will be redirected to login page is user is not logged in.
+ * In that case user will be redirected to login page if user is not logged in.
  */
 @WebFilter(
         filterName = "AuthenticationFilter",
